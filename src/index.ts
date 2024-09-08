@@ -4,10 +4,10 @@ import express, { Express, Request, Response } from "express";
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-// app.get("/", (_: Request, res: Response) => {
-//   res.send(`<h1>Hello world</h1>`);
-// });
-app.get("/data", (req, res) => {
+app.get("/", (_: Request, res: Response) => {
+  res.send(`<h1>Hello world</h1>`);
+});
+app.get("/data", (req: Request, res: Response) => {
   res.json({ message: "Hello, world!" });
 
   //   res.send("Hello, world!");
