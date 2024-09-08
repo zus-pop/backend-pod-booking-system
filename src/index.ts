@@ -8,9 +8,9 @@ const port = process.env.PORT || 3000;
 //   res.send(`<h1>Hello world</h1>`);
 // });
 app.get("/data", (req, res) => {
-  //   res.json({ message: "Hello, world!" });
+  res.json({ message: "Hello, world!" });
 
-  res.send("Hello, world!");
+  //   res.send("Hello, world!");
 });
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
