@@ -1,17 +1,8 @@
 import moment from "moment";
+import { SlotOption } from "../types/type.ts";
+import { pool } from "../database/db.ts";
 
-interface SlotOption {
-    startDate: string;
-    endDate: string;
-    startHour: number;
-    endHour: number;
-    durationMinutes: number;
-    podId: number;
-    unitPrice: number;
-    gap?: number;
-}
-
-export const generateSlots = (options: SlotOption) => {
+export const generateSlots = async (options: SlotOption) => {
     const formatType = "YYYY-MM-DD HH:mm:ss";
     const startDatetime = moment(options.startDate).set({
         hour: options.startHour,
@@ -27,12 +18,18 @@ export const generateSlots = (options: SlotOption) => {
 
     while (startDatetime.isBefore(endDatetime)) {
         const slot = {
-            start: startDatetime.format(formatType),
-            end: startDatetime
+            pod_id: options.podId,
+            start_time: startDatetime.format(formatType),
+            end_time: startDatetime
                 .add(options.durationMinutes, "minutes")
                 .format(formatType),
+            unit_price: options.unitPrice,
+            is_available: true,
         };
-        console.log(`From: ${slot.start} To: ${slot.end}`);
+        console.log(`From: ${slot.start_time} To: ${slot.end_time}`);
+        const sql = "INSERT INTO ?? SET ?";
+        const values = ["slot", slot];
+        console.log(pool.format(sql, values));
 
         if (options.gap) {
             startDatetime.add(options.gap, "minutes");
@@ -49,12 +46,12 @@ export const generateSlots = (options: SlotOption) => {
     }
 };
 
-generateSlots({
+await generateSlots({
     startDate: "2022-01-01",
     endDate: "2022-01-01",
     startHour: 7,
     endHour: 12,
     durationMinutes: 60,
     podId: 30,
-    unitPrice: 30.0,
+    unitPrice: 329000,
 });
