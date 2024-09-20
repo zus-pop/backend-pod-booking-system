@@ -1,0 +1,38 @@
+import { Request, Response } from "express";
+import UserService from "../services/UserService.ts";
+
+const findAll = async (_: Request, res: Response) => {
+    const users = await UserService.findAll();
+    if (!users) {
+        return res.status(404).json({ message: "No users found" });
+    }
+    return res.status(200).json(users);
+};
+
+const login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const user = await UserService.findByEmail(email);
+    if (!user) {
+        return res.status(404).json({ message: "User not found!" });
+    }
+    const isValidPassword = await UserService.comparePassword(
+        password,
+        user.password
+    );
+    if (!isValidPassword) {
+        return res.status(403).json({ message: "Password is not correct!" });
+    }
+    console.log(user);
+    const payload = {
+        user_id: user.user_id,
+        user_name: user.user_name,
+        role_id: user.role_id,
+    };
+    const token = UserService.generateToken(payload);
+    return res.status(200).json({ token, message: "Login successfully!" });
+};
+
+export default {
+    findAll,
+    login,
+};
