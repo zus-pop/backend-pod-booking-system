@@ -1,4 +1,3 @@
-import "dotenv/config";
 import moment from "moment";
 import { SlotOption } from "../types/type.ts";
 import { pool } from "../database/db.ts";
