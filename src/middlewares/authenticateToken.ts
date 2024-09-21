@@ -13,10 +13,12 @@ export const authenticateToken = async (
             .status(401)
             .json({ message: "Access denied. No token provided." });
     }
-    const payload = UserService.verifyToken(token);
-    if (!payload) {
-        return res.status(403).json({ message: "Invalid token!" });
+
+    try {
+        const payload = UserService.verifyToken(token);
+        req.payload = payload;
+        next();
+    } catch (err: any) {
+        return res.status(403).json({ name: err.name, message: err.message });
     }
-    req.payload = payload;
-    next();
 };

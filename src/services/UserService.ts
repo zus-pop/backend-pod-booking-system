@@ -1,89 +1,29 @@
-import { ResultSetHeader } from "mysql2";
-import { pool } from "../config/pool.ts";
-import { User } from "../types/type.ts";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import UserRepo from "../databases/UserRepository.ts";
 
-const connection = await pool.getConnection();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
 
-const findAll = async () => {
-    try {
-        const sql = "SELECT ?? FROM ??";
-        const columns = [
-            "user_id",
-            "email",
-            "password",
-            "user_name",
-            "role_id",
-        ];
-        const values = [columns, "User"];
-        const [users] = await connection.query(sql, values);
-        return users;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+const findAll = () => {
+    return UserRepo.findAll();
 };
-const findById = async (id: null) => {
-    try {
-        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-        const columns = [
-            "user_id",
-            "email",
-            "password",
-            "user_name",
-            "role_id",
-        ];
-        const values = [columns, "User", "user_id", id];
-        const [user] = await connection.query<User[]>(sql, values);
-        return user[0];
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+const findById = (id: number) => {
+    return UserRepo.findById(id);
 };
 
-const findByEmail = async (email: string) => {
-    try {
-        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-        const columns = [
-            "user_id",
-            "email",
-            "password",
-            "user_name",
-            "role_id",
-        ];
-        const values = [columns, "User", "email", email];
-        const [user] = await connection.query<User[]>(sql, values);
-        return user[0];
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+const findByEmail = (email: string) => {
+    return UserRepo.findByEmail(email);
 };
 
-const persist = async (user: {
+const persist = (user: {
     email: string;
     password: string;
     user_name: string;
     role_id: number;
     phone_number?: string;
 }) => {
-    try {
-        await connection.beginTransaction();
-        const sql = "INSERT INTO ?? SET ?";
-        const values = ["User", user];
-        console.log(connection.format(sql, values));
-        const [result] = await connection.query<ResultSetHeader>(sql, values);
-        await connection.commit();
-        return result;
-    } catch (err) {
-        await connection.rollback();
-        console.error(err);
-        return null;
-    }
+    return UserRepo.persist(user);
 };
 
 const comparePassword = async (password: string, hashedPassword: string) => {
@@ -108,8 +48,7 @@ const verifyToken = (token: string) => {
         const decoded = jwt.verify(token, JWT_SECRET_KEY);
         return decoded;
     } catch (err) {
-        console.error(err);
-        return null;
+        throw err;
     }
 };
 
