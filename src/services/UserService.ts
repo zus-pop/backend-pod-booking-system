@@ -1,5 +1,5 @@
 import { ResultSetHeader } from "mysql2";
-import { pool } from "../database/db.ts";
+import { pool } from "../config/pool.ts";
 import { User } from "../types/type.ts";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

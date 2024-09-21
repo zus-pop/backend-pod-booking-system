@@ -1,6 +1,6 @@
 import moment from "moment";
 import { SlotOption } from "../types/type.ts";
-import { pool } from "../database/db.ts";
+import { pool } from "../config/pool.ts";
 import { ResultSetHeader } from "mysql2";
 
 const connection = await pool.getConnection();

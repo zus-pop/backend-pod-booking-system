@@ -54,8 +54,14 @@ const register = async (req: Request, res: Response) => {
 };
 
 const getUser = async (req: Request, res: Response) => {
-    const { user } = req;
-    res.json(user);
+    const { payload } = req;
+    const user = await UserService.findById(payload.user_id);
+    res.json({
+        user_id: user?.user_id,
+        email: user?.email,
+        user_name: user?.user_name,
+        role_id: user?.role_id,
+    });
 };
 
 export default {

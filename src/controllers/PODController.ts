@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import PODService from "../services/PODService.ts";
 
-const findAll = async (req: Request, res: Response) => {
-    const pod = await PODService.findAll();
+const findAll = async (_: Request, res: Response) => {
+    const pod = await PODService.findAllPOD();
     if (!pod) {
         return res.status(404).json({ message: "No POD found" });
     }
@@ -11,7 +11,7 @@ const findAll = async (req: Request, res: Response) => {
 
 const findById = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const pod = await PODService.findById(+id);
+    const pod = await PODService.findPODById(+id);
     if (!pod) {
         return res.status(404).json({ message: "No POD found" });
     }

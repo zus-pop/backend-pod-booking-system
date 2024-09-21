@@ -13,10 +13,10 @@ export const authenticateToken = async (
             .status(401)
             .json({ message: "Access denied. No token provided." });
     }
-    const user = UserService.verifyToken(token);
-    if (!user) {
+    const payload = UserService.verifyToken(token);
+    if (!payload) {
         return res.status(403).json({ message: "Invalid token!" });
     }
-    req.user = user;
+    req.payload = payload;
     next();
 };
