@@ -1,5 +1,4 @@
 import { RowDataPacket } from "mysql2";
-import bcrypt from "bcryptjs";
 export interface SlotOption {
     startDate: string;
     endDate: string;
@@ -19,7 +18,6 @@ export interface POD extends RowDataPacket {
     is_available: boolean;
     store_id?: number;
 }
-
 export interface User extends RowDataPacket {
     user_id?: number;
     email: string;

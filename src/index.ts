@@ -5,6 +5,12 @@ import cors from "cors";
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
+declare module "express-serve-static-core" {
+    interface Request {
+        [key: string]: any;
+    }
+}
+
 app.use(express.json());
 app.use(
     cors({

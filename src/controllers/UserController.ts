@@ -25,8 +25,6 @@ const login = async (req: Request, res: Response) => {
     }
     const payload = {
         user_id: user.user_id,
-        user_name: user.user_name,
-        role_id: user.role_id,
     };
     const token = UserService.generateToken(payload);
     return res.status(200).json({ token, message: "Login successfully!" });
@@ -55,8 +53,14 @@ const register = async (req: Request, res: Response) => {
     });
 };
 
+const getUser = async (req: Request, res: Response) => {
+    const { user } = req;
+    res.json(user);
+};
+
 export default {
     findAll,
     login,
     register,
+    getUser,
 };
