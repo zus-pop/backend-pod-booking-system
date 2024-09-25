@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/pool.ts";
 import { User } from "../types/type.ts";
 
