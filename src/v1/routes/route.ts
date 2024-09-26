@@ -1,6 +1,9 @@
 import { Express } from "express";
 import { PODRouter } from "./PODRoute.ts";
 import { UserRouter } from "./UserRoute.ts";
+import { SlotRouter } from "./SlotRoute.ts";
+import { ProductRouter } from "./ProductRoute.ts";
+import { CategoryRouter } from "./CategoryRoute.ts";
 
 export const router = (app: Express) => {
   app.use("/api/v1/auth", UserRouter);
