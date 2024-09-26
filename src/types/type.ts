@@ -68,6 +68,22 @@ export interface PODType extends RowDataPacket {
     capacity: number;
 }
 
+export interface Booking extends RowDataPacket {
+    booking_id?: number;
+    pod_id?: number;
+    slot_id?: number;
+    user_id?: number;
+    booking_date?: Date;
+    booking_status?: keyof typeof BookingStatus;
+}
+
+export enum BookingStatus {
+    Pending = "Pending",
+    Confirmed = "Confirmed",
+    Cancelled = "Cancelled",
+    Completed = "Completed",
+}
+
 export enum Role {
     Admin = 1,
     Customer = 2,
