@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import UserRepo from "../databases/UserRepository.ts";
+import UserRepo from "../repositories/UserRepository.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;

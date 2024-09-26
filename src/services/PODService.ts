@@ -1,4 +1,4 @@
-import PODRepo from "../databases/PODRepository.ts";
+import PODRepo from "../repositories/PODRepository.ts";
 
 const findAllPOD = () => {
     return PODRepo.findAll();

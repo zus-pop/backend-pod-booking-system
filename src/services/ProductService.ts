@@ -1,14 +1,14 @@
-import ProductRepository from "../databases/ProductRepository.ts";
+import ProductRepository from "../repositories/ProductRepository.ts";
 
 const findAllProduct = () => {
-  return ProductRepository.findAll();
+    return ProductRepository.findAll();
 };
 
 const findProductById = (id: number) => {
-  return ProductRepository.findById(id);
+    return ProductRepository.findById(id);
 };
 
 export default {
-  findAllProduct,
-  findProductById,
+    findAllProduct,
+    findProductById,
 };
