@@ -6,6 +6,7 @@ import { ProductRouter } from "./ProductRoute.ts";
 import { CategoryRouter } from "./CategoryRoute.ts";
 import { StoreRouter } from "./StoreRoute.ts";
 import { PODTypeRouter } from "./PODTypeRoute.ts";
+import { BookingRouter } from "./BookingRoute.ts";
 
 export const router = (app: Express) => {
     app.use("/api/v1/auth", UserRouter);
@@ -15,4 +16,5 @@ export const router = (app: Express) => {
     app.use("/api/v1/categories", CategoryRouter);
     app.use("/api/v1/stores", StoreRouter);
     app.use("/api/v1/pod-types", PODTypeRouter);
+    app.use("/api/v1/bookings", BookingRouter);
 };
