@@ -46,21 +46,26 @@ const findById = async (id: number) => {
 
 const create = async (booking: Booking) => {
     try {
+        await connection.beginTransaction();
         const sql = "INSERT INTO ?? SET ?";
         const values = ["Booking", booking];
         const [result] = await connection.query<ResultSetHeader>(sql, values);
+        await connection.commit();
         return result;
     } catch (err) {
         console.error(err);
+        await connection.rollback();
         return null;
     }
 };
 
 const update = async (booking: Booking) => {
     try {
+        await connection.beginTransaction();
         const sql = "UPDATE ?? SET ? WHERE ?? = ?";
         const values = ["Booking", booking, "booking_id", booking.booking_id];
         const [result] = await connection.query<ResultSetHeader>(sql, values);
+        await connection.commit();
         return result;
     } catch (err) {
         console.error(err);

@@ -22,13 +22,13 @@ const findById = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
     const {
         booking,
-        products,
-    }: { booking: Booking; products: BookingProduct[] } = req.body;
+        bookingProducts,
+    }: { booking: Booking; bookingProducts: BookingProduct[] } = req.body;
     const { payload } = req;
 
     const result = await BookingService.createABooking(
         booking,
-        products,
+        bookingProducts,
         payload.user_id
     );
     if (!result) {
