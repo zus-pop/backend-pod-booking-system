@@ -1,4 +1,4 @@
-import SlotRepo from "../databases/SlotRepository.ts";
+import SlotRepo from "../repositories/SlotRepository.ts";
 
 const findAllSlot = () => {
     return SlotRepo.findAll();
