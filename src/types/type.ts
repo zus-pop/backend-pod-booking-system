@@ -41,6 +41,11 @@ export interface Product extends RowDataPacket {
   stock: number;
 }
 
+export interface Category extends RowDataPacket {
+  category_id: number;
+  category_name: string;
+}
+
 export enum Role {
   Admin = 1,
   Customer = 2,
