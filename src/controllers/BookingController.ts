@@ -1,5 +1,6 @@
 import BookingService from "../services/BookingService.ts";
 import { Request, Response } from "express";
+import { Booking, BookingProduct, Product } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const bookings = await BookingService.findAllBooking();
@@ -18,7 +19,38 @@ const findById = async (req: Request, res: Response) => {
     return res.status(200).json(booking);
 };
 
+const create = async (req: Request, res: Response) => {
+    const {
+        booking,
+        products,
+    }: { booking: Booking; products: BookingProduct[] } = req.body;
+    const { payload } = req;
+
+    const result = await BookingService.createABooking(
+        booking,
+        products,
+        payload.user_id
+    );
+    if (!result) {
+        return res.status(400).json({ message: "Failed to create booking" });
+    }
+    return res
+        .status(200)
+        .json({ result, message: "Create a booking successfully" });
+};
+
+const update = async (req: Request, res: Response) => {
+    const booking: Booking = req.body;
+    const result = await BookingService.updateABooking(booking);
+    if (!result) {
+        return res.status(404).json({ message: "Booking not found" });
+    }
+    return res.status(200).json({ result, message: "Update successfully" });
+};
+
 export default {
     findAll,
     findById,
+    create,
+    update,
 };

@@ -49,7 +49,7 @@ const create = async (booking: Booking) => {
         const sql = "INSERT INTO ?? SET ?";
         const values = ["Booking", booking];
         const [result] = await connection.query<ResultSetHeader>(sql, values);
-        return result.insertId;
+        return result;
     } catch (err) {
         console.error(err);
         return null;
@@ -61,7 +61,7 @@ const update = async (booking: Booking) => {
         const sql = "UPDATE ?? SET ? WHERE ?? = ?";
         const values = ["Booking", booking, "booking_id", booking.booking_id];
         const [result] = await connection.query<ResultSetHeader>(sql, values);
-        return result.affectedRows;
+        return result;
     } catch (err) {
         console.error(err);
         return null;

@@ -1,5 +1,8 @@
+import moment from "moment";
 import BookingRepo from "../repositories/BookingRepository.ts";
-import { Booking } from "../types/type.ts";
+import { Booking, BookingProduct } from "../types/type.ts";
+
+const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
 const findAllBooking = () => {
     return BookingRepo.findAll();
@@ -9,14 +12,24 @@ const findBookingById = (id: number) => {
     return BookingRepo.findById(id);
 };
 
-const createABooking = (booking: Booking) => {
+const createABooking = (
+    booking: Booking,
+    products: BookingProduct[],
+    user_id: number
+) => {
     // TODO: create new booking and tracking booking status background task
-    // return BookingRepo.create(booking);
+    booking = {
+        ...booking,
+        user_id,
+        booking_date: moment().format(FORMAT_TYPE),
+        booking_status: "Pending",
+    };
+    console.log(booking);
+    return BookingRepo.create(booking);
 };
 
 const updateABooking = (booking: Booking) => {
-    // TODO: update booking and tracking booking status background task
-    // return  BookingRepo.update(booking);
+    return BookingRepo.update(booking);
 };
 
 export default {

@@ -26,19 +26,26 @@ export interface User extends RowDataPacket {
     avatar?: string;
     role_id: number;
     phone_number?: string;
-    created_at?: Date;
-    updated_at?: Date;
+    created_at?: Date | string;
+    updated_at?: Date | string;
 }
 
 export interface Product extends RowDataPacket {
-    product_id: number;
-    product_name: string;
-    catedory_id: number;
-    image: string;
-    description: string;
-    price: number;
-    store_id: number;
-    stock: number;
+    product_id?: number;
+    product_name?: string;
+    catedory_id?: number;
+    image?: string;
+    description?: string;
+    price?: number;
+    store_id?: number;
+    stock?: number;
+}
+
+export interface BookingProduct extends RowDataPacket {
+    booking_id?: number;
+    product_id?: number;
+    unit_price?: number;
+    quantity?: number;
 }
 
 export interface Category extends RowDataPacket {
@@ -73,7 +80,7 @@ export interface Booking extends RowDataPacket {
     pod_id?: number;
     slot_id?: number;
     user_id?: number;
-    booking_date?: Date;
+    booking_date?: Date | string;
     booking_status?: keyof typeof BookingStatus;
 }
 
