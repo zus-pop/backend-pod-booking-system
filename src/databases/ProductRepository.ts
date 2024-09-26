@@ -15,6 +15,20 @@ const findAll = async () => {
   }
 };
 
+const findById = async (id: number) => {
+  try {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const colum = ["product_id", "product_name", "price", "stock"];
+    const values = [colum, "Product", "product_id", id];
+    const [product] = await connection.query<Product[]>(sql, values);
+    return product[0];
+  } catch (err) {
+    console.error("error:", err);
+    return null;
+  }
+};
+
 export default {
   findAll,
+  findById,
 };
