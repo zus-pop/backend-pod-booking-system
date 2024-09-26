@@ -1,11 +1,17 @@
 import moment from "moment";
 import { SlotOption } from "../types/type.ts";
 import { pool } from "../config/pool.ts";
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader } from "mysql2/promise";
+import { PoolConnection } from "mysql2/promise";
+import cron from "node-cron";
 
-const connection = await pool.getConnection();
-export const generateSlots = async (options: SlotOption) => {
-    const formatType = "YYYY-MM-DD HH:mm:ss";
+// const conn = await pool.getConnection();
+const formatType = "YYYY-MM-DD HH:mm:ss";
+
+export const generateSlots = async (
+    connection: PoolConnection,
+    options: SlotOption
+) => {
     const startDatetime = moment(options.startDate).set({
         hour: options.startHour,
         minute: 0,
@@ -53,12 +59,27 @@ export const generateSlots = async (options: SlotOption) => {
     }
 };
 
-await generateSlots({
-    startDate: "2024-09-22",
-    endDate: "2024-09-22",
-    startHour: 7,
-    endHour: 22,
-    durationMinutes: 60,
-    podId: 1,
-    unitPrice: 85000,
-});
+// await generateSlots(conn, {
+//     startDate: "2024-09-22",
+//     endDate: "2024-09-22",
+//     startHour: 7,
+//     endHour: 22,
+//     durationMinutes: 60,
+//     podId: 1,
+//     unitPrice: 85000,
+// });
+
+console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
+
+export const bookingTracker = (
+    booking_id: number,
+    connection: PoolConnection
+) => {
+    cron.schedule("* * * * * *", async () => {
+        const threshHold = 5;
+        const current = moment().format(formatType);
+
+        const sql = 'SELECT ?? FROM ?? WHERE ?? = ?';
+        const columns = [""]
+    });
+};

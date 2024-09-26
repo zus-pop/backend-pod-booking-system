@@ -46,6 +46,23 @@ export interface Category extends RowDataPacket {
   category_name: string;
 }
 
+export interface Store extends RowDataPacket {
+    store_id: number;
+    store_name: string;
+    address: string;
+    hotline: string;
+}
+
+export interface Slot extends RowDataPacket {
+    slot_id: number;
+    pod_id: number;
+    start_time: Date;
+    end_time: Date;
+    unit_price: number;
+    is_available: boolean
+
+}
+
 export enum Role {
   Admin = 1,
   Customer = 2,
