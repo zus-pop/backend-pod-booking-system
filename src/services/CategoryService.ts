@@ -1,14 +1,14 @@
-import CategoryRepo from "../databases/CategoryRepository.ts";
+import CategoryReposỉtory from "../databases/CategoryRepository.ts";
 
-const findAllCategory = () => {
-  return CategoryRepo.findAll();
+const findAll = () => {
+  return CategoryReposỉtory.findAll();
 };
 
 const findCategoryById = (id: number) => {
-  return CategoryRepo.findById(id);
+  return CategoryReposỉtory.findById(id);
 };
 
 export default {
-  findAllCategory,
+  findAll,
   findCategoryById,
 };
