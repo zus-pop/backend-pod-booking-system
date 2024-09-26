@@ -47,5 +47,5 @@ const findById = async (id: number) => {
 
 export default {
     findAll,
-    findById
+    findById,
 };

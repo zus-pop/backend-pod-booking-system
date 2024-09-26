@@ -1,49 +1,49 @@
 import { RowDataPacket } from "mysql2";
 export interface SlotOption {
-  startDate: string;
-  endDate: string;
-  startHour: number;
-  endHour: number;
-  durationMinutes: number;
-  podId: number;
-  unitPrice: number;
-  gap?: number;
+    startDate: string;
+    endDate: string;
+    startHour: number;
+    endHour: number;
+    durationMinutes: number;
+    podId: number;
+    unitPrice: number;
+    gap?: number;
 }
 export interface POD extends RowDataPacket {
-  pod_id: number;
-  pod_name: string;
-  type_id: number;
-  description?: string;
-  image?: string;
-  is_available: boolean;
-  store_id?: number;
+    pod_id: number;
+    pod_name: string;
+    type_id: number;
+    description?: string;
+    image?: string;
+    is_available: boolean;
+    store_id?: number;
 }
 export interface User extends RowDataPacket {
-  user_id?: number;
-  email: string;
-  password: string;
-  user_name: string;
-  avatar?: string;
-  role_id: number;
-  phone_number?: string;
-  created_at?: Date;
-  updated_at?: Date;
+    user_id?: number;
+    email: string;
+    password: string;
+    user_name: string;
+    avatar?: string;
+    role_id: number;
+    phone_number?: string;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
 export interface Product extends RowDataPacket {
-  product_id: number;
-  product_name: string;
-  catedory_id: number;
-  image: string;
-  description: string;
-  price: number;
-  store_id: number;
-  stock: number;
+    product_id: number;
+    product_name: string;
+    catedory_id: number;
+    image: string;
+    description: string;
+    price: number;
+    store_id: number;
+    stock: number;
 }
 
 export interface Category extends RowDataPacket {
-  category_id: number;
-  category_name: string;
+    category_id: number;
+    category_name: string;
 }
 
 export interface Store extends RowDataPacket {
@@ -59,13 +59,18 @@ export interface Slot extends RowDataPacket {
     start_time: Date;
     end_time: Date;
     unit_price: number;
-    is_available: boolean
+    is_available: boolean;
+}
 
+export interface PODType extends RowDataPacket {
+    type_id: number;
+    type_name: string;
+    capacity: number;
 }
 
 export enum Role {
-  Admin = 1,
-  Customer = 2,
-  Manager = 3,
-  Staff = 4,
+    Admin = 1,
+    Customer = 2,
+    Manager = 3,
+    Staff = 4,
 }

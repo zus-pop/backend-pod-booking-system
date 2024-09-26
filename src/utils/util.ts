@@ -1,6 +1,5 @@
 import moment from "moment";
 import { SlotOption } from "../types/type.ts";
-import { pool } from "../config/pool.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
