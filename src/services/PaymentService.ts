@@ -1,7 +1,11 @@
 import moment from "moment";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import BookingService from "./BookingService.ts";
-import { BookingProduct, Payment } from "../types/type.ts";
+import {
+    BookingProduct,
+    OnlinePaymentResponse,
+    Payment,
+} from "../types/type.ts";
 import crypto from "crypto";
 import qs from "qs";
 
@@ -77,7 +81,10 @@ const createOnlinePaymentRequest = async (
             method: "POST",
         });
         const result = await response.json();
-        return result;
+        return {
+            ...result,
+            app_trans_id: order.app_trans_id,
+        } as OnlinePaymentResponse;
     } catch (err) {
         throw err;
     }

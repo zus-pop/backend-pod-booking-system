@@ -41,14 +41,14 @@ const createABooking = async (
     bookingProducts: BookingProduct[],
     user_id: number
 ) => {
-    booking = {
-        ...booking,
-        user_id,
-        booking_date: moment().format(FORMAT_TYPE),
-        booking_status: "Pending",
-    };
     try {
         await BookingRepo.beginTransaction();
+        booking = {
+            ...booking,
+            user_id,
+            booking_date: moment().format(FORMAT_TYPE),
+            booking_status: "Pending",
+        };
         const bookingResult = await BookingRepo.create(booking);
         bookingProducts = bookingProducts.map((bookingProduct) => ({
             ...bookingProduct,
@@ -68,17 +68,19 @@ const createABooking = async (
         }
         const slot = await SlotService.findSlotById(booking.slot_id!);
         const total_cost = await getTotalCost(bookingProducts, slot!);
-
-        const paymentResult = await PaymentService.createPayment({
-            booking_id: bookingResult.insertId,
-            transaction_id: "",
-            total_cost,
-            payment_date: moment().format(FORMAT_TYPE),
-            payment_status: "Unpaid",
-        });
-        // Update soon
-
-        await BookingRepo.commit();
+        const { return_code, order_url, sub_return_message, app_trans_id } =
+            await PaymentService.createOnlinePaymentRequest(bookingProducts);
+        if (return_code === 1) {
+            const paymentResult = await PaymentService.createPayment({
+                booking_id: bookingResult.insertId,
+                transaction_id: app_trans_id,
+                total_cost,
+                payment_date: moment().format(FORMAT_TYPE),
+                payment_status: "Unpaid",
+            });
+            // Update soon
+            await BookingRepo.commit();
+        } else throw new Error(sub_return_message);
     } catch (err) {
         console.log(err);
         await BookingRepo.rollback();
