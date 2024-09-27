@@ -1,10 +1,28 @@
 import moment from "moment";
+import "dotenv/config";
+import { pool } from "../config/pool.ts";
 import { SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
 
 // const conn = await pool.getConnection();
+const product = [
+    {
+        product_name: "foo",
+    },
+    {
+        product_name: "bar",
+    },
+    {
+        product_name: "zar",
+    },
+    {
+        product_name: "haa",
+    },
+];
+const sql = "INSERT INTO Product "
+console.log()
 const formatType = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (
@@ -68,8 +86,6 @@ export const generateSlots = async (
 //     unitPrice: 85000,
 // });
 
-console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
-
 export const bookingTracker = (
     booking_id: number,
     connection: PoolConnection
@@ -78,7 +94,7 @@ export const bookingTracker = (
         const threshHold = 5;
         const current = moment().format(formatType);
 
-        const sql = 'SELECT ?? FROM ?? WHERE ?? = ?';
-        const columns = [""]
+        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+        const columns = [""];
     });
 };

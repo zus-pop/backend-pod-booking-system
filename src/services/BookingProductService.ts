@@ -1,12 +1,25 @@
 import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 import { BookingProduct } from "../types/type.ts";
 
-const findAllBookingProducts = () => {
-    return BookingProductRepository.findAll();
+const findAllBookingProducts = async () => {
+    try {
+        const bookingProducts = await BookingProductRepository.findAll();
+        return bookingProducts;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
 const findByBookingId = (booking_id: number) => {
-    return BookingProductRepository.findByBookingId(booking_id);
+    try {
+        const bookingProducts =
+            BookingProductRepository.findByBookingId(booking_id);
+        return bookingProducts;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
 const createBookingProductList = async (

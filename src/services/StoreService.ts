@@ -1,11 +1,23 @@
 import StoreRepo from "../repositories/StoreRepository.ts";
 
-const findAllStore = () => {
-    return StoreRepo.findAll();
+const findAllStore = async () => {
+    try {
+        const stores = await StoreRepo.findAll();
+        return stores;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
 const findStoreById = (id: number) => {
-    return StoreRepo.findById(id);
+    try {
+        const store = StoreRepo.findById(id);
+        return store;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
 export default {

@@ -5,15 +5,33 @@ import UserRepo from "../repositories/UserRepository.ts";
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
 
-const findAll = () => {
-    return UserRepo.findAll();
+const findAll = async () => {
+    try {
+        const users = await UserRepo.findAll();
+        return users;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
-const findById = (id: number) => {
-    return UserRepo.findById(id);
+const findById = async (id: number) => {
+    try {
+        const user = await UserRepo.findById(id);
+        return user;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
-const findByEmail = (email: string) => {
-    return UserRepo.findByEmail(email);
+const findByEmail = async (email: string) => {
+    try {
+        const user = await UserRepo.findByEmail(email);
+        return user;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 };
 
 const persist = (user: {

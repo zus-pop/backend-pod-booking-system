@@ -1,11 +1,23 @@
 import PODRepo from "../repositories/PODRepository.ts";
 
-const findAllPOD = () => {
-    return PODRepo.findAll();
+const findAllPOD = async () => {
+    try {
+        const PODs = await PODRepo.findAll();
+        return PODs;
+    } catch (err) {
+        console.log(err);
+        return null;;
+    }
 };
 
-const findPODById = (id: number) => {
-    return PODRepo.findById(id);
+const findPODById = async (id: number) => {
+    try {
+        const POD = await PODRepo.findById(id);
+        return POD;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 };
 
 export default {

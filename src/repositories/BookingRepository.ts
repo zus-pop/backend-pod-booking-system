@@ -4,73 +4,60 @@ import { Booking } from "../types/type.ts";
 
 const connection = await pool.getConnection();
 
+const beginTransaction = async () => {
+    await connection.beginTransaction();
+};
+
+const commit = async () => {
+    await connection.commit();
+};
+
+const rollback = async () => {
+    await connection.rollback();
+};
+
 const findAll = async () => {
-    try {
-        const sql = "SELECT ?? FROM ??";
-        const columns = [
-            "booking_id",
-            "pod_id",
-            "slot_id",
-            "user_id",
-            "booking_date",
-            "booking_status",
-        ];
-        const values = [columns, "Booking"];
-        const [bookings] = await connection.query<Booking[]>(sql, values);
-        return bookings;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+    const sql = "SELECT ?? FROM ??";
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "slot_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+    ];
+    const values = [columns, "Booking"];
+    const [bookings] = await connection.query<Booking[]>(sql, values);
+    return bookings;
 };
 
 const findById = async (id: number) => {
-    try {
-        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-        const columns = [
-            "booking_id",
-            "pod_id",
-            "slot_id",
-            "user_id",
-            "booking_date",
-            "booking_status",
-        ];
-        const values = [columns, "Booking", "booking_id", id];
-        const [bookings] = await connection.query<Booking[]>(sql, values);
-        return bookings[0];
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "slot_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+    ];
+    const values = [columns, "Booking", "booking_id", id];
+    const [bookings] = await connection.query<Booking[]>(sql, values);
+    return bookings[0];
 };
 
 const create = async (booking: Booking) => {
-    try {
-        await connection.beginTransaction();
-        const sql = "INSERT INTO ?? SET ?";
-        const values = ["Booking", booking];
-        const [result] = await connection.query<ResultSetHeader>(sql, values);
-        await connection.commit();
-        return result;
-    } catch (err) {
-        console.error(err);
-        await connection.rollback();
-        return null;
-    }
+    const sql = "INSERT INTO ?? SET ?";
+    const values = ["Booking", booking];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
 };
 
 const update = async (booking: Booking) => {
-    try {
-        await connection.beginTransaction();
-        const sql = "UPDATE ?? SET ? WHERE ?? = ?";
-        const values = ["Booking", booking, "booking_id", booking.booking_id];
-        const [result] = await connection.query<ResultSetHeader>(sql, values);
-        await connection.commit();
-        return result;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["Booking", booking, "booking_id", booking.booking_id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
 };
 
 // const remove = async (id: number) => {
@@ -86,6 +73,9 @@ const update = async (booking: Booking) => {
 // };
 
 export default {
+    beginTransaction,
+    commit,
+    rollback,
     findAll,
     findById,
     create,

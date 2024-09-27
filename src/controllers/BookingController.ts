@@ -42,7 +42,7 @@ const create = async (req: Request, res: Response) => {
 const update = async (req: Request, res: Response) => {
     const booking: Booking = req.body;
     const result = await BookingService.updateABooking(booking);
-    if (!result) {
+    if (!result || !result.affectedRows) {
         return res.status(404).json({ message: "Booking not found" });
     }
     return res.status(200).json({ result, message: "Update successfully" });
