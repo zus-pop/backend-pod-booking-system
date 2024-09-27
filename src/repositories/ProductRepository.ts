@@ -1,3 +1,4 @@
+import { ResultSetHeader } from "mysql2";
 import { pool } from "../config/pool.ts";
 import { Product } from "../types/type.ts";
 
@@ -52,8 +53,38 @@ const createNewProduct = async (product: Product) => {
   return result.insertId;
 };
 
+const updateProduct = async (product: Product) => {
+  const sql = `
+      UPDATE Product 
+      SET 
+          product_name = ?, 
+          category_id = ?, 
+          image = ?, 
+          description = ?, 
+          price = ?, 
+          store_id = ?, 
+          stock = ? 
+      WHERE 
+          product_id = ?`;
+
+  const values = [
+    product.product_name,
+    product.category_id,
+    product.image,
+    product.description,
+    product.price,
+    product.store_id,
+    product.stock,
+    product.product_id,
+  ];
+
+  const [result] = await connection.query<ResultSetHeader>(sql, values);
+  return result.affectedRows > 0; // Trả về true nếu có sản phẩm được cập nhật
+};
+
 export default {
   findAll,
   findById,
   createNewProduct,
+  updateProduct,
 };
