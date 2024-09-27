@@ -53,6 +53,15 @@ export interface Category extends RowDataPacket {
     category_name: string;
 }
 
+export interface Payment extends RowDataPacket {
+    payment_id: number;
+    booking_id: number;
+    transaction_id: string;
+    total_cost: number;
+    payment_date: Date | string;
+    payment_status: keyof typeof PaymentStatus;
+}
+
 export interface Store extends RowDataPacket {
     store_id: number;
     store_name: string;
@@ -89,6 +98,13 @@ export enum BookingStatus {
     Confirmed = "Confirmed",
     Cancelled = "Cancelled",
     Completed = "Completed",
+}
+
+export enum PaymentStatus {
+    Processing = "Processing",
+    Unpaid = "Unpaid",
+    Paid = "Paid",
+    Failed = "Failed",
 }
 
 export enum Role {
