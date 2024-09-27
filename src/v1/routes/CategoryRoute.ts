@@ -5,3 +5,5 @@ export const CategoryRouter = Router();
 
 CategoryRouter.get("/", CategoryController.findAll);
 CategoryRouter.get("/:id", CategoryController.findById);
+CategoryRouter.post("/", CategoryController.createNewCategory);
+CategoryRouter.put("/:id", CategoryController.updateCategory);
