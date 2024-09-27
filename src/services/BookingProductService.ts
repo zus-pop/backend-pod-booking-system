@@ -34,8 +34,7 @@ const createBookingProductList = async (
         const result = await BookingProductRepository.create(bookingProducts);
         return result;
     } catch (err) {
-        console.error(err);
-        return null;
+        throw err;
     }
 };
 

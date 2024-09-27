@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "../config/pool.ts";
 import { BookingProduct } from "../types/type.ts";
 
@@ -8,22 +8,22 @@ const findAll = async () => {
     const sql = "SELECT ?? FROM ??";
     const columns = ["booking_id", "product_id", "unit_price", "quantity"];
     const values = [columns, "Booking_Product"];
-    const [bookingProducts] = await connection.query<BookingProduct[]>(
+    const [bookingProducts] = await connection.query<RowDataPacket[]>(
         sql,
         values
     );
-    return bookingProducts;
+    return bookingProducts as BookingProduct[];
 };
 
 const findByBookingId = async (booking_id: number) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = ["booking_id", "product_id", "unit_price", "quantity"];
     const values = [columns, "Booking_Product", "booking_id", booking_id];
-    const [bookingProducts] = await connection.query<BookingProduct[]>(
+    const [bookingProducts] = await connection.query<RowDataPacket[]>(
         sql,
         values
     );
-    return bookingProducts;
+    return bookingProducts as BookingProduct[];
 };
 
 const create = async (bookingProducts: BookingProduct[]) => {

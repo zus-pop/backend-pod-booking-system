@@ -41,7 +41,7 @@ export interface Product extends RowDataPacket {
     stock?: number;
 }
 
-export interface BookingProduct extends RowDataPacket {
+export interface BookingProduct {
     booking_id?: number;
     product_id?: number;
     unit_price?: number;
@@ -53,13 +53,13 @@ export interface Category extends RowDataPacket {
     category_name: string;
 }
 
-export interface Payment extends RowDataPacket {
-    payment_id: number;
-    booking_id: number;
-    transaction_id: string;
-    total_cost: number;
-    payment_date: Date | string;
-    payment_status: keyof typeof PaymentStatus;
+export interface Payment {
+    payment_id?: number;
+    booking_id?: number;
+    transaction_id?: string;
+    total_cost?: number;
+    payment_date?: Date | string;
+    payment_status?: keyof typeof PaymentStatus;
 }
 
 export interface Store extends RowDataPacket {
@@ -69,13 +69,13 @@ export interface Store extends RowDataPacket {
     hotline: string;
 }
 
-export interface Slot extends RowDataPacket {
-    slot_id: number;
-    pod_id: number;
-    start_time: Date;
-    end_time: Date;
-    unit_price: number;
-    is_available: boolean;
+export interface Slot {
+    slot_id?: number;
+    pod_id?: number;
+    start_time?: Date;
+    end_time?: Date;
+    unit_price?: number;
+    is_available?: boolean;
 }
 
 export interface PODType extends RowDataPacket {

@@ -1,44 +1,22 @@
 import moment from "moment";
 import "dotenv/config";
 import { pool } from "../config/pool.ts";
-import { SlotOption } from "../types/type.ts";
+import { BookingProduct, Payment, Slot, SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
 
 // const conn = await pool.getConnection();
-const product = [
-    {
-        booking_id: 1,
-        product_id: 2,
-        unit_price: 20000,
-        quantity: 2,
-    },
-    {
-        booking_id: 1,
-        product_id: 4,
-        unit_price: 10000,
-        quantity: 2,
-    },
-    {
-        booking_id: 1,
-        product_id: 4,
-        unit_price: 24000,
-        quantity: 2,
-    },
-];
-const sql = "INSERT INTO ?? (??) VALUES ?";
-const columns = ["booking_id", "product_id", "unit_price", "quantity"];
-const values = [
-    "Booking_Product",
-    columns,
-    product.map((item) => [
-        item.booking_id,
-        item.product_id,
-        item.unit_price,
-        item.quantity,
-    ]),
-];
+const product: Payment = {
+    booking_id: 1,
+    transaction_id: "",
+    total_cost: 122,
+    payment_date: moment().format("YYYY-MM-DD HH:mm:ss"),
+    payment_status: "Unpaid",
+};
+const sql = "INSERT INTO ?? SET ?";
+const values = ["Booking_Product", product];
+console.log(pool.format(sql, values));
 const formatType = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (
@@ -90,6 +68,19 @@ export const generateSlots = async (
     } finally {
         connection.release();
     }
+};
+
+export const getTotalCost = async (
+    bookingProducts: BookingProduct[],
+    slot: Slot
+) => {
+    let totalCost = 0;
+    totalCost = bookingProducts.reduce(
+        (acc, curr) => acc + curr.unit_price! * curr.quantity!,
+        0
+    );
+    totalCost += slot?.unit_price!;
+    return totalCost;
 };
 
 // await generateSlots(conn, {

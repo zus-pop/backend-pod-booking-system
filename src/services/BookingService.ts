@@ -1,7 +1,10 @@
 import moment from "moment";
 import BookingRepo from "../repositories/BookingRepository.ts";
-import { Booking, BookingProduct } from "../types/type.ts";
+import { Booking, BookingProduct, Slot } from "../types/type.ts";
 import BookingProductService from "./BookingProductService.ts";
+import PaymentService from "./PaymentService.ts";
+import SlotService from "./SlotService.ts";
+import { getTotalCost } from "../utils/util.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -37,15 +40,25 @@ const createABooking = async (
     try {
         await BookingRepo.beginTransaction();
         const bookingResult = await BookingRepo.create(booking);
-        const bookingProductsResult =
-            await BookingProductService.createBookingProductList(
-                bookingProducts,
-                bookingResult.insertId
-            );
+        await BookingProductService.createBookingProductList(
+            bookingProducts,
+            bookingResult.insertId
+        );
+        const slot = await SlotService.findSlotById(booking.slot_id!);
+        const total_cost = await getTotalCost(bookingProducts, slot!)
+
+        const paymentResult = await PaymentService.createPayment({
+            booking_id: bookingResult.insertId,
+            transaction_id: "",
+            total_cost,
+            payment_date: moment().format(FORMAT_TYPE),
+            payment_status: "Unpaid",
+        });
         // Update soon
 
         await BookingRepo.commit();
     } catch (err) {
+        console.log(err);
         await BookingRepo.rollback();
         return null;
     }
