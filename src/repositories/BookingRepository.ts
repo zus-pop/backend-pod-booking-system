@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "../config/pool.ts";
 import { Booking } from "../types/type.ts";
 
@@ -27,8 +27,8 @@ const findAll = async () => {
         "booking_status",
     ];
     const values = [columns, "Booking"];
-    const [bookings] = await connection.query<Booking[]>(sql, values);
-    return bookings;
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings as Booking[];
 };
 
 const findById = async (id: number) => {
@@ -42,8 +42,23 @@ const findById = async (id: number) => {
         "booking_status",
     ];
     const values = [columns, "Booking", "booking_id", id];
-    const [bookings] = await connection.query<Booking[]>(sql, values);
-    return bookings[0];
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings[0] as Booking;
+};
+
+const findByTransactionId = async (transaction_id: number) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "slot_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+    ];
+    const values = [columns, "Booking", "transaction_id", transaction_id];
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings[0] as Booking;
 };
 
 const create = async (booking: Booking) => {
@@ -78,6 +93,7 @@ export default {
     rollback,
     findAll,
     findById,
+    findByTransactionId,
     create,
     update,
     // remove,

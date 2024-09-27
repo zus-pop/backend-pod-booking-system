@@ -35,7 +35,6 @@ export const createPaymentRequest = async (products: Product[]) => {
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };
-    console.log(order.app_trans_id);
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item
     const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
     order.mac = crypto
@@ -49,13 +48,14 @@ export const createPaymentRequest = async (products: Product[]) => {
             method: "POST",
         });
         const result = await response.json();
+        return result;
     } catch (err) {
-        console.error(err);
+        throw err;
     }
 };
 
 app.post("/callback", (req, res) => {
-    let result: Record<string, any> = {};
+    const result: Record<string, any> = {};
     try {
         const { data: dataStr, mac: reqMac } = req.body;
         let mac = crypto
@@ -89,9 +89,8 @@ app.post("/callback", (req, res) => {
     res.json(result);
 });
 
-app.post("/status/:app_trans_id", async (req, res) => {
-    const { app_trans_id } = req.params;
-    let postData: Record<string, any> = {
+export const paymentTracking = async (app_trans_id: string) => {
+    const postData: Record<string, any> = {
         app_id: config.app_id,
         app_trans_id, // Input your app_trans_id
     };
@@ -110,8 +109,8 @@ app.post("/status/:app_trans_id", async (req, res) => {
         body: qs.stringify(postData),
     });
     const query = await response.json();
-    res.json(query);
-});
+    return query;
+};
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");

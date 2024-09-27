@@ -24,13 +24,8 @@ const findByBookingId = (booking_id: number) => {
 
 const createBookingProductList = async (
     bookingProducts: BookingProduct[],
-    booking_id: number
 ) => {
     try {
-        bookingProducts = bookingProducts.map((product) => ({
-            ...product,
-            booking_id,
-        }));
         const result = await BookingProductRepository.create(bookingProducts);
         return result;
     } catch (err) {

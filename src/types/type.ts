@@ -1,4 +1,3 @@
-import { RowDataPacket } from "mysql2";
 export interface SlotOption {
   startDate: string;
   endDate: string;
@@ -9,7 +8,7 @@ export interface SlotOption {
   unitPrice: number;
   gap?: number;
 }
-export interface POD extends RowDataPacket {
+export interface POD {
   pod_id: number;
   pod_name: string;
   type_id: number;
@@ -18,7 +17,7 @@ export interface POD extends RowDataPacket {
   is_available: boolean;
   store_id?: number;
 }
-export interface User extends RowDataPacket {
+export interface User {
   user_id?: number;
   email: string;
   password: string;
@@ -78,13 +77,13 @@ export interface Slot {
   is_available?: boolean;
 }
 
-export interface PODType extends RowDataPacket {
+export interface PODType {
   type_id: number;
   type_name: string;
   capacity: number;
 }
 
-export interface Booking extends RowDataPacket {
+export interface Booking {
   booking_id?: number;
   pod_id?: number;
   slot_id?: number;

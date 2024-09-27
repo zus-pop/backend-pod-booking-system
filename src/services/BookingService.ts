@@ -5,6 +5,7 @@ import BookingProductService from "./BookingProductService.ts";
 import PaymentService from "./PaymentService.ts";
 import SlotService from "./SlotService.ts";
 import { getTotalCost } from "../utils/util.ts";
+import ProductService from "./ProductService.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -26,6 +27,15 @@ const findBookingById = async (id: number) => {
     }
 };
 
+const findBookingByTransactionId = async (transaction_id: number) => {
+    try {
+        const booking = await BookingRepo.findByTransactionId(transaction_id);
+        return booking;
+    } catch (err) {
+        return null;
+    }
+};
+
 const createABooking = async (
     booking: Booking,
     bookingProducts: BookingProduct[],
@@ -40,12 +50,24 @@ const createABooking = async (
     try {
         await BookingRepo.beginTransaction();
         const bookingResult = await BookingRepo.create(booking);
-        await BookingProductService.createBookingProductList(
-            bookingProducts,
-            bookingResult.insertId
-        );
+        bookingProducts = bookingProducts.map((bookingProduct) => ({
+            ...bookingProduct,
+            booking_id: bookingResult.insertId,
+        }));
+        await BookingProductService.createBookingProductList(bookingProducts);
+        for (const bookingProduct of bookingProducts) {
+            const product = await ProductService.findProductById(
+                bookingProduct.product_id!
+            );
+            const newStock = product?.stock! - bookingProduct.quantity!;
+            await ProductService.updateProduct({
+                // This need to beed change in the repo
+                product_id: bookingProduct.product_id,
+                stock: newStock,
+            });
+        }
         const slot = await SlotService.findSlotById(booking.slot_id!);
-        const total_cost = await getTotalCost(bookingProducts, slot!)
+        const total_cost = await getTotalCost(bookingProducts, slot!);
 
         const paymentResult = await PaymentService.createPayment({
             booking_id: bookingResult.insertId,
@@ -77,6 +99,7 @@ const updateABooking = async (booking: Booking) => {
 export default {
     findAllBooking,
     findBookingById,
+    findBookingByTransactionId,
     createABooking,
     updateABooking,
 };

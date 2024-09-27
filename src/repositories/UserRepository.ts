@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2/promise";
+import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { pool } from "../config/pool.ts";
 import { User } from "../types/type.ts";
 
@@ -8,24 +8,24 @@ const findAll = async () => {
     const sql = "SELECT ?? FROM ??";
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User"];
-    const [users] = await connection.query<User[]>(sql, values);
-    return users;
+    const [users] = await connection.query<RowDataPacket[]>(sql, values);
+    return users as User[];
 };
 
 const findById = async (id: number) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", "user_id", id];
-    const [user] = await connection.query<User[]>(sql, values);
-    return user[0];
+    const [user] = await connection.query<RowDataPacket[]>(sql, values);
+    return user[0] as User;
 };
 
 const findByEmail = async (email: string) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", "email", email];
-    const [user] = await connection.query<User[]>(sql, values);
-    return user[0];
+    const [user] = await connection.query<RowDataPacket[]>(sql, values);
+    return user[0] as User;
 };
 
 const persist = async (user: {

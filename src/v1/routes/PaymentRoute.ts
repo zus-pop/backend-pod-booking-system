@@ -8,3 +8,6 @@ PaymentRouter.get("/", PaymentController.findAll);
 
 // GET: api/v1/payments/:id
 PaymentRouter.get("/:id", PaymentController.findById);
+
+// POST: api/v1/payments/callback
+PaymentRouter.post("/callback", PaymentController.callback);

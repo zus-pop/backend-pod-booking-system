@@ -18,7 +18,14 @@ const findById = async (req: Request, res: Response) => {
     return res.status(200).json(payment);
 };
 
+const callback = async (req: Request, res: Response) => {
+    const { data: dataStr, mac: reqMac } = req.body;
+    const result = await PaymentService.callback(dataStr, reqMac);
+    res.json(result);
+};
+
 export default {
     findAll,
     findById,
+    callback,
 };

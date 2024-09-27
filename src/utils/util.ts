@@ -7,16 +7,6 @@ import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
 
 // const conn = await pool.getConnection();
-const product: Payment = {
-    booking_id: 1,
-    transaction_id: "",
-    total_cost: 122,
-    payment_date: moment().format("YYYY-MM-DD HH:mm:ss"),
-    payment_status: "Unpaid",
-};
-const sql = "INSERT INTO ?? SET ?";
-const values = ["Booking_Product", product];
-console.log(pool.format(sql, values));
 const formatType = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (

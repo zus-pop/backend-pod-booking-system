@@ -73,7 +73,7 @@ const create = async (payment: Payment) => {
 
 const update = async (payment: Payment) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ?";
-    const values = ["Payment", payment, "payment_id", payment.payment_id];
+    const values = ["Payment", {payment}, "transaction_id", payment.transaction_id];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
     return result;
 };
