@@ -26,9 +26,19 @@ const findByBookingId = async (booking_id: number) => {
     return bookingProducts;
 };
 
-const create = async (bookingProducts: BookingProduct) => {
-    const sql = "INSERT INTO ?? SET ?";
-    const values = ["Booking_Product", bookingProducts];
+const create = async (bookingProducts: BookingProduct[]) => {
+    const sql = "INSERT INTO ?? (??) VALUES ?";
+    const columns = ["booking_id", "product_id", "unit_price", "quantity"];
+    const values = [
+        "Booking_Product",
+        columns,
+        bookingProducts.map((item) => [
+            item.booking_id,
+            item.product_id,
+            item.unit_price,
+            item.quantity,
+        ]),
+    ];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
     return result;
 };

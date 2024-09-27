@@ -9,20 +9,36 @@ import cron from "node-cron";
 // const conn = await pool.getConnection();
 const product = [
     {
-        product_name: "foo",
+        booking_id: 1,
+        product_id: 2,
+        unit_price: 20000,
+        quantity: 2,
     },
     {
-        product_name: "bar",
+        booking_id: 1,
+        product_id: 4,
+        unit_price: 10000,
+        quantity: 2,
     },
     {
-        product_name: "zar",
-    },
-    {
-        product_name: "haa",
+        booking_id: 1,
+        product_id: 4,
+        unit_price: 24000,
+        quantity: 2,
     },
 ];
-const sql = "INSERT INTO Product "
-console.log()
+const sql = "INSERT INTO ?? (??) VALUES ?";
+const columns = ["booking_id", "product_id", "unit_price", "quantity"];
+const values = [
+    "Booking_Product",
+    columns,
+    product.map((item) => [
+        item.booking_id,
+        item.product_id,
+        item.unit_price,
+        item.quantity,
+    ]),
+];
 const formatType = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (

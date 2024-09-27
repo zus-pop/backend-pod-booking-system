@@ -26,12 +26,17 @@ const createBookingProductList = async (
     bookingProducts: BookingProduct[],
     booking_id: number
 ) => {
-    let result;
-    for (const product of bookingProducts) {
-        product.booking_id = booking_id;
-        result = await BookingProductRepository.create(product);
+    try {
+        bookingProducts = bookingProducts.map((product) => ({
+            ...product,
+            booking_id,
+        }));
+        const result = await BookingProductRepository.create(bookingProducts);
+        return result;
+    } catch (err) {
+        console.error(err);
+        return null;
     }
-    return result;
 };
 
 export default {
