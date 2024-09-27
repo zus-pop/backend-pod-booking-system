@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "../config/pool.ts";
 import { Product } from "../types/type.ts";
 
@@ -7,7 +7,7 @@ const findAll = async () => {
   const sql = "SELECT ?? FROM ??";
   const colum = ["product_id", "product_name", "price", "stock"];
   const values = [colum, "Product"];
-  const [product] = await connection.query<Product[]>(sql, values);
+  const [product] = await connection.query<RowDataPacket[]>(sql, values);
   return product;
 };
 
@@ -15,8 +15,8 @@ const findById = async (id: number) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
   const colum = ["product_id", "product_name", "price", "stock"];
   const values = [colum, "Product", "product_id", id];
-  const [product] = await connection.query<Product[]>(sql, values);
-  return product[0];
+  const [product] = await connection.query<RowDataPacket[]>(sql, values);
+  return product[0] as Product;
 };
 
 const createNewProduct = async (product: Product) => {
@@ -79,7 +79,7 @@ const updateProduct = async (product: Product) => {
   ];
 
   const [result] = await connection.query<ResultSetHeader>(sql, values);
-  return result.affectedRows > 0; // Trả về true nếu có sản phẩm được cập nhật
+  return result.affectedRows > 0;
 };
 
 export default {

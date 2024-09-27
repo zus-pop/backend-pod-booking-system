@@ -30,10 +30,10 @@ export interface User extends RowDataPacket {
   updated_at?: Date | string;
 }
 
-export interface Product extends RowDataPacket {
+export interface Product {
   product_id?: number;
   product_name?: string;
-  catedory_id?: number;
+  category_id?: number;
   image?: string;
   description?: string;
   price?: number;
@@ -48,12 +48,12 @@ export interface BookingProduct extends RowDataPacket {
   quantity?: number;
 }
 
-export interface Category extends RowDataPacket {
+export interface Category {
   category_id: number;
   category_name: string;
 }
 
-export interface Store extends RowDataPacket {
+export interface Store {
   store_id: number;
   store_name: string;
   address: string;
