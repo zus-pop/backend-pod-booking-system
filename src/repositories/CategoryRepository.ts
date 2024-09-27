@@ -1,4 +1,4 @@
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "../config/pool.ts";
 import { Category } from "../types/type.ts";
 
@@ -19,7 +19,32 @@ const findById = async (id: number) => {
   return category[0] as Category;
 };
 
+const createNewCategory = async (category: Category) => {
+  const sql = `
+        INSERT INTO Category (category_name) 
+        VALUES (?)`;
+
+  const values = [category.category_name];
+
+  const [result] = await connection.query<ResultSetHeader>(sql, values);
+  return result.insertId;
+};
+
+const updateCategory = async (category: Category) => {
+  const sql = `
+        UPDATE Category 
+        SET category_name = ?
+        WHERE category_id = ?`;
+
+  const values = [category.category_name, category.category_id];
+
+  const [result] = await connection.query<ResultSetHeader>(sql, values);
+  return result.affectedRows; // Trả về số hàng bị ảnh hưởng
+};
+
 export default {
   findAll,
   findById,
+  createNewCategory,
+  updateCategory,
 };
