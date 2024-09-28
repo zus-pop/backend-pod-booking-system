@@ -20,26 +20,24 @@ const findById = async (id: number) => {
 };
 
 const createNewCategory = async (category: Category) => {
-  const sql = `
-        INSERT INTO Category (category_name) 
-        VALUES (?)`;
+  const sql = `INSERT INTO Category SET ?`;
 
-  const values = [category.category_name];
+  const values = { category_name: category.category_name };
 
   const [result] = await connection.query<ResultSetHeader>(sql, values);
   return result.insertId;
 };
 
 const updateCategory = async (category: Category) => {
-  const sql = `
-        UPDATE Category 
-        SET category_name = ?
-        WHERE category_id = ?`;
+  const sql = `UPDATE Category SET ? WHERE category_id = ?`;
 
-  const values = [category.category_name, category.category_id];
+  const values = { category_name: category.category_name };
 
-  const [result] = await connection.query<ResultSetHeader>(sql, values);
-  return result.affectedRows; // Trả về số hàng bị ảnh hưởng
+  const [result] = await connection.query<ResultSetHeader>(sql, [
+    values,
+    category.category_id,
+  ]);
+  return result.affectedRows;
 };
 
 export default {

@@ -1,9 +1,7 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { pool } from "../config/pool.ts";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Product } from "../types/type.ts";
 
-const connection = await pool.getConnection();
-const findAll = async () => {
+const findAll = async (connection: PoolConnection) => {
   const sql = "SELECT ?? FROM ??";
   const colum = ["product_id", "product_name", "price", "stock"];
   const values = [colum, "Product"];
@@ -11,7 +9,7 @@ const findAll = async () => {
   return product;
 };
 
-const findById = async (id: number) => {
+const findById = async (id: number, connection: PoolConnection) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
   const colum = ["product_id", "product_name", "price", "stock"];
   const values = [colum, "Product", "product_id", id];
@@ -19,66 +17,21 @@ const findById = async (id: number) => {
   return product[0] as Product;
 };
 
-const createNewProduct = async (product: Product) => {
-  const sql =
-    "INSERT INTO ?? (??, ??, ??, ??, ??, ??, ??) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-  const table = "Product";
-  const columns = [
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "store_id",
-    "stock",
-  ];
-
-  const values = [
-    product.product_name,
-    product.category_id,
-    product.image,
-    product.description,
-    product.price,
-    product.store_id,
-    product.stock,
-  ];
-
-  const [result]: any = await connection.query(sql, [
-    table,
-    ...columns,
-    ...values,
-  ]);
-
+const createNewProduct = async (
+  product: Product,
+  connection: PoolConnection
+) => {
+  const sql = "INSERT INTO Product SET ?";
+  const [result] = await connection.query<ResultSetHeader>(sql, [product]);
   return result.insertId;
 };
 
-const updateProduct = async (product: Product) => {
-  const sql = `
-      UPDATE Product 
-      SET 
-          product_name = ?, 
-          category_id = ?, 
-          image = ?, 
-          description = ?, 
-          price = ?, 
-          store_id = ?, 
-          stock = ? 
-      WHERE 
-          product_id = ?`;
-
-  const values = [
-    product.product_name,
-    product.category_id,
-    product.image,
-    product.description,
-    product.price,
-    product.store_id,
-    product.stock,
+const updateProduct = async (product: Product, connection: PoolConnection) => {
+  const sql = `UPDATE Product SET ? WHERE product_id = ?`;
+  const [result] = await connection.query<ResultSetHeader>(sql, [
+    product,
     product.product_id,
-  ];
-
-  const [result] = await connection.query<ResultSetHeader>(sql, values);
+  ]);
   return result.affectedRows > 0;
 };
 
