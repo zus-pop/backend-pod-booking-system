@@ -29,7 +29,7 @@ const createNewCategory = async (
     return result.insertId;
 };
 
-const updateCategory = async (category: Category) => {
+const updateCategory = async (category: Category, connection: PoolConnection) => {
   const sql = `
         UPDATE Category 
         SET category_name = ?

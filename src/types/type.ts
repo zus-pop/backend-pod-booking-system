@@ -98,8 +98,9 @@ export interface PODType {
 export interface Booking {
     booking_id?: number;
     pod_id?: number;
-    slot_id?: number;
     user_id?: number;
+    rating?: number;
+    comment?: string;
     booking_date?: Date | string;
     booking_status?: keyof typeof BookingStatus;
 }

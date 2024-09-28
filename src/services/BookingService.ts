@@ -17,6 +17,7 @@ const findAllBooking = async () => {
         const bookings = await BookingRepo.findAll(connection);
         return bookings;
     } catch (err) {
+        console.log(err);
         return null;
     } finally {
         if (connection) {
@@ -84,7 +85,7 @@ const createABooking = async (
                 stock: newStock,
             });
         }
-        const slot = await SlotService.findSlotById(booking.slot_id!);
+        const slot = await SlotService.findSlotById(1); // This need to be change for [slots]
         const total_cost = await getTotalCost(bookingProducts, slot!);
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest(bookingProducts);

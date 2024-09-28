@@ -7,7 +7,6 @@ const findAll = async (connection: PoolConnection) => {
     const columns = [
         "booking_id",
         "pod_id",
-        "slot_id",
         "user_id",
         "booking_date",
         "booking_status",
@@ -22,7 +21,6 @@ const findById = async (id: number, connection: PoolConnection) => {
     const columns = [
         "booking_id",
         "pod_id",
-        "slot_id",
         "user_id",
         "booking_date",
         "booking_status",
@@ -37,7 +35,6 @@ const findByTransactionId = async (transaction_id: number, connection: PoolConne
     const columns = [
         "booking_id",
         "pod_id",
-        "slot_id",
         "user_id",
         "booking_date",
         "booking_status",
