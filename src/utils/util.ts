@@ -87,11 +87,10 @@ export const bookingTracker = (
     booking_id: number,
     connection: PoolConnection
 ) => {
-    cron.schedule("* * * * * *", async () => {
-        const threshHold = 5;
-        const current = moment().format(formatType);
+    cron.schedule("* * * * * *", async () => {});
+    const threshHold = 5;
+    const current = moment().format(formatType);
 
-        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-        const columns = [""];
-    });
+    const create_at = "2024-09-28 14:30:00";
+    console.log(moment(current).diff(moment(create_at), "minutes"));
 };

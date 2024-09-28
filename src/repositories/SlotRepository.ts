@@ -1,9 +1,8 @@
 import "dotenv/config";
 import { Slot } from "../types/type.ts";
 import moment from "moment";
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { PoolConnection } from "mysql2/promise";
-
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
@@ -35,7 +34,15 @@ const findById = async (id: number, connection: PoolConnection) => {
     return slots[0] as Slot;
 };
 
+const update = async (slot: Slot, connection: PoolConnection) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["Slot", slot, "slot_id", slot.slot_id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
 export default {
     findAll,
     findById,
+    update,
 };

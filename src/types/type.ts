@@ -107,7 +107,7 @@ export interface Booking {
 export enum BookingStatus {
     Pending = "Pending",
     Confirmed = "Confirmed",
-    Cancelled = "Cancelled",
+    Canceled = "Canceled",
     Completed = "Completed",
 }
 
