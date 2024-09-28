@@ -1,9 +1,13 @@
+import { pool } from "../config/pool.ts";
 import BookingProductRepository from "../repositories/BookingProductRepository.ts";
-import { BookingProduct } from "../types/type.ts";
+
+const connection = await pool.getConnection();
 
 const findAllBookingProducts = async () => {
     try {
-        const bookingProducts = await BookingProductRepository.findAll();
+        const bookingProducts = await BookingProductRepository.findAll(
+            connection
+        );
         return bookingProducts;
     } catch (err) {
         console.error(err);
@@ -13,8 +17,10 @@ const findAllBookingProducts = async () => {
 
 const findByBookingId = (booking_id: number) => {
     try {
-        const bookingProducts =
-            BookingProductRepository.findByBookingId(booking_id);
+        const bookingProducts = BookingProductRepository.findByBookingId(
+            booking_id,
+            connection
+        );
         return bookingProducts;
     } catch (err) {
         console.error(err);
@@ -22,25 +28,19 @@ const findByBookingId = (booking_id: number) => {
     }
 };
 
-const createBookingProductList = async (
-    bookingProducts: BookingProduct[],
-    booking_id: number
-) => {
-    try {
-        bookingProducts = bookingProducts.map((product) => ({
-            ...product,
-            booking_id,
-        }));
-        const result = await BookingProductRepository.create(bookingProducts);
-        return result;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-};
+// const createBookingProductList = async (
+//     bookingProducts: BookingProduct[],
+// ) => {
+//     try {
+//         const result = await BookingProductRepository.create(bookingProducts);
+//         return result;
+//     } catch (err) {
+//         throw err;
+//     }
+// };
 
 export default {
     findAllBookingProducts,
     findByBookingId,
-    createBookingProductList,
+    // createBookingProductList,
 };

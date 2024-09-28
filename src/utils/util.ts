@@ -1,44 +1,12 @@
 import moment from "moment";
 import "dotenv/config";
 import { pool } from "../config/pool.ts";
-import { SlotOption } from "../types/type.ts";
+import { BookingProduct, Payment, Slot, SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
 
 // const conn = await pool.getConnection();
-const product = [
-    {
-        booking_id: 1,
-        product_id: 2,
-        unit_price: 20000,
-        quantity: 2,
-    },
-    {
-        booking_id: 1,
-        product_id: 4,
-        unit_price: 10000,
-        quantity: 2,
-    },
-    {
-        booking_id: 1,
-        product_id: 4,
-        unit_price: 24000,
-        quantity: 2,
-    },
-];
-const sql = "INSERT INTO ?? (??) VALUES ?";
-const columns = ["booking_id", "product_id", "unit_price", "quantity"];
-const values = [
-    "Booking_Product",
-    columns,
-    product.map((item) => [
-        item.booking_id,
-        item.product_id,
-        item.unit_price,
-        item.quantity,
-    ]),
-];
 const formatType = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (
@@ -92,6 +60,19 @@ export const generateSlots = async (
     }
 };
 
+export const getTotalCost = async (
+    bookingProducts: BookingProduct[],
+    slot: Slot
+) => {
+    let totalCost = 0;
+    totalCost = bookingProducts.reduce(
+        (acc, curr) => acc + curr.unit_price! * curr.quantity!,
+        0
+    );
+    totalCost += slot?.unit_price!;
+    return totalCost;
+};
+
 // await generateSlots(conn, {
 //     startDate: "2024-09-22",
 //     endDate: "2024-09-22",
@@ -106,11 +87,10 @@ export const bookingTracker = (
     booking_id: number,
     connection: PoolConnection
 ) => {
-    cron.schedule("* * * * * *", async () => {
-        const threshHold = 5;
-        const current = moment().format(formatType);
+    cron.schedule("* * * * * *", async () => {});
+    const threshHold = 5;
+    const current = moment().format(formatType);
 
-        const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-        const columns = [""];
-    });
+    const create_at = "2024-09-28 14:30:00";
+    console.log(moment(current).diff(moment(create_at), "minutes"));
 };

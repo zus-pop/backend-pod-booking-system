@@ -1,59 +1,57 @@
-import { ResultSetHeader } from "mysql2";
-import { pool } from "../config/pool.ts";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { Booking } from "../types/type.ts";
+import { PoolConnection } from "mysql2/promise";
 
-const connection = await pool.getConnection();
-
-const beginTransaction = async () => {
-    await connection.beginTransaction();
-};
-
-const commit = async () => {
-    await connection.commit();
-};
-
-const rollback = async () => {
-    await connection.rollback();
-};
-
-const findAll = async () => {
+const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
     const columns = [
         "booking_id",
         "pod_id",
-        "slot_id",
         "user_id",
         "booking_date",
         "booking_status",
     ];
     const values = [columns, "Booking"];
-    const [bookings] = await connection.query<Booking[]>(sql, values);
-    return bookings;
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings as Booking[];
 };
 
-const findById = async (id: number) => {
+const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "booking_id",
         "pod_id",
-        "slot_id",
         "user_id",
         "booking_date",
         "booking_status",
     ];
     const values = [columns, "Booking", "booking_id", id];
-    const [bookings] = await connection.query<Booking[]>(sql, values);
-    return bookings[0];
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings[0] as Booking;
 };
 
-const create = async (booking: Booking) => {
+const findByTransactionId = async (transaction_id: number, connection: PoolConnection) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+    ];
+    const values = [columns, "Booking", "transaction_id", transaction_id];
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings[0] as Booking;
+};
+
+const create = async (booking: Booking, connection: PoolConnection) => {
     const sql = "INSERT INTO ?? SET ?";
     const values = ["Booking", booking];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
     return result;
 };
 
-const update = async (booking: Booking) => {
+const update = async (booking: Booking, connection: PoolConnection) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ?";
     const values = ["Booking", booking, "booking_id", booking.booking_id];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
@@ -73,11 +71,9 @@ const update = async (booking: Booking) => {
 // };
 
 export default {
-    beginTransaction,
-    commit,
-    rollback,
     findAll,
     findById,
+    findByTransactionId,
     create,
     update,
     // remove,

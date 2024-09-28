@@ -1,6 +1,6 @@
 import BookingService from "../services/BookingService.ts";
 import { Request, Response } from "express";
-import { Booking, BookingProduct, Product } from "../types/type.ts";
+import { Booking, BookingProduct } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const bookings = await BookingService.findAllBooking();
