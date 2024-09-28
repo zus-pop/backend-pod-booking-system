@@ -1,9 +1,11 @@
+import { pool } from "../config/pool.ts";
 import ProductRepository from "../repositories/ProductRepository.ts";
 import { Product } from "../types/type.ts";
 
+const connection = await pool.getConnection();
 const findAllProduct = async () => {
   try {
-    const products = await ProductRepository.findAll();
+    const products = await ProductRepository.findAll(connection);
     return products;
   } catch (err) {
     console.log(err);
@@ -13,7 +15,7 @@ const findAllProduct = async () => {
 
 const findProductById = async (id: number) => {
   try {
-    const product = await ProductRepository.findById(id);
+    const product = await ProductRepository.findById(id, connection);
     return product;
   } catch (err) {
     console.log(err);
@@ -23,8 +25,14 @@ const findProductById = async (id: number) => {
 
 const createNewProduct = async (productData: Product) => {
   try {
-    const newProductId = await ProductRepository.createNewProduct(productData);
-    const newProduct = await ProductRepository.findById(newProductId);
+    const newProductId = await ProductRepository.createNewProduct(
+      productData,
+      connection
+    );
+    const newProduct = await ProductRepository.findById(
+      newProductId,
+      connection
+    );
     return newProduct;
   } catch (err) {
     console.error("Error creating new product:", err);
@@ -34,7 +42,7 @@ const createNewProduct = async (productData: Product) => {
 
 const updateProduct = async (product: Product) => {
   try {
-    const updated = await ProductRepository.updateProduct(product);
+    const updated = await ProductRepository.updateProduct(product, connection);
     return updated;
   } catch (err) {
     console.error(err);
