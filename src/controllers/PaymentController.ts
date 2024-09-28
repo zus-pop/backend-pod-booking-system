@@ -1,5 +1,6 @@
 import PaymentService from "../services/PaymentService.ts";
 import { Request, Response } from "express";
+import { callbackPayment } from "../utils/zalo.ts";
 
 const findAll = async (req: Request, res: Response) => {
     const payments = await PaymentService.findAllPayment();
@@ -20,7 +21,7 @@ const findById = async (req: Request, res: Response) => {
 
 const callback = async (req: Request, res: Response) => {
     const { data: dataStr, mac: reqMac } = req.body;
-    const result = await PaymentService.callback(dataStr, reqMac);
+    const result = await callbackPayment(dataStr, reqMac);
     res.json(result);
 };
 

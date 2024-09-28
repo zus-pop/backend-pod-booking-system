@@ -1,12 +1,11 @@
 import "dotenv/config";
-import { pool } from "../config/pool.ts";
 import { Slot } from "../types/type.ts";
 import moment from "moment";
 import { RowDataPacket } from "mysql2";
+import { PoolConnection } from "mysql2/promise";
 
-const connection = await pool.getConnection();
 
-const findAll = async () => {
+const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
     const colums = [
         "slot_id",
@@ -21,7 +20,7 @@ const findAll = async () => {
     return slots as Slot[];
 };
 
-const findById = async (id: number) => {
+const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const colums = [
         "slot_id",

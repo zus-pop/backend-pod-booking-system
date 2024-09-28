@@ -1,13 +1,15 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import UserRepo from "../repositories/UserRepository.ts";
+import { pool } from "../config/pool.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
+const connection = await pool.getConnection();
 
 const findAll = async () => {
     try {
-        const users = await UserRepo.findAll();
+        const users = await UserRepo.findAll(connection);
         return users;
     } catch (err) {
         console.error(err);
@@ -16,7 +18,7 @@ const findAll = async () => {
 };
 const findById = async (id: number) => {
     try {
-        const user = await UserRepo.findById(id);
+        const user = await UserRepo.findById(id, connection);
         return user;
     } catch (err) {
         console.error(err);
@@ -26,7 +28,7 @@ const findById = async (id: number) => {
 
 const findByEmail = async (email: string) => {
     try {
-        const user = await UserRepo.findByEmail(email);
+        const user = await UserRepo.findByEmail(email, connection);
         return user;
     } catch (err) {
         console.log(err);
@@ -41,7 +43,7 @@ const persist = (user: {
     role_id: number;
     phone_number?: string;
 }) => {
-    return UserRepo.persist(user);
+    return UserRepo.persist(user, connection);
 };
 
 const comparePassword = async (password: string, hashedPassword: string) => {

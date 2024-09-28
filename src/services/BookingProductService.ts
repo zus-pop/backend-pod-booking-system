@@ -22,19 +22,19 @@ const findByBookingId = (booking_id: number) => {
     }
 };
 
-const createBookingProductList = async (
-    bookingProducts: BookingProduct[],
-) => {
-    try {
-        const result = await BookingProductRepository.create(bookingProducts);
-        return result;
-    } catch (err) {
-        throw err;
-    }
-};
+// const createBookingProductList = async (
+//     bookingProducts: BookingProduct[],
+// ) => {
+//     try {
+//         const result = await BookingProductRepository.create(bookingProducts);
+//         return result;
+//     } catch (err) {
+//         throw err;
+//     }
+// };
 
 export default {
     findAllBookingProducts,
     findByBookingId,
-    createBookingProductList,
+    // createBookingProductList,
 };

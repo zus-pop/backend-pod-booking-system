@@ -1,10 +1,9 @@
 import { RowDataPacket } from "mysql2";
-import { pool } from "../config/pool.ts";
 import { POD } from "../types/type.ts";
+import { PoolConnection } from "mysql2/promise";
 
-const connection = await pool.getConnection();
 
-const findAll = async () => {
+const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
     const colum = ["pod_id", "pod_name", "type_id", "is_available"];
     const values = [colum, "POD"];
@@ -12,7 +11,7 @@ const findAll = async () => {
     return pods as POD[];
 };
 
-const findById = async (id: number) => {
+const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const colum = ["pod_id", "pod_name", "type_id", "is_available"];
     const values = [colum, "POD", "pod_id", id];

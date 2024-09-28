@@ -1,29 +1,28 @@
-import express from "express";
-import crypto from "crypto";
 import moment from "moment";
+import { BookingProduct, OnlinePaymentResponse } from "../types/type.ts";
+import crypto from "crypto";
+import PaymentService from "../services/PaymentService.ts";
+import BookingService from "../services/BookingService.ts";
 import qs from "qs";
-import { Product } from "../types/type.ts";
-
-const app = express();
-const baseUrl = "https://sb-openapi.zalopay.vn/v2";
-
-app.use(express.json());
 
 const config = {
-    app_id: "2554",
-    key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
-    key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
-    endpoint: `${baseUrl}/create`,
+    APP_ID: process.env.APP_ID as string,
+    KEY1: process.env.KEY1 as string,
+    KEY2: process.env.KEY2 as string,
+    CREATE_PAYMENT: process.env.CREATE_PAYMENT as string,
+    QUERY_STATUS: process.env.QUERY_STATUS as string,
 };
 
-export const createPaymentRequest = async (products: Product[]) => {
+export const createOnlinePaymentRequest = async (
+    bookingProducts: BookingProduct[]
+) => {
     const embed_data = {
         redirecturl: "https://google.com",
     };
-    const items = products;
+    const items = bookingProducts;
     const transID = Math.floor(Math.random() * 1000000);
     const order: Record<string, any> = {
-        app_id: config.app_id,
+        app_id: config.APP_ID,
         app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
         app_user: "user123",
         app_time: Date.now(), // miliseconds
@@ -36,30 +35,32 @@ export const createPaymentRequest = async (products: Product[]) => {
         bank_code: "",
     };
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item
-    const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
+    const data = `${config.APP_ID}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
     order.mac = crypto
-        .createHmac("sha256", config.key1)
+        .createHmac("sha256", config.KEY1)
         .update(data)
         .digest("hex");
 
     try {
         const params = new URLSearchParams(order);
-        const response = await fetch(`${config.endpoint}?${params}`, {
+        const response = await fetch(`${config.CREATE_PAYMENT}?${params}`, {
             method: "POST",
         });
         const result = await response.json();
-        return result;
+        return {
+            ...result,
+            app_trans_id: order.app_trans_id,
+        } as OnlinePaymentResponse;
     } catch (err) {
         throw err;
     }
 };
 
-app.post("/callback", (req, res) => {
+export const callbackPayment = async (dataStr: any, reqMac: any) => {
     const result: Record<string, any> = {};
     try {
-        const { data: dataStr, mac: reqMac } = req.body;
         let mac = crypto
-            .createHmac("sha256", config.key2)
+            .createHmac("sha256", config.KEY2)
             .update(dataStr)
             .digest("hex");
         console.log("mac =", mac);
@@ -77,6 +78,17 @@ app.post("/callback", (req, res) => {
                 "update order's status = success where app_trans_id =",
                 dataJson["app_trans_id"]
             );
+            PaymentService.updatePayment({
+                transaction_id: dataJson["app_trans_id"],
+                payment_status: "Paid",
+            });
+            const booking = await BookingService.findBookingByTransactionId(
+                dataJson["app_trans_id"]
+            );
+            await BookingService.updateABooking({
+                booking_id: booking?.booking_id,
+                booking_status: "Confirmed",
+            });
 
             result.return_code = 1;
             result.return_message = "success";
@@ -86,22 +98,22 @@ app.post("/callback", (req, res) => {
         result.return_message = ex.message;
     }
     // thông báo kết quả cho ZaloPay server
-    res.json(result);
-});
+    return result;
+};
 
-export const paymentTracking = async (app_trans_id: string) => {
+export const getPaymentStatus = async (app_trans_id: string) => {
     const postData: Record<string, any> = {
-        app_id: config.app_id,
+        app_id: config.APP_ID,
         app_trans_id, // Input your app_trans_id
     };
-    let data = `${postData.app_id}|${postData.app_trans_id}|${config.key1}`; // appid|app_trans_id|key1
+    let data = `${postData.app_id}|${postData.app_trans_id}|${config.KEY1}`; // appid|app_trans_id|key1
 
     postData.mac = crypto
-        .createHmac("sha256", config.key1)
+        .createHmac("sha256", config.KEY1)
         .update(data)
         .digest("hex");
 
-    const response = await fetch(`${baseUrl}/query`, {
+    const response = await fetch(config.QUERY_STATUS, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -111,7 +123,3 @@ export const paymentTracking = async (app_trans_id: string) => {
     const query = await response.json();
     return query;
 };
-
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-});
