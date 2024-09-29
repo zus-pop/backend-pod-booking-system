@@ -3,9 +3,7 @@ import BookingRepo from "../repositories/BookingRepository.ts";
 import { Booking, BookingProduct } from "../types/type.ts";
 import SlotService from "./SlotService.ts";
 import { getTotalCost } from "../utils/util.ts";
-import ProductService from "./ProductService.ts";
 import { pool } from "../config/pool.ts";
-import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 import PaymentRepository from "../repositories/PaymentRepository.ts";
 
@@ -69,22 +67,22 @@ const createABooking = async (
             booking_status: "Pending",
         };
         const bookingResult = await BookingRepo.create(booking, connection);
-        bookingProducts = bookingProducts.map((bookingProduct) => ({
-            ...bookingProduct,
-            booking_id: bookingResult.insertId,
-        }));
-        await BookingProductRepository.create(bookingProducts, connection);
-        for (const bookingProduct of bookingProducts) {
-            const product = await ProductService.findProductById(
-                bookingProduct.product_id!
-            );
-            const newStock = product?.stock! - bookingProduct.quantity!;
-            await ProductService.updateProduct({
-                // This need to beed change in the repo
-                product_id: bookingProduct.product_id,
-                stock: newStock,
-            });
-        }
+        // bookingProducts = bookingProducts.map((bookingProduct) => ({
+        //     ...bookingProduct,
+        //     booking_id: bookingResult.insertId,
+        // }));
+        // await BookingProductRepository.create(bookingProducts, connection);
+        // for (const bookingProduct of bookingProducts) {
+        //     const product = await ProductService.findProductById(
+        //         bookingProduct.product_id!
+        //     );
+        //     const newStock = product?.stock! - bookingProduct.quantity!;
+        //     await ProductService.updateProduct({
+        //         // This need to beed change in the repo
+        //         product_id: bookingProduct.product_id,
+        //         stock: newStock,
+        //     });
+        // }
         const slot = await SlotService.findSlotById(1); // This need to be change for [slots]
         const total_cost = await getTotalCost(bookingProducts, slot!);
         const { return_code, order_url, sub_return_message, app_trans_id } =

@@ -47,6 +47,11 @@ export interface BookingProduct {
     quantity?: number;
 }
 
+export interface BookingSlot {
+    booking_id?: number;
+    pod_id?: number;
+}
+
 export interface Category {
     category_id: number;
     category_name: string;
@@ -110,6 +115,7 @@ export enum BookingStatus {
     Confirmed = "Confirmed",
     Canceled = "Canceled",
     Completed = "Completed",
+    Ongoing = "Ongoing",
 }
 
 export enum PaymentStatus {
@@ -124,4 +130,14 @@ export enum Role {
     Customer = 2,
     Manager = 3,
     Staff = 4,
+}
+
+export enum DaysOfWeek {
+    Sunday = 1 << 0,
+    Monday = 1 << 1,
+    Tuesday = 1 << 2,
+    Wednesday = 1 << 3,
+    Thursday = 1 << 4,
+    Friday = 1 << 5,
+    Saturday = 1 << 6,
 }

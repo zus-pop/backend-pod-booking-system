@@ -23,7 +23,7 @@ const findByBookingId = async (
         sql,
         values
     );
-    return bookingProducts as BookingProduct[];
+    return bookingProducts[0] as BookingProduct;
 };
 
 const create = async (
