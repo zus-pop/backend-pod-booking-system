@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import StoreService from "../services/StoreService.ts";
 
-const findAll = async (req: Request, res: Response) => {
+const findAll = async (_: Request, res: Response) => {
     const stores = await StoreService.findAllStore();
     if (!stores || !stores.length) {
         return res.status(404).json({ message: "No stores found" });
