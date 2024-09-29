@@ -113,16 +113,63 @@ BookingRouter.get("/", BookingController.findAll);
  *                              booking_status:
  *                                  type: string
  *                                  description: status of booking
- *                                  enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *                                  enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
  *                                  example: Pending
  *          404:
  *              description: Booking found
- *
- */
+*
+*/
 BookingRouter.get("/:id", BookingController.findById);
 
 // POST: api/v1/bookings
 // BookingRouter.post("/", authenticateToken, validateEmptyObject, BookingController.create);
 
 // PUT: api/v1/bookings
+/**
+ * @openapi
+ * /api/v1/bookings:
+ *  put:
+ *      summary: Update Booking status
+ *      tags: [Bookings]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          booking_id:
+ *                              type: integer
+ *                              required: true
+ *                          booking_status:
+ *                              type: string
+ *                              required: true
+ *                              enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
+ *      responses:
+ *          200:
+ *              description: Update successfully
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              result:
+ *                                  type: object
+ *                                  description: result meta data
+ *                              message:
+ *                                  type: string
+ *                                  description: update message response
+ *                                  example: Update successfully
+ *          404:
+ *              description: Update Failed
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: update message response
+ *                                  example: Booking not found
+*/
 BookingRouter.put("/", validateEmptyObject, BookingController.update);
