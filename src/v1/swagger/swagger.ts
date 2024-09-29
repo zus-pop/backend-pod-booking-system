@@ -17,6 +17,16 @@ const options: Options = {
                 url: "http://localhost:3000",
             },
         ],
+        components: {
+            securitySchemes: {
+                Authorization: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT",
+                    value: "Bearer <JWT token here>",
+                },
+            },
+        },
     },
     apis: ["./src/v1/routes/*.ts"],
 };
