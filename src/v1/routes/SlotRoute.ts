@@ -62,6 +62,7 @@ SlotRouter.get("/", SlotController.findAll);
  *            schema:
  *                type: number
  *            required: true
+ *            description: The slot id
  *      responses:
  *          200:
  *              description: success
