@@ -12,7 +12,7 @@ export const BookingRouter = Router();
  *   description: The Payments managing API
  * /api/v1/bookings:
  *   get:
- *     summary: Get lists of Payments
+ *     summary: Get list of Payments
  *     tags: [Bookings]
  *     responses:
  *       200:

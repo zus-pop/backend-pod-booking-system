@@ -48,6 +48,7 @@ export interface BookingProduct {
 }
 
 export interface BookingSlot {
+    id?: number;
     booking_id?: number;
     pod_id?: number;
 }
@@ -110,10 +111,14 @@ export interface Booking {
     booking_status?: keyof typeof BookingStatus;
 }
 
-export interface BookingSlot {
-    id: number;
-    booking_id?: number;
-    slot_id?: number;
+export interface StorePrice {
+    id?: number;
+    start_hour?: number;
+    end_hour?: number;
+    price?: number;
+    store_id?: number;
+    type_id?: number;
+    days_of_week?: number;
 }
 
 export enum BookingStatus {
