@@ -1,7 +1,6 @@
 import BookingController from "../../controllers/BookingController.ts";
 import { Router } from "express";
 import { validateEmptyObject } from "../../middlewares/emptyObject.ts";
-import { authenticateToken } from "../../middlewares/authenticateToken.ts";
 
 export const BookingRouter = Router();
 

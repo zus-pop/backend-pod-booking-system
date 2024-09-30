@@ -110,6 +110,12 @@ export interface Booking {
     booking_status?: keyof typeof BookingStatus;
 }
 
+export interface BookingSlot {
+    id: number;
+    booking_id?: number;
+    slot_id?: number;
+}
+
 export enum BookingStatus {
     Pending = "Pending",
     Confirmed = "Confirmed",

@@ -5,45 +5,61 @@ import { pool } from "../config/pool.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
-const connection = await pool.getConnection();
 
 const findAll = async () => {
+    const connection = await pool.getConnection();
     try {
         const users = await UserRepo.findAll(connection);
         return users;
     } catch (err) {
         console.error(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 const findById = async (id: number) => {
+    const connection = await pool.getConnection();
     try {
         const user = await UserRepo.findById(id, connection);
         return user;
     } catch (err) {
         console.error(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
 const findByEmail = async (email: string) => {
+    const connection = await pool.getConnection();
     try {
         const user = await UserRepo.findByEmail(email, connection);
         return user;
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
-const persist = (user: {
+const persist = async (user: {
     email: string;
     password: string;
     user_name: string;
     role_id: number;
     phone_number?: string;
 }) => {
-    return UserRepo.persist(user, connection);
+    const connection = await pool.getConnection();
+    try {
+        return UserRepo.persist(user, connection);
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
 };
 
 const comparePassword = async (password: string, hashedPassword: string) => {

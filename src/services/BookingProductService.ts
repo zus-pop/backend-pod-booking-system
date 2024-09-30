@@ -1,9 +1,8 @@
 import { pool } from "../config/pool.ts";
 import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 
-const connection = await pool.getConnection();
-
 const findAllBookingProducts = async () => {
+    const connection = await pool.getConnection();
     try {
         const bookingProducts = await BookingProductRepository.findAll(
             connection
@@ -12,10 +11,13 @@ const findAllBookingProducts = async () => {
     } catch (err) {
         console.error(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
-const findByBookingId = (booking_id: number) => {
+const findByBookingId = async (booking_id: number) => {
+    const connection = await pool.getConnection();
     try {
         const bookingProducts = BookingProductRepository.findByBookingId(
             booking_id,
@@ -25,6 +27,8 @@ const findByBookingId = (booking_id: number) => {
     } catch (err) {
         console.error(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
