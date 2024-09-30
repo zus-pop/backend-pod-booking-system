@@ -1,6 +1,6 @@
 import moment from "moment";
 import BookingRepo from "../repositories/BookingRepository.ts";
-import { Booking, BookingProduct } from "../types/type.ts";
+import { Booking, BookingProduct, BookingSlot } from "../types/type.ts";
 import SlotService from "./SlotService.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { pool } from "../config/pool.ts";
@@ -51,7 +51,7 @@ const findBookingByTransactionId = async (transaction_id: number) => {
 
 const createABooking = async (
     booking: Booking,
-    bookingProducts: BookingProduct[],
+    bookingSlots: BookingSlot[],
     user_id: number
 ) => {
     const connection = await pool.getConnection();
@@ -80,10 +80,13 @@ const createABooking = async (
         //         stock: newStock,
         //     });
         // }
-        const slot = await SlotService.findSlotById(1); // This need to be change for [slots]
-        const total_cost = await getTotalCost(bookingProducts, slot!);
+        bookingSlots = bookingSlots.map((bookingSlot) => ({
+            ...bookingSlot,
+            booking_id: bookingResult.insertId,
+        }));
+        const total_cost = await getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
-            await createOnlinePaymentRequest(bookingProducts);
+            await createOnlinePaymentRequest(bookingSlots);
         if (return_code === 1) {
             const paymentResult = await PaymentRepository.create(
                 {

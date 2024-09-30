@@ -50,7 +50,8 @@ export interface BookingProduct {
 export interface BookingSlot {
     id?: number;
     booking_id?: number;
-    pod_id?: number;
+    slot_id?: number;
+    price?: number;
 }
 
 export interface Category {

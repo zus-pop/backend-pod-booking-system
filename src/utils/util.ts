@@ -1,7 +1,13 @@
 import moment from "moment";
 import "dotenv/config";
 import { pool } from "../config/pool.ts";
-import { BookingProduct, Payment, Slot, SlotOption } from "../types/type.ts";
+import {
+    BookingProduct,
+    BookingSlot,
+    Payment,
+    Slot,
+    SlotOption,
+} from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
@@ -60,16 +66,9 @@ export const generateSlots = async (
     }
 };
 
-export const getTotalCost = async (
-    bookingProducts: BookingProduct[],
-    slot: Slot
-) => {
+export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
     let totalCost = 0;
-    totalCost = bookingProducts.reduce(
-        (acc, curr) => acc + curr.unit_price! * curr.quantity!,
-        0
-    );
-    totalCost += slot?.unit_price!;
+    totalCost = bookingSlots.reduce((acc, curr) => acc + curr.price!, 0);
     return totalCost;
 };
 

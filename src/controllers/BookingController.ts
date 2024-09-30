@@ -1,6 +1,6 @@
 import BookingService from "../services/BookingService.ts";
 import { Request, Response } from "express";
-import { Booking, BookingProduct } from "../types/type.ts";
+import { Booking, BookingProduct, BookingSlot } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const bookings = await BookingService.findAllBooking();
@@ -22,13 +22,13 @@ const findById = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
     const {
         booking,
-        bookingProducts,
-    }: { booking: Booking; bookingProducts: BookingProduct[] } = req.body;
+        bookingSlots,
+    }: { booking: Booking; bookingSlots: BookingSlot[] } = req.body;
     const { payload } = req;
 
     const result = await BookingService.createABooking(
         booking,
-        bookingProducts,
+        bookingSlots,
         payload.user_id
     );
     if (!result) {
