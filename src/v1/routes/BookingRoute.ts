@@ -1,7 +1,6 @@
 import BookingController from "../../controllers/BookingController.ts";
 import { Router } from "express";
 import { validateEmptyObject } from "../../middlewares/emptyObject.ts";
-import { authenticateToken } from "../../middlewares/authenticateToken.ts";
 
 export const BookingRouter = Router();
 
@@ -13,7 +12,7 @@ export const BookingRouter = Router();
  *   description: The Payments managing API
  * /api/v1/bookings:
  *   get:
- *     summary: Get lists of Payments
+ *     summary: Get list of Payments
  *     tags: [Bookings]
  *     responses:
  *       200:

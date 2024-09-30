@@ -2,9 +2,8 @@ import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot } from "../types/type.ts";
 
-const connection = await pool.getConnection();
-
 const findAllSlot = async () => {
+    const connection = await pool.getConnection();
     try {
         const slots = await SlotRepo.findAll(connection);
         return slots;
@@ -17,6 +16,7 @@ const findAllSlot = async () => {
 };
 
 const findSlotById = async (id: number) => {
+    const connection = await pool.getConnection();
     try {
         const slot = await SlotRepo.findById(id, connection);
         return slot;
@@ -29,6 +29,7 @@ const findSlotById = async (id: number) => {
 };
 
 const updateSlot = async (slot: Slot) => {
+    const connection = await pool.getConnection();
     try {
         const result = await SlotRepo.update(slot, connection);
         return result;

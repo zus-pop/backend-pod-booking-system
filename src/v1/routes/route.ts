@@ -8,17 +8,21 @@ import { StoreRouter } from "./StoreRoute.ts";
 import { PODTypeRouter } from "./PODTypeRoute.ts";
 import { BookingRouter } from "./BookingRoute.ts";
 import { BookingProductRouter } from "./BookingProductRoute.ts";
+import { BookingSlotRouter } from "./BookingSlotRoute.ts";
 import { PaymentRouter } from "./PaymentRoute.ts";
+import { StorePriceRouter } from "./StorePriceRoute.ts";
 
 export const router = (app: Express) => {
     app.use("/api/v1/auth", UserRouter);
     app.use("/api/v1/pods", PODRouter);
+    app.use("/api/v1/pod-types", PODTypeRouter);
     app.use("/api/v1/slots", SlotRouter);
     app.use("/api/v1/products", ProductRouter);
     app.use("/api/v1/categories", CategoryRouter);
     app.use("/api/v1/stores", StoreRouter);
-    app.use("/api/v1/pod-types", PODTypeRouter);
+    app.use("/api/v1/store-prices", StorePriceRouter);
     app.use("/api/v1/bookings", BookingRouter);
     app.use("/api/v1/booking-products", BookingProductRouter);
+    app.use("/api/v1/booking-slots", BookingSlotRouter);
     app.use("/api/v1/payments", PaymentRouter);
 };

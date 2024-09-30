@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { Slot } from "../types/type.ts";
 import moment from "moment";
 import { ResultSetHeader, RowDataPacket } from "mysql2";

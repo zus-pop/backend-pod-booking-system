@@ -8,9 +8,9 @@ import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 import PaymentRepository from "../repositories/PaymentRepository.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
-const connection = await pool.getConnection();
 
 const findAllBooking = async () => {
+    const connection = await pool.getConnection();
     try {
         const bookings = await BookingRepo.findAll(connection);
         return bookings;
@@ -18,26 +18,24 @@ const findAllBooking = async () => {
         console.log(err);
         return null;
     } finally {
-        if (connection) {
-            connection.release();
-        }
+        connection.release();
     }
 };
 
 const findBookingById = async (id: number) => {
+    const connection = await pool.getConnection();
     try {
         const booking = await BookingRepo.findById(id, connection);
         return booking;
     } catch (err) {
         return null;
     } finally {
-        if (connection) {
-            connection.release();
-        }
+        connection.release();
     }
 };
 
 const findBookingByTransactionId = async (transaction_id: number) => {
+    const connection = await pool.getConnection();
     try {
         const booking = await BookingRepo.findByTransactionId(
             transaction_id,
@@ -47,9 +45,7 @@ const findBookingByTransactionId = async (transaction_id: number) => {
     } catch (err) {
         return null;
     } finally {
-        if (connection) {
-            connection.release();
-        }
+        connection.release();
     }
 };
 
@@ -58,6 +54,7 @@ const createABooking = async (
     bookingProducts: BookingProduct[],
     user_id: number
 ) => {
+    const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
         booking = {
@@ -106,23 +103,21 @@ const createABooking = async (
         await connection.rollback();
         return null;
     } finally {
-        if (connection) {
-            connection.release();
-        }
+        connection.release();
     }
     return 1;
 };
 
 const updateABooking = async (booking: Booking) => {
+    const connection = await pool.getConnection();
     try {
         const result = await BookingRepo.update(booking, connection);
         return result;
     } catch (err) {
+        console.log(err);
         return null;
     } finally {
-        if (connection) {
-            connection.release();
-        }
+        connection.release();
     }
 };
 
