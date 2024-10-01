@@ -28,10 +28,10 @@ export const trackBooking = (booking_id: number) => {
                 `Booking ${booking.booking_id} is canceled -> stop the job`
             );
             // release slot available again
-            await SlotService.updateSlot({
-                slot_id: booking.slot_id,
-                is_available: true,
-            });
+            // await SlotService.updateSlot({
+            //     slot_id: booking.slot_id,
+            //     is_available: true,
+            // });
             // update product stock
             setTimeout(() => {
                 job.stop();
