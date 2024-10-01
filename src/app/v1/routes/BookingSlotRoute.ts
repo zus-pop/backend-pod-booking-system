@@ -46,7 +46,7 @@ export const BookingSlotRouter = Router();
  *                                  type: string
  *                                  description: response error message
  *                                  example: Not found any slot!
-*/
+ */
 BookingSlotRouter.get("/", BookingSlotController.findAllSlot);
 
 // GET: api/v1/booking-slots/:booking_id
@@ -96,8 +96,8 @@ BookingSlotRouter.get("/", BookingSlotController.findAllSlot);
  *                                  type: string
  *                                  description: response error message
  *                                  example: Not found any slot!
-*
-*/
+ *
+ */
 BookingSlotRouter.get(
     "/:booking_id",
     BookingSlotController.findAllSlotByBookingId

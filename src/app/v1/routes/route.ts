@@ -26,5 +26,5 @@ export const router = (app: Express) => {
   app.use("/api/v1/booking-products", BookingProductRouter);
   app.use("/api/v1/booking-slots", BookingSlotRouter);
   app.use("/api/v1/payments", PaymentRouter);
-  app.use("/api/v1/utility", UtilityRouter);
+  app.use("/api/v1/utilities", UtilityRouter);
 };

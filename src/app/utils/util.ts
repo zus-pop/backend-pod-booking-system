@@ -1,13 +1,13 @@
 import moment from "moment";
 import "dotenv/config";
-import { pool } from "../config/pool.ts";
-import { BookingProduct, Payment, Slot, SlotOption } from "../types/type.ts";
+import { BookingSlot, SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
+import BookingRepository from "../repositories/BookingRepository.ts";
 
 // const conn = await pool.getConnection();
-const formatType = "YYYY-MM-DD HH:mm:ss";
+const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
 export const generateSlots = async (
     connection: PoolConnection,
@@ -29,10 +29,10 @@ export const generateSlots = async (
         while (startDatetime.isBefore(endDatetime)) {
             const slot = {
                 pod_id: options.podId,
-                start_time: startDatetime.format(formatType),
+                start_time: startDatetime.format(FORMAT_TYPE),
                 end_time: startDatetime
                     .add(options.durationMinutes, "minutes")
-                    .format(formatType),
+                    .format(FORMAT_TYPE),
                 unit_price: options.unitPrice,
                 is_available: true,
             };
@@ -60,16 +60,9 @@ export const generateSlots = async (
     }
 };
 
-export const getTotalCost = async (
-    bookingProducts: BookingProduct[],
-    slot: Slot
-) => {
+export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
     let totalCost = 0;
-    totalCost = bookingProducts.reduce(
-        (acc, curr) => acc + curr.unit_price! * curr.quantity!,
-        0
-    );
-    totalCost += slot?.unit_price!;
+    totalCost = bookingSlots.reduce((acc, curr) => acc + curr.price!, 0);
     return totalCost;
 };
 
@@ -87,10 +80,16 @@ export const bookingTracker = (
     booking_id: number,
     connection: PoolConnection
 ) => {
-    cron.schedule("* * * * * *", async () => {});
-    const threshHold = 5;
-    const current = moment().format(formatType);
-
-    const create_at = "2024-09-28 14:30:00";
-    console.log(moment(current).diff(moment(create_at), "minutes"));
+    cron.schedule("* * * * * *", async () => {
+        const threshHold = 5;
+        const current = moment().format(FORMAT_TYPE);
+        const booking = await BookingRepository.findById(
+            booking_id,
+            connection
+        );
+        const create_at = moment(booking?.booking_date).format(FORMAT_TYPE);
+        if (moment(current).diff(moment(create_at), "minutes") >= threshHold) {
+            console.log("Booking has been expired");
+        }
+    });
 };

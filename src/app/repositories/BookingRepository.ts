@@ -30,7 +30,10 @@ const findById = async (id: number, connection: PoolConnection) => {
     return bookings[0] as Booking;
 };
 
-const findByTransactionId = async (transaction_id: number, connection: PoolConnection) => {
+const findByTransactionId = async (
+    transaction_id: number,
+    connection: PoolConnection
+) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "booking_id",

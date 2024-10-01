@@ -12,7 +12,7 @@
         "noEmit": true,
     },
     "include": [
-        "src/**/*.ts"
+        "src/app/**/*.ts"
     ],
     "exclude": [
         "node_modules"
