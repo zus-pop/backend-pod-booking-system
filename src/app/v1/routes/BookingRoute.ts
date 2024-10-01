@@ -116,8 +116,8 @@ BookingRouter.get("/", BookingController.findAll);
  *                                  example: Pending
  *          404:
  *              description: Booking found
-*
-*/
+ *
+ */
 BookingRouter.get("/:id", BookingController.findById);
 
 // POST: api/v1/bookings
@@ -170,5 +170,5 @@ BookingRouter.get("/:id", BookingController.findById);
  *                                  type: string
  *                                  description: update message response
  *                                  example: Booking not found
-*/
+ */
 BookingRouter.put("/", validateEmptyObject, BookingController.update);

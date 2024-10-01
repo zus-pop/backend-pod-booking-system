@@ -6,6 +6,7 @@ import { getTotalCost } from "../utils/util.ts";
 import { pool } from "../config/pool.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 import PaymentRepository from "../repositories/PaymentRepository.ts";
+import SlotRepository from "../repositories/SlotRepository.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -99,6 +100,11 @@ const createABooking = async (
                 connection
             );
             // Update soon
+            await SlotRepository.updateStatusMultipleSlot(
+                false,
+                bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
+                connection
+            );
             await connection.commit();
         } else throw new Error(sub_return_message);
     } catch (err) {

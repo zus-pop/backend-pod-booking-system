@@ -1,7 +1,6 @@
 import { pool } from "../config/pool.ts";
 import PODRepo from "../repositories/PODRepository.ts";
 
-
 const findAllPOD = async () => {
     const connection = await pool.getConnection();
     try {

@@ -2,7 +2,6 @@ import { RowDataPacket } from "mysql2";
 import { POD } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
 
-
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
     const colum = ["pod_id", "pod_name", "type_id", "is_available"];

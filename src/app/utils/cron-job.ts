@@ -30,8 +30,8 @@ export const trackBooking = (booking_id: number) => {
             // release slot available again
             await SlotService.updateSlot({
                 slot_id: booking.slot_id,
-                is_available: true
-            })
+                is_available: true,
+            });
             // update product stock
             setTimeout(() => {
                 job.stop();
