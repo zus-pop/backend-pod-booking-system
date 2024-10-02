@@ -163,10 +163,17 @@ UserRouter.post("/register", UserController.register);
  *                                      type: string
  *                                      description: name of user
  *                                      example: marry jane
- *                                  role_id:
- *                                      type: integer
- *                                      description: role of user
- *                                      example: 2
+ *                                  role:
+ *                                      type: object
+ *                                      properties:
+ *                                          role_id:
+ *                                              type: integer
+ *                                              description: id of role
+ *                                              example: 2
+ *                                          role_name:
+ *                                              type: string
+ *                                              description: name of role
+ *                                              example: Customer
  *          404:
  *              description: No users found
  *              content:
@@ -211,10 +218,17 @@ UserRouter.get("/users", UserController.findAll);
  *                                      type: string
  *                                      description: name of user
  *                                      example: marry jane
- *                                  role_id:
- *                                      type: integer
- *                                      description: role of user
- *                                      example: 2
+ *                                  role:
+ *                                      type: object
+ *                                      properties:
+ *                                          role_id:
+ *                                              type: integer
+ *                                              description: id of role
+ *                                              example: 2
+ *                                          role_name:
+ *                                              type: string
+ *                                              description: name of role
+ *                                              example: Customer
  *          401:
  *              description: No token provided
  *              content:

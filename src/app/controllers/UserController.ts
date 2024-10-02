@@ -7,14 +7,7 @@ const findAll = async (_: Request, res: Response) => {
     if (!users) {
         return res.status(404).json({ message: "No users found" });
     }
-    return res.status(200).json(
-        users.map((user) => ({
-            user_id: user.user_id,
-            email: user.email,
-            user_name: user.user_name,
-            role_id: user.role_id,
-        }))
-    );
+    return res.status(200).json(users);
 };
 
 const login = async (req: Request, res: Response) => {
@@ -62,12 +55,7 @@ const register = async (req: Request, res: Response) => {
 const getUser = async (req: Request, res: Response) => {
     const { payload } = req;
     const user = await UserService.findById(payload.user_id);
-    res.status(200).json({
-        user_id: user?.user_id,
-        email: user?.email,
-        user_name: user?.user_name,
-        role_id: user?.role_id,
-    });
+    res.status(200).json(user);
 };
 
 export default {
