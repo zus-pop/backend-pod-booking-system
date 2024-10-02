@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/UserService.ts";
-import { Role } from "../types/type.ts";
+import { Roles } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const users = await UserService.findAll();
@@ -48,7 +48,7 @@ const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         user_name,
-        role_id: Role.Customer,
+        role_id: Roles.Customer,
     };
     const result = await UserService.persist(newUser);
     if (!result) {
