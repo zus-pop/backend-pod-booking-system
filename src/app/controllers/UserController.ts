@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 import UserService from "../services/UserService.ts";
-import { Role } from "../types/type.ts";
+import { Roles } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const users = await UserService.findAll();
     if (!users) {
         return res.status(404).json({ message: "No users found" });
     }
-    return res.status(200).json(
-        users.map((user) => ({
-            user_id: user.user_id,
-            email: user.email,
-            user_name: user.user_name,
-            role_id: user.role_id,
-        }))
-    );
+    return res.status(200).json(users);
 };
 
 const login = async (req: Request, res: Response) => {
@@ -48,7 +41,7 @@ const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         user_name,
-        role_id: Role.Customer,
+        role_id: Roles.Customer,
     };
     const result = await UserService.persist(newUser);
     if (!result) {
@@ -62,12 +55,7 @@ const register = async (req: Request, res: Response) => {
 const getUser = async (req: Request, res: Response) => {
     const { payload } = req;
     const user = await UserService.findById(payload.user_id);
-    res.status(200).json({
-        user_id: user?.user_id,
-        email: user?.email,
-        user_name: user?.user_name,
-        role_id: user?.role_id,
-    });
+    res.status(200).json(user);
 };
 
 export default {

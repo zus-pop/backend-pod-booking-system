@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import UserRepo from "../repositories/UserRepository.ts";
+import RoleRepo from "../repositories/RoleRepository.ts";
 import { pool } from "../config/pool.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
@@ -10,7 +11,14 @@ const findAll = async () => {
     const connection = await pool.getConnection();
     try {
         const users = await UserRepo.findAll(connection);
-        return users;
+        return await Promise.all(
+            users.map(async (user) => ({
+                user_id: user.user_id,
+                email: user.email,
+                user_name: user.user_name,
+                role: await RoleRepo.findById(user.role_id, connection),
+            }))
+        );
     } catch (err) {
         console.error(err);
         return null;
@@ -22,7 +30,12 @@ const findById = async (id: number) => {
     const connection = await pool.getConnection();
     try {
         const user = await UserRepo.findById(id, connection);
-        return user;
+        return {
+            user_id: user.user_id,
+            email: user.email,
+            user_name: user.user_name,
+            role: await RoleRepo.findById(user.role_id, connection),
+        };
     } catch (err) {
         console.error(err);
         return null;
