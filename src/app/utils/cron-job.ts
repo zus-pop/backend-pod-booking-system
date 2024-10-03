@@ -4,6 +4,8 @@ import cron from "node-cron";
 import BookingService from "../services/BookingService.ts";
 import SlotService from "../services/SlotService.ts";
 import BookingSlotService from "../services/BookingSlotService.ts";
+import PaymentService from "../services/PaymentService.ts";
+import { getPaymentStatus } from "./zalo.ts";
 
 export const trackBooking = (booking_id: number) => {
     const job = cron.schedule("* * * * * *", async () => {
@@ -51,12 +53,61 @@ export const trackBooking = (booking_id: number) => {
                     true,
                     bookingSlots!.map((bookingSlot) => bookingSlot.slot_id!)
                 );
+                await BookingService.updateABooking({
+                    booking_id,
+                    booking_status: "Canceled",
+                });
                 console.log(
                     `Booking ${booking!.booking_id} is expired -> stop the job`
                 );
                 setTimeout(() => {
                     job.stop();
                 }, 0);
+            }
+        }
+    });
+};
+
+export const trackPayment = (payment_id: number) => {
+    const job = cron.schedule("* * * * * *", async () => {
+        const payment = await PaymentService.findPaymentById(payment_id);
+        if (payment) {
+            const { return_code } = await getPaymentStatus(
+                payment.transaction_id!
+            );
+            if (return_code === 1) {
+                // payment is successful
+                console.log(
+                    `Payment ${payment_id} is successful -> stop the job`
+                );
+                await PaymentService.updatePayment({
+                    transaction_id: payment.transaction_id,
+                    payment_status: "Paid",
+                });
+                await BookingService.updateABooking({
+                    booking_id: payment.booking_id,
+                    booking_status: "Confirmed",
+                });
+                setTimeout(() => {
+                    job.stop();
+                }, 0);
+            } else if (return_code === 2) {
+                // payment is failed
+                console.log(`Payment ${payment_id} is failed -> stop the job`);
+                await PaymentService.updatePayment({
+                    transaction_id: payment.transaction_id,
+                    payment_status: "Failed",
+                });
+                await BookingService.updateABooking({
+                    booking_id: payment.booking_id,
+                    booking_status: "Canceled",
+                });
+                setTimeout(() => {
+                    job.stop();
+                }, 0);
+            } else {
+                // payment is pending
+                console.log(`Payment ${payment_id} is processing`);
             }
         }
     });

@@ -84,7 +84,7 @@ export const callbackPayment = async (dataStr: any, reqMac: any) => {
                 "update order's status = success where app_trans_id =",
                 dataJson["app_trans_id"]
             );
-            PaymentRepo.update(
+            PaymentRepo.updateByTransactionId(
                 {
                     transaction_id: dataJson["app_trans_id"],
                     payment_status: "Paid",
@@ -136,5 +136,13 @@ export const getPaymentStatus = async (app_trans_id: string) => {
         body: qs.stringify(postData),
     });
     const query = await response.json();
-    return query;
+    return query as {
+        return_code: 1 | 2 | 3;
+        return_message: string;
+        sub_return_code: number;
+        is_processing: boolean;
+        amount: number;
+        discount_amount: number;
+        zp_trans_id: number;
+    };
 };

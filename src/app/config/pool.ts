@@ -10,6 +10,7 @@ export const pool = mysql2.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     connectionLimit: 30,
+    timezone: "Z",
     typeCast: (field: TypeCastField, next: TypeCastNext) => {
         if (field.type === "TINY" && field.length === 1) {
             return field.string() === "1";

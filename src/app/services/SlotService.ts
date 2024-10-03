@@ -98,11 +98,11 @@ const checkAllAvailableSlot = async (slot_ids: number[]) => {
             message: notAvailableSlots
                 .map(
                     (notAvailableSlot) =>
-                        `Slot from ( ${moment(
-                            notAvailableSlot.start_time
-                        ).format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment(
-                            notAvailableSlot.end_time
-                        ).format("YYYY-MM-DD HH:mm:ss")} ) is not available`
+                        `Slot from ( ${moment
+                            .utc(notAvailableSlot.start_time)
+                            .format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment
+                            .utc(notAvailableSlot.end_time)
+                            .format("YYYY-MM-DD HH:mm:ss")} ) is not available`
                 )
                 .join("\r\n"),
         };

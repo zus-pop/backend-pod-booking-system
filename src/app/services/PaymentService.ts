@@ -59,7 +59,7 @@ const createPayment = async (payment: Payment) => {
 const updatePayment = async (payment: Payment) => {
     const connection = await pool.getConnection();
     try {
-        const updatedPayment = await PaymentRepo.update(payment, connection);
+        const updatedPayment = await PaymentRepo.updateByTransactionId(payment, connection);
         return updatedPayment;
     } catch (err) {
         throw err;

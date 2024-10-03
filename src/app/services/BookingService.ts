@@ -6,7 +6,7 @@ import SlotRepo from "../repositories/SlotRepository.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 import { Booking, BookingSlot } from "../types/type.ts";
 import { getTotalCost } from "../utils/util.ts";
-import { trackBooking } from "../utils/cron-job.ts";
+import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
@@ -65,7 +65,7 @@ const createABooking = async (
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest(bookingSlots, total_cost);
         if (return_code === 1) {
-            await PaymentRepo.create(
+            const paymentResult = await PaymentRepo.create(
                 {
                     booking_id: bookingResult.insertId,
                     transaction_id: app_trans_id,
@@ -78,6 +78,7 @@ const createABooking = async (
             );
             await connection.commit();
             trackBooking(bookingResult.insertId);
+            trackPayment(paymentResult.insertId);
             return {
                 payment_url: order_url,
                 message: sub_return_message,
