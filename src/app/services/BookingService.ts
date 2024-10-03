@@ -65,22 +65,6 @@ const createABooking = async (
             booking_status: "Pending",
         };
         const bookingResult = await BookingRepo.create(booking, connection);
-        // bookingProducts = bookingProducts.map((bookingProduct) => ({
-        //     ...bookingProduct,
-        //     booking_id: bookingResult.insertId,
-        // }));
-        // await BookingProductRepository.create(bookingProducts, connection);
-        // for (const bookingProduct of bookingProducts) {
-        //     const product = await ProductService.findProductById(
-        //         bookingProduct.product_id!
-        //     );
-        //     const newStock = product?.stock! - bookingProduct.quantity!;
-        //     await ProductService.updateProduct({
-        //         // This need to beed change in the repo
-        //         product_id: bookingProduct.product_id,
-        //         stock: newStock,
-        //     });
-        // }
         bookingSlots = bookingSlots.map((bookingSlot) => ({
             ...bookingSlot,
             booking_id: bookingResult.insertId,
@@ -89,7 +73,7 @@ const createABooking = async (
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest(bookingSlots);
         if (return_code === 1) {
-            const paymentResult = await PaymentRepository.create(
+            await PaymentRepository.create(
                 {
                     booking_id: bookingResult.insertId,
                     transaction_id: app_trans_id,
@@ -99,13 +83,17 @@ const createABooking = async (
                 },
                 connection
             );
-            // Update soon
             await SlotRepository.updateStatusMultipleSlot(
                 false,
                 bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
                 connection
             );
+            // Update soon
             await connection.commit();
+            return {
+                order_url,
+                message: sub_return_message,
+            };
         } else throw new Error(sub_return_message);
     } catch (err) {
         console.log(err);
@@ -114,7 +102,6 @@ const createABooking = async (
     } finally {
         connection.release();
     }
-    return 1;
 };
 
 const updateABooking = async (booking: Booking) => {

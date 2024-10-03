@@ -1,3 +1,4 @@
+import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot } from "../types/type.ts";
@@ -33,6 +34,78 @@ const findSlotByRangeOfId = async (slot_ids: number[]) => {
     try {
         const slots = await SlotRepo.findByMultipleId(slot_ids, connection);
         return slots;
+    } catch (err) {
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const findByPodId = async (pod_id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        const slots = await SlotRepo.findByPodId(pod_id, connection);
+        return slots;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+};
+
+const findAvailableSlotByDate = async (date: Date | string) => {
+    const connection = await pool.getConnection();
+    try {
+        const slots = await SlotRepo.findAvailableSlotByDate(date, connection);
+        return slots;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+};
+
+const findAvailableSlotByDateAndPodId = async (
+    pod_id: number,
+    date: Date | string
+) => {
+    const connection = await pool.getConnection();
+    try {
+        const slots = await SlotRepo.findAvailableSlotByDateAndPodId(
+            pod_id,
+            date,
+            connection
+        );
+        return slots;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+};
+
+const checkAllAvailableSlot = async (slot_ids: number[]) => {
+    const connection = await pool.getConnection();
+    try {
+        const slots = await SlotRepo.findByMultipleId(slot_ids, connection);
+        const notAvailableSlots = slots.filter((slot) => !slot.is_available);
+        if (notAvailableSlots.length === 0) {
+            return {
+                status: true,
+                message: "All slots are available",
+            };
+        }
+        return {
+            status: false,
+            message: notAvailableSlots
+                .map(
+                    (notAvailableSlot) =>
+                        `Slot from ( ${moment(
+                            notAvailableSlot.start_time
+                        ).format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment(
+                            notAvailableSlot.end_time
+                        ).format("YYYY-MM-DD HH:mm:ss")} ) is not available`
+                )
+                .join("\r\n"),
+        };
     } catch (err) {
         console.log(err);
         return null;
@@ -78,6 +151,10 @@ export default {
     findAllSlot,
     findSlotById,
     findSlotByRangeOfId,
+    // findByPodId,
+    // findAvailableSlotByDate,
+    findAvailableSlotByDateAndPodId,
+    checkAllAvailableSlot,
     updateSlot,
     updateMultipleSlot,
 };

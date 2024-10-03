@@ -96,8 +96,8 @@ export interface Store {
 export interface Slot {
     slot_id?: number;
     pod_id?: number;
-    start_time?: Date;
-    end_time?: Date;
+    start_time?: Date | string;
+    end_time?: Date | string;
     unit_price?: number;
     is_available?: boolean;
 }
