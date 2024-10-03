@@ -70,6 +70,7 @@ export interface Payment {
     booking_id?: number;
     transaction_id?: string;
     total_cost?: number;
+    payment_url?: string;
     payment_date?: Date | string;
     payment_status?: keyof typeof PaymentStatus;
 }
@@ -137,7 +138,7 @@ export enum BookingStatus {
     Pending = "Pending",
     Confirmed = "Confirmed",
     Canceled = "Canceled",
-    Completed = "Completed",
+    Complete = "Complete",
     Ongoing = "Ongoing",
 }
 

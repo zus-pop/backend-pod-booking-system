@@ -35,7 +35,7 @@ export const createOnlinePaymentRequest = async (
         amount,
         expire_duration_seconds: 300,
         callback_url:
-            "https://42af-118-69-69-187.ngrok-free.app/api/v1/payments/callback",
+            "https://dbac-116-110-41-26.ngrok-free.app/api/v1/payments/callback",
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };

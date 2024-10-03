@@ -1,12 +1,13 @@
 import moment from "moment";
-import BookingRepo from "../repositories/BookingRepository.ts";
-import { Booking, BookingSlot } from "../types/type.ts";
-import { getTotalCost } from "../utils/util.ts";
 import { pool } from "../config/pool.ts";
-import { createOnlinePaymentRequest } from "../utils/zalo.ts";
+import BookingRepo from "../repositories/BookingRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
+import { Booking, BookingSlot } from "../types/type.ts";
+import { getTotalCost } from "../utils/util.ts";
+import { trackBooking } from "../utils/cron-job.ts";
+import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -69,14 +70,16 @@ const createABooking = async (
                     booking_id: bookingResult.insertId,
                     transaction_id: app_trans_id,
                     total_cost,
+                    payment_url: order_url,
                     payment_date: moment().format(FORMAT_TYPE),
                     payment_status: "Unpaid",
                 },
                 connection
             );
             await connection.commit();
+            trackBooking(bookingResult.insertId);
             return {
-                order_url,
+                payment_url: order_url,
                 message: sub_return_message,
             };
         } else throw new Error(sub_return_message);
