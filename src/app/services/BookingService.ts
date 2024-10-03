@@ -1,12 +1,12 @@
 import moment from "moment";
 import BookingRepo from "../repositories/BookingRepository.ts";
-import { Booking, BookingProduct, BookingSlot } from "../types/type.ts";
-import SlotService from "./SlotService.ts";
+import { Booking, BookingSlot } from "../types/type.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { pool } from "../config/pool.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
-import PaymentRepository from "../repositories/PaymentRepository.ts";
-import SlotRepository from "../repositories/SlotRepository.ts";
+import PaymentRepo from "../repositories/PaymentRepository.ts";
+import SlotRepo from "../repositories/SlotRepository.ts";
+import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -35,21 +35,6 @@ const findBookingById = async (id: number) => {
     }
 };
 
-const findBookingByTransactionId = async (transaction_id: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const booking = await BookingRepo.findByTransactionId(
-            transaction_id,
-            connection
-        );
-        return booking;
-    } catch (err) {
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
 const createABooking = async (
     booking: Booking,
     bookingSlots: BookingSlot[],
@@ -69,11 +54,17 @@ const createABooking = async (
             ...bookingSlot,
             booking_id: bookingResult.insertId,
         }));
+        await BookingSlotRepo.createMany(bookingSlots, connection);
+        await SlotRepo.updateStatusMultipleSlot(
+            false,
+            bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
+            connection
+        );
         const total_cost = await getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
-            await createOnlinePaymentRequest(bookingSlots);
+            await createOnlinePaymentRequest(bookingSlots, total_cost);
         if (return_code === 1) {
-            await PaymentRepository.create(
+            await PaymentRepo.create(
                 {
                     booking_id: bookingResult.insertId,
                     transaction_id: app_trans_id,
@@ -83,12 +74,6 @@ const createABooking = async (
                 },
                 connection
             );
-            await SlotRepository.updateStatusMultipleSlot(
-                false,
-                bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
-                connection
-            );
-            // Update soon
             await connection.commit();
             return {
                 order_url,
@@ -120,7 +105,6 @@ const updateABooking = async (booking: Booking) => {
 export default {
     findAllBooking,
     findBookingById,
-    findBookingByTransactionId,
     createABooking,
     updateABooking,
 };

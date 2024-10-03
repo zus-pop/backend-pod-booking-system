@@ -125,7 +125,7 @@ BookingRouter.get("/:id", BookingController.findById);
 // POST: api/v1/bookings
 BookingRouter.post(
     "/",
-    // authenticateToken,
+    authenticateToken,
     validateEmptyObject,
     checkAllAvailableSlot,
     BookingController.create

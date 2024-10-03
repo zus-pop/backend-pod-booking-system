@@ -2,7 +2,7 @@ import PaymentService from "../services/PaymentService.ts";
 import { Request, Response } from "express";
 import { callbackPayment } from "../utils/zalo.ts";
 
-const findAll = async (req: Request, res: Response) => {
+const findAll = async (_: Request, res: Response) => {
     const payments = await PaymentService.findAllPayment();
     if (!payments || !payments.length) {
         return res.status(404).json({ message: "No payments found" });

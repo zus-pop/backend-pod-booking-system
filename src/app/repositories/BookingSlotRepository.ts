@@ -1,4 +1,4 @@
-import { PoolConnection, RowDataPacket } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { BookingSlot } from "../types/type.ts";
 
 const findAllSlot = async (connection: PoolConnection) => {
@@ -20,7 +20,26 @@ const findAllSlotByBookingId = async (
     return rows as BookingSlot[];
 };
 
+const createMany = async (
+    bookingSlots: BookingSlot[],
+    connection: PoolConnection
+) => {
+    const sql = "INSERT INTO ?? (??) VALUES ?";
+    const values = [
+        "Booking_Slot",
+        ["booking_id", "slot_id", "price"],
+        bookingSlots.map((bookingSlot) => [
+            bookingSlot.booking_id,
+            bookingSlot.slot_id,
+            bookingSlot.price,
+        ]),
+    ];
+    const [rows] = await connection.query<ResultSetHeader>(sql, values);
+    return rows;
+};
+
 export default {
     findAllSlot,
     findAllSlotByBookingId,
+    createMany,
 };

@@ -28,6 +28,22 @@ const findPaymentById = async (id: number) => {
     }
 };
 
+const findByTransactionId = async (transaction_id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        const payment = await PaymentRepo.findByTransactionId(
+            transaction_id,
+            connection
+        );
+        return payment;
+    } catch (err) {
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 const createPayment = async (payment: Payment) => {
     const connection = await pool.getConnection();
     try {
@@ -55,6 +71,7 @@ const updatePayment = async (payment: Payment) => {
 export default {
     findAllPayment,
     findPaymentById,
+    findByTransactionId,
     createPayment,
     updatePayment,
 };

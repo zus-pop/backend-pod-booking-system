@@ -4,6 +4,9 @@ import crypto from "crypto";
 import PaymentService from "../services/PaymentService.ts";
 import BookingService from "../services/BookingService.ts";
 import qs from "qs";
+import { pool } from "../config/pool.ts";
+import PaymentRepo from "../repositories/PaymentRepository.ts";
+import BookingRepo from "../repositories/BookingRepository.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
@@ -14,7 +17,8 @@ const config = {
 };
 
 export const createOnlinePaymentRequest = async (
-    bookingProducts: BookingProduct[]
+    bookingProducts: BookingProduct[],
+    amount: number
 ) => {
     const embed_data = {
         redirecturl: "https://google.com",
@@ -28,9 +32,10 @@ export const createOnlinePaymentRequest = async (
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
         embed_data: JSON.stringify(embed_data),
-        amount: 50000,
+        amount,
         expire_duration_seconds: 300,
-        callback_url: "http://3.27.69.109:3000/api/v1/payments/callback",
+        callback_url:
+            "https://42af-118-69-69-187.ngrok-free.app/api/v1/payments/callback",
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };
@@ -58,6 +63,7 @@ export const createOnlinePaymentRequest = async (
 
 export const callbackPayment = async (dataStr: any, reqMac: any) => {
     const result: Record<string, any> = {};
+    const connection = await pool.getConnection();
     try {
         let mac = crypto
             .createHmac("sha256", config.KEY2)
@@ -78,17 +84,24 @@ export const callbackPayment = async (dataStr: any, reqMac: any) => {
                 "update order's status = success where app_trans_id =",
                 dataJson["app_trans_id"]
             );
-            PaymentService.updatePayment({
-                transaction_id: dataJson["app_trans_id"],
-                payment_status: "Paid",
-            });
-            const booking = await BookingService.findBookingByTransactionId(
-                dataJson["app_trans_id"]
+            PaymentRepo.update(
+                {
+                    transaction_id: dataJson["app_trans_id"],
+                    payment_status: "Paid",
+                },
+                connection
             );
-            await BookingService.updateABooking({
-                booking_id: booking?.booking_id,
-                booking_status: "Confirmed",
-            });
+            const payment = await PaymentRepo.findByTransactionId(
+                dataJson["app_trans_id"],
+                connection
+            );
+            await BookingRepo.update(
+                {
+                    booking_id: payment?.booking_id,
+                    booking_status: "Confirmed",
+                },
+                connection
+            );
 
             result.return_code = 1;
             result.return_message = "success";
@@ -96,6 +109,8 @@ export const callbackPayment = async (dataStr: any, reqMac: any) => {
     } catch (ex: any) {
         result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
         result.return_message = ex.message;
+    } finally {
+        connection.release();
     }
     // thông báo kết quả cho ZaloPay server
     return result;
