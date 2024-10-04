@@ -1,0 +1,31 @@
+import { pool } from "../config/pool.ts";
+import PODUtilityRepo from "../repositories/PODUtilityRepository.ts";
+
+const findAll = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const podUtility = await PODUtilityRepo.findAll(connection);
+    return podUtility;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+const findById = async (id: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const podUtility = await PODUtilityRepo.findById(id, connection);
+    return podUtility;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+export default {
+  findAll,
+  findById,
+};
