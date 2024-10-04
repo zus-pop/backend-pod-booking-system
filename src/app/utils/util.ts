@@ -1,10 +1,8 @@
-import moment from "moment";
 import "dotenv/config";
+import moment from "moment";
 import { BookingSlot, SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
 import { PoolConnection } from "mysql2/promise";
-import cron from "node-cron";
-import BookingRepository from "../repositories/BookingRepository.ts";
 
 // const conn = await pool.getConnection();
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
@@ -75,21 +73,3 @@ export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
 //     podId: 1,
 //     unitPrice: 85000,
 // });
-
-export const bookingTracker = (
-    booking_id: number,
-    connection: PoolConnection
-) => {
-    cron.schedule("* * * * * *", async () => {
-        const threshHold = 5;
-        const current = moment().format(FORMAT_TYPE);
-        const booking = await BookingRepository.findById(
-            booking_id,
-            connection
-        );
-        const create_at = moment(booking?.booking_date).format(FORMAT_TYPE);
-        if (moment(current).diff(moment(create_at), "minutes") >= threshHold) {
-            console.log("Booking has been expired");
-        }
-    });
-};

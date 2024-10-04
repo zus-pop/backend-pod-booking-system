@@ -25,7 +25,6 @@ const create = async (req: Request, res: Response) => {
         bookingSlots,
     }: { booking: Booking; bookingSlots: BookingSlot[] } = req.body;
     const { payload } = req;
-
     const result = await BookingService.createABooking(
         booking,
         bookingSlots,

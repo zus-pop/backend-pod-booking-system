@@ -1,6 +1,8 @@
 import BookingController from "../../controllers/BookingController.ts";
 import { Router } from "express";
 import { validateEmptyObject } from "../../middlewares/emptyObject.ts";
+import { authenticateToken } from "../../middlewares/authenticateToken.ts";
+import { checkAllAvailableSlot } from "../../middlewares/checkAllAvailableSlot.ts";
 
 export const BookingRouter = Router();
 
@@ -121,7 +123,13 @@ BookingRouter.get("/", BookingController.findAll);
 BookingRouter.get("/:id", BookingController.findById);
 
 // POST: api/v1/bookings
-// BookingRouter.post("/", authenticateToken, validateEmptyObject, BookingController.create);
+BookingRouter.post(
+    "/",
+    authenticateToken,
+    validateEmptyObject,
+    checkAllAvailableSlot,
+    BookingController.create
+);
 
 // PUT: api/v1/bookings
 /**

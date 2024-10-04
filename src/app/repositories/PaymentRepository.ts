@@ -75,11 +75,11 @@ const create = async (payment: Payment, connection: PoolConnection) => {
     return result;
 };
 
-const update = async (payment: Payment, connection: PoolConnection) => {
+const updateByTransactionId = async (payment: Payment, connection: PoolConnection) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ?";
     const values = [
         "Payment",
-        { payment },
+        payment,
         "transaction_id",
         payment.transaction_id,
     ];
@@ -93,5 +93,5 @@ export default {
     findByBookingId,
     findByTransactionId,
     create,
-    update,
+    updateByTransactionId,
 };
