@@ -1,6 +1,6 @@
 import BookingService from "../services/BookingService.ts";
 import { Request, Response } from "express";
-import { Booking, BookingProduct, BookingSlot } from "../types/type.ts";
+import { Booking, BookingSlot } from "../types/type.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const bookings = await BookingService.findAllBooking();
@@ -33,9 +33,7 @@ const create = async (req: Request, res: Response) => {
     if (!result) {
         return res.status(400).json({ message: "Failed to create booking" });
     }
-    return res
-        .status(200)
-        .json({ result, message: "Create a booking successfully" });
+    return res.status(200).json(result);
 };
 
 const update = async (req: Request, res: Response) => {
