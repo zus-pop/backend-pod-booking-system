@@ -256,5 +256,28 @@ UserRouter.get("/users", UserController.findAll);
  */
 UserRouter.get("/profile", authenticateToken, UserController.getUser);
 
+// GET: api/v1/auth/google-calendar
+// Google Calendar API
+UserRouter.get(
+    "/google-calendar",
+    // authenticateToken,
+    UserController.authenticateCalendar
+);
+
+// GET: api/v1/auth/google-calendar/redirect
+// Google Calendar API
+UserRouter.get(
+    "/google-calendar/redirect",
+    // authenticateToken,
+    UserController.calendarRedirect
+);
+
+// POST: api/v1/auth/google-calendar/sync
+UserRouter.post(
+    "/google-calendar/sync",
+    // authenticateToken,
+    UserController.syncCalendar
+);
+
 // POST: api/v1/auth/forgot-password
 // POST: api/v1/auth/reset-password
