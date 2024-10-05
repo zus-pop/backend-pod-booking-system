@@ -9,9 +9,6 @@ describe("Select multiple slot", () => {
         const slots = await SlotService.findSlotByRangeOfId(slot_ids);
         expect(slots).toHaveLength(slot_ids.length);
     });
-});
-
-describe("Select multiple slot", () => {
     test("should return list of available slot by date and pod id", async () => {
         const slots = await SlotService.findAvailableSlotByDateAndPodId(
             3,

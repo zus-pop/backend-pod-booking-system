@@ -11,7 +11,7 @@ export const BookingProductRouter = Router();
  *   description: The Payments managing API
  * /api/v1/booking-products:
  *   get:
- *     summary: Get lists of Payments
+ *     summary: Get lists of Booking Products
  *     tags: [Booking Products]
  *     responses:
  *       200:
@@ -51,7 +51,7 @@ BookingProductRouter.get("/", BookingProductController.findAll);
  * @openapi
  * /api/v1/booking-products/{booking_id}:
  *  get:
- *    summary: Get a single booking by its id
+ *    summary: Get list of booking products by booking id
  *    tags: [Booking Products]
  *    parameters:
  *          - in: path

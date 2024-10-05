@@ -19,10 +19,10 @@ export const trackBooking = (booking_id: number) => {
         console.log(
             `booking ${booking?.booking_id}: ${booking?.booking_status}`
         );
-        // const isConfirmed = booking?.booking_status === "Confirmed";
+        const isConfirmed = booking?.booking_status === "Confirmed";
         const isCanceled = booking?.booking_status === "Canceled";
-        const isComplete = booking?.booking_status === "Complete";
-        if (isComplete) {
+        // const isComplete = booking?.booking_status === "Complete";
+        if (isConfirmed) {
             setTimeout(() => {
                 console.log(
                     `Booking ${booking.booking_id} is confirmed -> stop the job`

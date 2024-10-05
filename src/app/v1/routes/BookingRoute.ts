@@ -14,7 +14,7 @@ export const BookingRouter = Router();
  *   description: The Payments managing API
  * /api/v1/bookings:
  *   get:
- *     summary: Get list of Payments
+ *     summary: Get list of Bookings
  *     tags: [Bookings]
  *     responses:
  *       200:
@@ -123,6 +123,70 @@ BookingRouter.get("/", BookingController.findAll);
 BookingRouter.get("/:id", BookingController.findById);
 
 // POST: api/v1/bookings
+/**
+ * @openapi
+ * /api/v1/bookings:
+ *  post:
+ *      summary: Create a new booking
+ *      security:
+ *          - Authorization: []
+ *      tags: [Bookings]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          booking:
+ *                              type: object
+ *                              properties:
+ *                                  pod_id:
+ *                                      type: integer
+ *                                      description: id of selected POD
+ *                                      example: 1
+ *                          bookingSlots:
+ *                              type: array
+ *                              items:
+ *                                  type: object
+ *                                  properties:
+ *                                      slot_id:
+ *                                          type: integer
+ *                                          description: id of POD's selected slot
+ *                                          example: 1
+ *                                      price:
+ *                                          type: integer
+ *                                          format: double
+ *                                          description: the price for the selected slot
+ *                                          example: 80000
+ *      responses:
+ *           200:
+ *              description: Create a booking
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              payment_url:
+ *                                  type: string
+ *                                  description: payment link for from online payment API
+ *                                  example: https://example.com/pay
+ *                              message:
+ *                                  type: string
+ *                                  description: message about the response status
+ *                                  example: Booking created successfully
+ *           400:
+ *               description: Create a booking failed
+ *               content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                               message:
+ *                                   type: string
+ *                                   description: message about the response status failed
+ *                                   example: Booking failed
+ */
 BookingRouter.post(
     "/",
     authenticateToken,

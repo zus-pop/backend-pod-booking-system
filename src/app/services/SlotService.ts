@@ -102,7 +102,7 @@ const checkAllAvailableSlot = async (slot_ids: number[]) => {
                             .utc(notAvailableSlot.start_time)
                             .format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment
                             .utc(notAvailableSlot.end_time)
-                            .format("YYYY-MM-DD HH:mm:ss")} ) is not available`
+                            .format("YYYY-MM-DD HH:mm:ss")} ) is taken by other customer`
                 )
                 .join("\r\n"),
         };
