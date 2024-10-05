@@ -54,7 +54,7 @@ BookingSlotRouter.get("/", BookingSlotController.findAllSlot);
  * @openapi
  * /api/v1/booking-slots/{booking_id}:
  *     get:
- *      summary: Get a single pod by its id
+ *      summary: Get a list of booking slots by booking id
  *      tags: [Booking Slots]
  *      parameters:
  *          - in: path
