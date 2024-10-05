@@ -10,8 +10,8 @@ const findAllSlot = async (_: Request, res: Response) => {
 };
 
 const findAllSlotByBookingId = async (req: Request, res: Response) => {
-    const { booking_id } = req.params;
-    const slots = await BookingSlotService.findAllSlotByBookingId(+booking_id);
+    const { id } = req.params;
+    const slots = await BookingSlotService.findAllSlotByBookingId(+id);
     if (!slots || !slots.length) {
         return res.status(404).json({ message: "Not found any slot!" });
     }
