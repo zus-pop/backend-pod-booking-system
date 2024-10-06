@@ -11,6 +11,7 @@ import { PaymentRouter } from "./PaymentRoute.ts";
 import { StorePriceRouter } from "./StorePriceRoute.ts";
 import { UtilityRouter } from "./UtilityRoute.ts";
 import { RoleRouter } from "./RoleRoute.ts";
+import { GoogleCalendarRouter } from "./GoogleCalendarRoute.ts";
 
 export const router = (app: Express) => {
     app.use("/api/v1/auth", UserRouter);
@@ -25,4 +26,5 @@ export const router = (app: Express) => {
     app.use("/api/v1/bookings", BookingRouter);
     app.use("/api/v1/payments", PaymentRouter);
     app.use("/api/v1/utilities", UtilityRouter);
+    app.use("/api/v1/google-calendar", GoogleCalendarRouter);
 };

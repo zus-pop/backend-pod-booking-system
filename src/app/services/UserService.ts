@@ -87,7 +87,7 @@ const hashPassword = async (password: string) => {
 
 const generateToken = (payload: string | Buffer | object) => {
     const token = jwt.sign(payload, JWT_SECRET_KEY, {
-        // expiresIn: "30m",
+        expiresIn: "30m",
     });
     return token;
 };

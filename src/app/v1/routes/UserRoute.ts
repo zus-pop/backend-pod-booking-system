@@ -1,11 +1,6 @@
 import { Router } from "express";
 import UserController from "../../controllers/UserController.ts";
 import { authenticateToken } from "../../middlewares/authenticateToken.ts";
-import {
-    authenticateCalendar,
-    calendarRedirect,
-    syncCalendar,
-} from "../../utils/google-calendar.ts";
 import BookingController from "../../controllers/BookingController.ts";
 
 export const UserRouter = Router();
@@ -264,29 +259,6 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
 
 // GET: api/v1/auth/bookings
 UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
-
-// GET: api/v1/auth/google-calendar
-// Google Calendar API
-UserRouter.get(
-    "/google-calendar",
-    // authenticateToken,
-    authenticateCalendar
-);
-
-// GET: api/v1/auth/google-calendar/redirect
-// Google Calendar API
-UserRouter.get(
-    "/google-calendar/redirect",
-    // authenticateToken,
-    calendarRedirect
-);
-
-// POST: api/v1/auth/google-calendar/sync
-UserRouter.post(
-    "/google-calendar/sync",
-    authenticateToken,
-    syncCalendar
-);
 
 // POST: api/v1/auth/forgot-password
 // POST: api/v1/auth/reset-password
