@@ -32,7 +32,20 @@ const findBookingById = async (id: number) => {
     const connection = await pool.getConnection();
     try {
         const booking = await BookingRepo.findById(id, connection);
-        return booking;
+        return {
+            booking_id: booking.booking_id,
+            booking_date: booking.booking_date,
+            booking_status: booking.booking_status,
+            rating: booking.rating,
+            comment: booking.comment,
+            pod: await PODService.findPODById(booking.pod_id!),
+            slots: await BookingSlotService.findAllSlotByBookingId(
+                booking.booking_id!
+            ),
+            products: await BookingProductService.findByBookingId(
+                booking.booking_id!
+            ),
+        };
     } catch (err) {
         return null;
     } finally {

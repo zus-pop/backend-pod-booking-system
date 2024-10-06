@@ -284,7 +284,7 @@ UserRouter.get(
 // POST: api/v1/auth/google-calendar/sync
 UserRouter.post(
     "/google-calendar/sync",
-    // authenticateToken,
+    authenticateToken,
     syncCalendar
 );
 
