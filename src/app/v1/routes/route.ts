@@ -7,13 +7,12 @@ import { CategoryRouter } from "./CategoryRoute.ts";
 import { StoreRouter } from "./StoreRoute.ts";
 import { PODTypeRouter } from "./PODTypeRoute.ts";
 import { BookingRouter } from "./BookingRoute.ts";
-import { BookingProductRouter } from "./BookingProductRoute.ts";
-import { BookingSlotRouter } from "./BookingSlotRoute.ts";
 import { PaymentRouter } from "./PaymentRoute.ts";
 import { StorePriceRouter } from "./StorePriceRoute.ts";
 import { UtilityRouter } from "./UtilityRoute.ts";
 import { RoleRouter } from "./RoleRoute.ts";
 import { PODUtilityRouter } from "./PODUtilityRoute.ts";
+import { GoogleCalendarRouter } from "./GoogleCalendarRoute.ts";
 
 export const router = (app: Express) => {
   app.use("/api/v1/auth", UserRouter);
@@ -26,9 +25,8 @@ export const router = (app: Express) => {
   app.use("/api/v1/stores", StoreRouter);
   app.use("/api/v1/store-prices", StorePriceRouter);
   app.use("/api/v1/bookings", BookingRouter);
-  app.use("/api/v1/booking-products", BookingProductRouter);
-  app.use("/api/v1/booking-slots", BookingSlotRouter);
   app.use("/api/v1/payments", PaymentRouter);
   app.use("/api/v1/utilities", UtilityRouter);
   app.use("/api/v1/pod-utilities", PODUtilityRouter);
+  app.use("/api/v1/google-calendar", GoogleCalendarRouter);
 };

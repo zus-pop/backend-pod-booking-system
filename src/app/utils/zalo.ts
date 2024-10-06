@@ -1,8 +1,6 @@
 import moment from "moment";
 import { BookingProduct, OnlinePaymentResponse } from "../types/type.ts";
 import crypto from "crypto";
-import PaymentService from "../services/PaymentService.ts";
-import BookingService from "../services/BookingService.ts";
 import qs from "qs";
 import { pool } from "../config/pool.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
@@ -21,7 +19,7 @@ export const createOnlinePaymentRequest = async (
     amount: number
 ) => {
     const embed_data = {
-        redirecturl: "https://google.com",
+        redirecturl: process.env.ZALO_REDIRECT_URL as string,
     };
     const items = bookingProducts;
     const transID = Math.floor(Math.random() * 1000000);
@@ -34,8 +32,7 @@ export const createOnlinePaymentRequest = async (
         embed_data: JSON.stringify(embed_data),
         amount,
         expire_duration_seconds: 300,
-        callback_url:
-            "https://dbac-116-110-41-26.ngrok-free.app/api/v1/payments/callback",
+        callback_url: process.env.ZALO_CALLBACK_URL as string,
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };

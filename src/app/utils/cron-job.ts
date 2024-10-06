@@ -8,9 +8,12 @@ import PaymentService from "../services/PaymentService.ts";
 import { getPaymentStatus } from "./zalo.ts";
 
 export const trackBooking = (booking_id: number) => {
+    let isExtend = false;
     const job = cron.schedule("* * * * * *", async () => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
-        const threshHold = 5;
+        const baseTime = 5;
+        const bufferTime = 0.5;
+        const threshHold = isExtend ? baseTime + bufferTime : baseTime;
         const current = moment().format(FORMAT_TYPE);
         const booking = await BookingService.findBookingById(booking_id);
         const bookingSlots = await BookingSlotService.findAllSlotByBookingId(
@@ -19,10 +22,10 @@ export const trackBooking = (booking_id: number) => {
         console.log(
             `booking ${booking?.booking_id}: ${booking?.booking_status}`
         );
-        // const isConfirmed = booking?.booking_status === "Confirmed";
+        const isConfirmed = booking?.booking_status === "Confirmed";
         const isCanceled = booking?.booking_status === "Canceled";
-        const isComplete = booking?.booking_status === "Complete";
-        if (isComplete) {
+        // const isComplete = booking?.booking_status === "Complete";
+        if (isConfirmed) {
             setTimeout(() => {
                 console.log(
                     `Booking ${booking.booking_id} is confirmed -> stop the job`
@@ -44,25 +47,33 @@ export const trackBooking = (booking_id: number) => {
             }, 0);
         } else {
             const create_at = moment(booking?.booking_date).format(FORMAT_TYPE);
-
-            if (
-                moment(current).diff(moment(create_at), "minutes") >= threshHold
-            ) {
+            const timeDiff = moment(current).diff(moment(create_at), "minutes");
+            if (timeDiff >= threshHold) {
                 // do something when expired
-                await SlotService.updateMultipleSlot(
-                    true,
-                    bookingSlots!.map((bookingSlot) => bookingSlot.slot_id!)
-                );
-                await BookingService.updateABooking({
-                    booking_id,
-                    booking_status: "Canceled",
-                });
-                console.log(
-                    `Booking ${booking!.booking_id} is expired -> stop the job`
-                );
-                setTimeout(() => {
-                    job.stop();
-                }, 0);
+                if (!isExtend) {
+                    // extend the job
+                    console.log(
+                        `Threshold reached. Extending time by ${bufferTime} minutes.`
+                    );
+                    isExtend = true;
+                } else {
+                    await SlotService.updateMultipleSlot(
+                        true,
+                        bookingSlots!.map((bookingSlot) => bookingSlot.slot_id!)
+                    );
+                    await BookingService.updateABooking({
+                        booking_id,
+                        booking_status: "Canceled",
+                    });
+                    console.log(
+                        `Booking ${
+                            booking!.booking_id
+                        } is expired -> stop the job`
+                    );
+                    setTimeout(() => {
+                        job.stop();
+                    }, 0);
+                }
             }
         }
     });
