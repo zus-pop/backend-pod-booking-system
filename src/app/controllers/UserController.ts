@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/UserService.ts";
 import { Roles } from "../types/type.ts";
-import { calendar, oauth2Client, scopes } from "../utils/google-calendar.ts";
-import { calendar_v3 } from "googleapis";
 
 const findAll = async (_: Request, res: Response) => {
     const users = await UserService.findAll();
@@ -60,56 +58,11 @@ const getUser = async (req: Request, res: Response) => {
     res.status(200).json(user);
 };
 
-const authenticateCalendar = (req: Request, res: Response) => {
-    const url = oauth2Client.generateAuthUrl({
-        access_type: "offline",
-        scope: scopes,
-    });
-    res.redirect(url);
-};
 
-const calendarRedirect = async (req: Request, res: Response) => {
-    const { tokens } = await oauth2Client.getToken(req.query.code as string);
-    console.log(tokens);
-    oauth2Client.setCredentials(tokens);
-    res.send("Authentication successful! Please return to the website");
-};
-
-const syncCalendar = async (req: Request, res: Response) => {
-    const { payload } = req;
-    console.log(payload);
-    const event: calendar_v3.Schema$Event = {
-        summary: "Event from API",
-        description: "Event from API",
-        start: {
-            dateTime: "2024-11-01T00:00:00.000",
-            timeZone: "Asia/Ho_Chi_Minh",
-        },
-        end: {
-            dateTime: "2024-11-01T01:00:00.000",
-            timeZone: "Asia/Ho_Chi_Minh",
-        },
-    };
-    try {
-        const result = await calendar.events.insert({
-            calendarId: "primary",
-            auth: oauth2Client,
-            requestBody: event,
-        });
-        res.status(200).json({ message: "Event created", result });
-    } catch (err) {
-        console.error(err);
-        console.log("here");
-        res.status(500).json({ message: "Failed to sync calendar!" });
-    }
-};
 
 export default {
     findAll,
     login,
     register,
     getUser,
-    authenticateCalendar,
-    calendarRedirect,
-    syncCalendar,
 };

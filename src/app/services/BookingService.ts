@@ -8,6 +8,10 @@ import { Booking, BookingSlot } from "../types/type.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
+import PODService from "./PODService.ts";
+import SlotService from "./SlotService.ts";
+import BookingSlotService from "./BookingSlotService.ts";
+import BookingProductService from "./BookingProductService.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -30,6 +34,36 @@ const findBookingById = async (id: number) => {
         const booking = await BookingRepo.findById(id, connection);
         return booking;
     } catch (err) {
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const findByUserId = async (user_id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        const bookings = await BookingRepo.findByUserId(user_id, connection);
+        return await Promise.all(
+            bookings.map(async (booking) => {
+                return {
+                    booking_id: booking.booking_id,
+                    booking_date: booking.booking_date,
+                    booking_status: booking.booking_status,
+                    rating: booking.rating,
+                    comment: booking.comment,
+                    pod: await PODService.findPODById(booking.pod_id!),
+                    slots: await BookingSlotService.findAllSlotByBookingId(
+                        booking.booking_id!
+                    ),
+                    products: await BookingProductService.findByBookingId(
+                        booking.booking_id!
+                    ),
+                };
+            })
+        );
+    } catch (err) {
+        console.log(err);
         return null;
     } finally {
         connection.release();
@@ -109,6 +143,7 @@ const updateABooking = async (booking: Booking) => {
 export default {
     findAllBooking,
     findBookingById,
+    findByUserId,
     createABooking,
     updateABooking,
 };
