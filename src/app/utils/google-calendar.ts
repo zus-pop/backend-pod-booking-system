@@ -20,7 +20,15 @@ export const authenticateCalendar = (_: Request, res: Response) => {
         access_type: "offline",
         scope: scopes,
     });
-    res.json(url);
+    res.status(200).json({ redirect_url: url });
+    // res.send(`
+    //     <div id="foo">Click here</div>
+    //     <script>
+    //     document.getElementById('foo').addEventListener('click', function(){
+    //     console.log("foo")
+    //         window.open("${redirect_url}")
+    // })
+    //     </script>`);
 };
 
 export const getCalendar = async (summary: string, description: string) => {
@@ -88,7 +96,20 @@ export const deleteBeforeSyncAgain = async (userCalendarId: string) => {
 export const calendarRedirect = async (req: Request, res: Response) => {
     const { tokens } = await oauth2Client.getToken(req.query.code as string);
     oauth2Client.setCredentials(tokens);
-    res.send("Authentication successful! Please return to the website");
+    res.send(`
+        <html>
+        <body>
+          <h1>Authentication successful! Please return to the website</h1>
+          <p>You have successfully authenticated with Google Calendar.</p>
+          <p>This window will close automatically in 5 seconds...</p>
+          <script>
+            setTimeout(function() {
+              window.close();
+            }, 5000); // Close the window after 5 seconds
+          </script>
+        </body>
+      </html>
+        `);
 };
 
 export const syncCalendar = async (req: Request, res: Response) => {

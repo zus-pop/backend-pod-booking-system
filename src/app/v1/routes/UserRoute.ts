@@ -231,7 +231,7 @@ UserRouter.get("/users", UserController.findAll);
  *                                              description: name of role
  *                                              example: Customer
  *          401:
- *              description: No token provided
+ *              description: Unauthorized
  *              content:
  *                  application/json:
  *                      schema:
@@ -242,7 +242,7 @@ UserRouter.get("/users", UserController.findAll);
  *                                  description: message response
  *                                  example: No token provided
  *          403:
- *              description: No token provided
+ *              description: Forbidden
  *              content:
  *                  application/json:
  *                      schema:
