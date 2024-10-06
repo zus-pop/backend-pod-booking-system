@@ -1,23 +1,23 @@
 import { pool } from "../config/pool.ts";
-import PODTypeRepo from "../repositories/PODTypeRepository.ts";
+import PODUtilityRepo from "../repositories/PODUtilityRepository.ts";
 
-const findAllPODType = async () => {
+const findAll = async () => {
   const connection = await pool.getConnection();
   try {
-    const podTypes = await PODTypeRepo.findAll(connection);
-    return podTypes;
+    const podUtility = await PODUtilityRepo.findAll(connection);
+    return podUtility;
   } catch (err) {
     console.error(err);
+    return null;
   } finally {
     connection.release();
   }
 };
-
-const findPODTypeById = async (id: number) => {
+const findById = async (id: number) => {
   const connection = await pool.getConnection();
   try {
-    const podType = await PODTypeRepo.findById(id, connection);
-    return podType;
+    const podUtility = await PODUtilityRepo.findById(id, connection);
+    return podUtility;
   } catch (err) {
     console.log(err);
     return null;
@@ -26,11 +26,11 @@ const findPODTypeById = async (id: number) => {
   }
 };
 
-const findPodsByTypeId = async (typeId: number) => {
+const findByPodId = async (podId: number) => {
   const connection = await pool.getConnection();
   try {
-    const pods = await PODTypeRepo.findPodsByTypeId(typeId, connection);
-    return pods;
+    const utilities = await PODUtilityRepo.findByPodId(podId, connection);
+    return utilities;
   } catch (err) {
     console.error(err);
     return null;
@@ -40,7 +40,7 @@ const findPodsByTypeId = async (typeId: number) => {
 };
 
 export default {
-  findAllPODType,
-  findPODTypeById,
-  findPodsByTypeId,
+  findAll,
+  findById,
+  findByPodId,
 };
