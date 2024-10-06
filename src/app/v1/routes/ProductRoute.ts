@@ -53,6 +53,8 @@ ProductRouter.get("/", ProductController.findAll);
  *          description: The ID of the product
  *          schema:
  *            type: integer
+ *            minimum: 1
+ *            example: 1
  *      responses:
  *          200:
  *              description: Success
@@ -75,6 +77,8 @@ ProductRouter.get("/", ProductController.findAll);
  *                                  example: 100.50
  *          404:
  *              description: Product not found
+ *          500:
+ *              description: Internal server error
  */
 ProductRouter.get("/:id", ProductController.findById);
 //POST: api/v1/products

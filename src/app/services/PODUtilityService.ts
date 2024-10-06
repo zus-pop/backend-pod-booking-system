@@ -25,7 +25,22 @@ const findById = async (id: number) => {
     connection.release();
   }
 };
+
+const findByPodId = async (podId: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const utilities = await PODUtilityRepo.findByPodId(podId, connection);
+    return utilities;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAll,
   findById,
+  findByPodId,
 };
