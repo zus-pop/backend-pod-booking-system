@@ -3,6 +3,8 @@ import { Router } from "express";
 import { validateEmptyObject } from "../../middlewares/emptyObject.ts";
 import { authenticateToken } from "../../middlewares/authenticateToken.ts";
 import { checkAllAvailableSlot } from "../../middlewares/checkAllAvailableSlot.ts";
+import BookingProductController from "../../controllers/BookingProductController.ts";
+import BookingSlotController from "../../controllers/BookingSlotController.ts";
 
 export const BookingRouter = Router();
 
@@ -122,9 +124,104 @@ BookingRouter.get("/", BookingController.findAll);
  */
 BookingRouter.get("/:id", BookingController.findById);
 
-// POST: api/v1/bookings
+// GET: api/v1/bookings/:id/products
 /**
  * @openapi
+ * /api/v1/bookings/{id}/products:
+ *  get:
+ *    summary: Get list of booking products by booking id
+ *    tags: [Bookings]
+ *    parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Booking id
+ *    responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              booking_id:
+ *                                  type: integer
+ *                                  description: id of booking
+ *                                  example: 1
+ *                              product_id:
+ *                                  type: integer
+ *                                  description: id of product
+ *                                  example: 3
+ *                              unit_price:
+ *                                  type: integer
+ *                                  format: double
+ *                                  description: unit price of product
+ *                                  example: 30000
+ *                              quantity:
+ *                                  type: integer
+ *                                  description: quantity of product
+ *                                  example: 2
+ *          404:
+ *              description: No booking products found
+*/
+BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
+
+// GET: api/v1/bookings/:id/slots
+/**
+ * @openapi
+ * /api/v1/bookings/{id}/slots:
+ *     get:
+ *      summary: Get a list of booking slots by booking id
+ *      tags: [Bookings]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The booking id
+ *      responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  id:
+ *                                      type: integer
+ *                                      description: id of booking slot
+ *                                      example: 2
+ *                                  booking_id:
+ *                                      type: integer
+ *                                      description: id of booking
+ *                                      example: 4
+ *                                  slot_id:
+ *                                      type: integer
+ *                                      description: id of slot
+ *                                      example: 8
+ *          404:
+ *              description: No POD found
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: response error message
+ *                                  example: Not found any slot!
+ *
+ */
+BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
+
+// POST: api/v1/bookings
+/**
+* @openapi
  * /api/v1/bookings:
  *  post:
  *      summary: Create a new booking

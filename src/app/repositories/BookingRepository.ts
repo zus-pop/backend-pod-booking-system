@@ -30,6 +30,20 @@ const findById = async (id: number, connection: PoolConnection) => {
     return bookings[0] as Booking;
 };
 
+const findByUserId = async (user_id: number, connection: PoolConnection) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+    ];
+    const values = [columns, "Booking", "user_id", user_id];
+    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
+    return bookings as Booking[];
+};
+
 const create = async (booking: Booking, connection: PoolConnection) => {
     const sql = "INSERT INTO ?? SET ?";
     const values = ["Booking", booking];
@@ -59,6 +73,7 @@ const update = async (booking: Booking, connection: PoolConnection) => {
 export default {
     findAll,
     findById,
+    findByUserId,
     create,
     update,
     // remove,
