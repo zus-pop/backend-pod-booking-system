@@ -203,33 +203,31 @@ UserRouter.get("/users", UserController.findAll);
  *              content:
  *                  application/json:
  *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  user_id:
- *                                      type: integer
- *                                      description: id of user
- *                                      example: 1
- *                                  email:
- *                                      type: string
- *                                      format: email
- *                                      example: jane@gmail.com
- *                                  user_name:
- *                                      type: string
- *                                      description: name of user
- *                                      example: marry jane
- *                                  role:
- *                                      type: object
- *                                      properties:
- *                                          role_id:
- *                                              type: integer
- *                                              description: id of role
- *                                              example: 2
- *                                          role_name:
- *                                              type: string
- *                                              description: name of role
- *                                              example: Customer
+ *                          type: object
+ *                          properties:
+ *                              user_id:
+ *                                  type: integer
+ *                                  description: id of user
+ *                                  example: 1
+ *                              email:
+ *                                  type: string
+ *                                  format: email
+ *                                  example: jane@gmail.com
+ *                              user_name:
+ *                                  type: string
+ *                                  description: name of user
+ *                                  example: marry jane
+ *                              role:
+ *                                  type: object
+ *                                  properties:
+ *                                      role_id:
+ *                                          type: integer
+ *                                          description: id of role
+ *                                          example: 2
+ *                                      role_name:
+ *                                          type: string
+ *                                          description: name of role
+ *                                          example: Customer
  *          401:
  *              description: Unauthorized
  *              content:
@@ -240,7 +238,7 @@ UserRouter.get("/users", UserController.findAll);
  *                              message:
  *                                  type: string
  *                                  description: message response
- *                                  example: No token provided
+ *                                  example: Access denied. No token provided.
  *          403:
  *              description: Forbidden
  *              content:
