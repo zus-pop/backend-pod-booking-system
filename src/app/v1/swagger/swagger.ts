@@ -11,10 +11,7 @@ const options: Options = {
         },
         servers: [
             {
-                url: "http://3.27.69.109:3000",
-            },
-            {
-                url: "http://localhost:3000",
+                url: process.env.SWAGGER_SERVER as string,
             },
         ],
         components: {
