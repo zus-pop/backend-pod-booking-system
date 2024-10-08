@@ -162,11 +162,11 @@ PODRouter.get("/:id/utilities", PODController.findUtilitiesByPodId);
  */
 PODRouter.post("/", PODController.createNewPod);
 
-// PUT: api/v1/pods/:id
+// DELETE: api/v1/pods/:id
 /**
  * @openapi
  * /api/v1/pods/{id}:
- *   put:
+ *   delete:
  *     summary: Mark a POD as unavailable by its id
  *     tags: [PODs]
  *     parameters:
@@ -182,7 +182,7 @@ PODRouter.post("/", PODController.createNewPod);
  *       404:
  *         description: No POD found or failed to update
  */
-PODRouter.put("/:id/unavailable", PODController.deleteOnePod);
+PODRouter.delete("/:id", PODController.deleteOnePod);
 
 // PUT: api/v1/pods/{id}
 /**
