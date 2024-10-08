@@ -12,7 +12,8 @@
         "noEmit": true,
     },
     "include": [
-        "src/app/**/*.ts"
+        "src/app/**/*.ts",
+        "src/jest.config.ts"
     ],
     "exclude": [
         "node_modules"

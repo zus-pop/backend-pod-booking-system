@@ -14,7 +14,6 @@ describe("Select multiple slot", () => {
             3,
             moment("2024-10-01").format("YYYY-MM-DD")
         );
-        console.log(slots);
         expect(slots?.length).toBeGreaterThan(0);
     });
 });
