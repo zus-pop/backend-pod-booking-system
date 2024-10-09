@@ -32,20 +32,7 @@ const findBookingById = async (id: number) => {
     const connection = await pool.getConnection();
     try {
         const booking = await BookingRepo.findById(id, connection);
-        return {
-            booking_id: booking.booking_id,
-            booking_date: booking.booking_date,
-            booking_status: booking.booking_status,
-            rating: booking.rating,
-            comment: booking.comment,
-            pod: await PODService.findPODById(booking.pod_id!),
-            slots: await BookingSlotService.findAllSlotByBookingId(
-                booking.booking_id!
-            ),
-            products: await BookingProductService.findByBookingId(
-                booking.booking_id!
-            ),
-        };
+        return booking;
     } catch (err) {
         return null;
     } finally {
@@ -57,24 +44,7 @@ const findByUserId = async (user_id: number) => {
     const connection = await pool.getConnection();
     try {
         const bookings = await BookingRepo.findByUserId(user_id, connection);
-        return await Promise.all(
-            bookings.map(async (booking) => {
-                return {
-                    booking_id: booking.booking_id,
-                    booking_date: booking.booking_date,
-                    booking_status: booking.booking_status,
-                    rating: booking.rating,
-                    comment: booking.comment,
-                    pod: await PODService.findPODById(booking.pod_id!),
-                    slots: await BookingSlotService.findAllSlotByBookingId(
-                        booking.booking_id!
-                    ),
-                    products: await BookingProductService.findByBookingId(
-                        booking.booking_id!
-                    ),
-                };
-            })
-        );
+        return bookings;
     } catch (err) {
         console.log(err);
         return null;

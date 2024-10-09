@@ -3,18 +3,29 @@ import { Product } from "../types/type.ts";
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const colum = ["product_id", "product_name", "price", "stock"];
-    const values = [colum, "Product"];
+    const columns = ["product_id", "product_name", "price", "stock"];
+    const values = [columns, "Product"];
     const [product] = await connection.query<RowDataPacket[]>(sql, values);
     return product;
 };
 
 const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const colum = ["product_id", "product_name", "price", "stock"];
-    const values = [colum, "Product", "product_id", id];
+    const columns = ["product_id", "product_name", "price", "stock"];
+    const values = [columns, "Product", "product_id", id];
     const [product] = await connection.query<RowDataPacket[]>(sql, values);
     return product[0] as Product;
+};
+
+const findByMultipleId = async (
+    product_ids: number[],
+    connection: PoolConnection
+) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? IN ( ? )";
+    const columns = ["product_id", "product_name", "price", "stock"];
+    const values = [columns, "Product", "product_id", product_ids];
+    const [products] = await connection.query<RowDataPacket[]>(sql, values);
+    return products as Product[];
 };
 
 const createNewProduct = async (
@@ -38,6 +49,7 @@ const updateProduct = async (product: Product, connection: PoolConnection) => {
 export default {
     findAll,
     findById,
+    findByMultipleId,
     createNewProduct,
     updateProduct,
 };
