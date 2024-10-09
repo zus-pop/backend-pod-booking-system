@@ -54,8 +54,8 @@ const findById = async (id: number, connection: PoolConnection) => {
     ];
     const values = [columns, "Booking", "booking_id", id];
     const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
-    const booking = bookings[0] as Booking;
-    return await bookingMapper(booking, connection);
+    const booking = await bookingMapper(bookings[0] as Booking, connection);
+    return booking;
 };
 
 const findByUserId = async (user_id: number, connection: PoolConnection) => {

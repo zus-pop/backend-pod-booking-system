@@ -22,6 +22,9 @@ const findByBookingId = async (
     const values = [columns, "Booking_Product", "booking_id", booking_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookingProducts = rows as BookingProduct[];
+    if (!bookingProducts || !bookingProducts.length) {
+        return [] as BookingProduct[];
+    }
     const products = await ProductRepository.findByMultipleId(
         bookingProducts.map((bookingProduct) => bookingProduct.product_id!),
         connection

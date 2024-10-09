@@ -41,6 +41,19 @@ const findPODByName = async (name: string) => {
     }
 };
 
+const findPODByType = async (pod_type: number) => {
+    const connection = await pool.getConnection();
+    try {
+        const PODs = await PODRepo.findByType(pod_type, connection);
+        return PODs;
+    } catch (err) {
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 const createNewPOD = async (newPod: POD) => {
     const connection = await pool.getConnection();
     try {
@@ -87,6 +100,7 @@ export default {
     findAllPOD,
     findPODById,
     findPODByName,
+    findPODByType,
     createNewPOD,
     deletePODById,
     updatePOD,

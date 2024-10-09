@@ -13,6 +13,17 @@ export const PODRouter = Router();
  *   get:
  *     summary: Get lists of PODs
  *     tags: [PODs]
+ *     parameters:
+ *      - in: query
+ *        name: name
+ *        schema:
+ *          type: string
+ *        description: The name of the POD
+ *      - in: query
+ *        name: pod_type
+ *        schema:
+ *          type: number
+ *        description: The id of the POD type
  *     responses:
  *       200:
  *         description: Success.
@@ -43,7 +54,7 @@ export const PODRouter = Router();
  *         description: No PODs found
  *
  */
-PODRouter.get("/", PODController.findAll);
+PODRouter.get("/", PODController.find);
 
 // GET: api/v1/pods/:id
 /**

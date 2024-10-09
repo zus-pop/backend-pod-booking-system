@@ -4,7 +4,13 @@ import { PoolConnection } from "mysql2/promise";
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const columns = ["pod_id", "pod_name", "type_id", "is_available"];
+    const columns = [
+        "pod_id",
+        "pod_name",
+        "type_id",
+        "is_available",
+        "store_id",
+    ];
     const values = [columns, "POD"];
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
     return pods as POD[];
@@ -12,7 +18,13 @@ const findAll = async (connection: PoolConnection) => {
 
 const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["pod_id", "pod_name", "type_id", "is_available"];
+    const columns = [
+        "pod_id",
+        "pod_name",
+        "type_id",
+        "is_available",
+        "store_id",
+    ];
     const values = [columns, "POD", "pod_id", id];
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
     return pods[0] as POD;
@@ -20,8 +32,28 @@ const findById = async (id: number, connection: PoolConnection) => {
 
 const findByName = async (name: string, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? LIKE ?";
-    const columns = ["pod_id", "pod_name", "type_id", "is_available"];
+    const columns = [
+        "pod_id",
+        "pod_name",
+        "type_id",
+        "is_available",
+        "store_id",
+    ];
     const values = [columns, "POD", "pod_name", `%${name}%`];
+    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
+    return pods as POD[];
+};
+
+const findByType = async (pod_type: number, connection: PoolConnection) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "pod_id",
+        "pod_name",
+        "type_id",
+        "is_available",
+        "store_id",
+    ];
+    const values = [columns, "POD", "type_id", pod_type];
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
     return pods as POD[];
 };
@@ -57,6 +89,7 @@ export default {
     findAll,
     findById,
     findByName,
+    findByType,
     createNewPod,
     deleteOnePod,
     updatePOD,
