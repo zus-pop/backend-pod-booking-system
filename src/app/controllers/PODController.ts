@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import PODService from "../services/PODService.ts";
 import PODUtilityService from "../services/PODUtilityService.ts";
 import { POD } from "../types/type.ts";
+import { letImageCookToCloud } from "../utils/google-cloud-storage.ts";
 
 const find = async (req: Request, res: Response) => {
     const { name, pod_type } = req.query;
@@ -43,7 +44,20 @@ const findUtilitiesByPodId = async (req: Request, res: Response) => {
 };
 
 const createNewPod = async (req: Request, res: Response) => {
-    const newPod = req.body;
+    const newPod = req.body as POD;
+    const imageFile = req.file;
+
+    if (imageFile) {
+        try {
+            const publicUrl = await letImageCookToCloud(imageFile);
+            newPod.image = publicUrl;
+        } catch (err) {
+            console.log(err);
+            return res
+                .status(500)
+                .json({ message: "Error uploading image to cloud storage" });
+        }
+    }
     const insertId = await PODService.createNewPOD(newPod);
     if (!insertId) {
         return res.status(400).json({ message: "Failed to create new POD" });
@@ -65,15 +79,23 @@ const deleteOnePod = async (req: Request, res: Response) => {
 };
 
 const updatePOD = async (req: Request, res: Response) => {
-    const pod: any = {
-        pod_id: +req.params.id, // Lấy ID từ URL
-        pod_name: req.body.pod_name, // Các trường của POD được lấy từ body
-        type_id: req.body.type_id,
-        description: req.body.description,
-        image: req.body.image,
-        is_available: req.body.is_available,
-        store_id: req.body.store_id,
+    const { id } = req.params;
+    const pod: POD = {
+        ...(req.body as POD),
+        pod_id: +id, // Lấy ID từ URL
     };
+    const imageFile = req.file;
+    if (imageFile) {
+        try {
+            const publicUrl = await letImageCookToCloud(imageFile);
+            pod.image = publicUrl;
+        } catch (err) {
+            console.log(err);
+            return res
+                .status(500)
+                .json({ message: "Error uploading image to cloud storage" });
+        }
+    }
 
     const updated = await PODService.updatePOD(pod);
     if (updated) {

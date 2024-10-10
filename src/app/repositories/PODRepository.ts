@@ -8,6 +8,8 @@ const findAll = async (connection: PoolConnection) => {
         "pod_id",
         "pod_name",
         "type_id",
+        "description",
+        "image",
         "is_available",
         "store_id",
     ];
@@ -22,6 +24,8 @@ const findById = async (id: number, connection: PoolConnection) => {
         "pod_id",
         "pod_name",
         "type_id",
+        "description",
+        "image",
         "is_available",
         "store_id",
     ];
@@ -36,6 +40,8 @@ const findByName = async (name: string, connection: PoolConnection) => {
         "pod_id",
         "pod_name",
         "type_id",
+        "description",
+        "image",
         "is_available",
         "store_id",
     ];
@@ -50,6 +56,8 @@ const findByType = async (pod_type: number, connection: PoolConnection) => {
         "pod_id",
         "pod_name",
         "type_id",
+        "description",
+        "image",
         "is_available",
         "store_id",
     ];
