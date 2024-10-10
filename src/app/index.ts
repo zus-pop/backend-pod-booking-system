@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 declare module "express-serve-static-core" {
     interface Request {
         [key: string]: any;
+        file?: Express.Multer.File;
     }
 }
 

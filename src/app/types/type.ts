@@ -9,12 +9,12 @@ export interface SlotOption {
     gap?: number;
 }
 export interface POD {
-    pod_id: number;
-    pod_name: string;
-    type_id: number;
+    pod_id?: number;
+    pod_name?: string;
+    type_id?: number;
     description?: string;
     image?: string;
-    is_available: boolean;
+    is_available?: boolean;
     store_id?: number;
 }
 export interface User {

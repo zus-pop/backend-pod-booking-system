@@ -1,5 +1,6 @@
 import { Router } from "express";
 import PODController from "../../controllers/PODController.ts";
+import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const PODRouter = Router();
 
@@ -149,29 +150,33 @@ PODRouter.get("/:id/utilities", PODController.findUtilitiesByPodId);
  *       requestBody:
  *         required: true
  *         content:
- *           application/json:
+ *           multipart/form-data:
  *             schema:
  *               type: object
  *               properties:
- *                 pod_id:
- *                   type: integer
- *                   description: id of pod
  *                 pod_name:
  *                   type: string
  *                   description: name of pod
+ *                 description:
+ *                   type: string
+ *                   description: description of pod
+ *                 image:
+ *                   type: string
+ *                   format: binary
+ *                   description: image of pod
  *                 type_id:
  *                   type: integer
- *                   description: type of pod
- *                 is_available:
+ *                   description: id type of pod
+ *                 store_id:
  *                   type: integer
- *                   description: availability status
+ *                   description: id store's pod
  *       responses:
  *         201:
  *           description: POD created successfully
  *         400:
  *           description: Failed to create new POD
  */
-PODRouter.post("/", PODController.createNewPod);
+PODRouter.post("/", upload.single("image"), PODController.createNewPod);
 
 // DELETE: api/v1/pods/:id
 /**
@@ -212,26 +217,26 @@ PODRouter.delete("/:id", PODController.deleteOnePod);
  *      requestBody:
  *          required: true
  *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          pod_name:
- *                              type: string
- *                              description: Name of the POD
- *                              example: "Updated POD A"
- *                          type_id:
- *                              type: number
- *                              description: Type of the POD
- *                              example: 2
- *                          description:
- *                              type: string
- *                              description: Description of the POD
- *                              example: "This is an updated POD"
- *                          is_available:
- *                              type: boolean
- *                              description: Availability of the POD
- *                              example: true
+ *           multipart/form-data:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 pod_name:
+ *                   type: string
+ *                   description: name of pod
+ *                 description:
+ *                   type: string
+ *                   description: description of pod
+ *                 image:
+ *                   type: string
+ *                   format: binary
+ *                   description: image of pod
+ *                 type_id:
+ *                   type: integer
+ *                   description: id type of pod
+ *                 store_id:
+ *                   type: integer
+ *                   description: id store's pod
  *      responses:
  *          200:
  *              description: POD updated
@@ -251,4 +256,4 @@ PODRouter.delete("/:id", PODController.deleteOnePod);
  *          404:
  *              description: POD not found
  */
-PODRouter.put("/:id", PODController.updatePOD);
+PODRouter.put("/:id", upload.single("image"), PODController.updatePOD);
