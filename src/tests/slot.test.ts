@@ -19,8 +19,8 @@ describe("Select multiple slot", () => {
 });
 
 describe("checkAllAvailableSlot", () => {
-    test.skip("should return true if all slots are available", async () => {
-        const slot_ids: number[] = [4, 5, 6, 7];
+    test("should return true if all slots are available", async () => {
+        const slot_ids: number[] = [1, 5, 6, 7];
         const slots = await SlotService.checkAllAvailableSlot(slot_ids);
         expect(slots?.status).toBe(true);
     });

@@ -1,3 +1,4 @@
+import PODController from "../../controllers/PODController.ts";
 import StoreController from "../../controllers/StoreController.ts";
 import { Router } from "express";
 
@@ -83,3 +84,47 @@ StoreRouter.get("/", StoreController.findAll);
  *
  */
 StoreRouter.get("/:id", StoreController.findById);
+
+/**
+ * @openapi
+ * /api/v1/stores/{id}/pods:
+ *     get:
+ *      summary: Get list of pods by store id
+ *      tags: [Stores]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Store id
+ *      responses:
+ *        200:
+ *          description: Success.
+ *          content:
+ *            application/json:
+ *              schema:
+ *               type: array
+ *               items:
+ *                   type: object
+ *                   properties:
+ *                       pod_id:
+ *                           type: integer
+ *                           description: id of pod
+ *                           example: 1
+ *                       pod_name:
+ *                           type: string
+ *                           description: name of pod
+ *                           example: POD A
+ *                       type_id:
+ *                           type: integer
+ *                           description: type of pod
+ *                           example: 1
+ *                       is_available:
+ *                           type: integer
+ *                           description: status of pod
+ *                           example: 1
+ *        404:
+ *          description: No PODs found
+ */
+StoreRouter.get("/:id/pods", PODController.findByStoreId);
