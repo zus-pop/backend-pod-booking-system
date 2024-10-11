@@ -1,5 +1,5 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { BookingProduct } from "../types/type.ts";
+import { BookingProduct, Product } from "../types/type.ts";
 import ProductRepository from "./ProductRepository.ts";
 
 const findAll = async (connection: PoolConnection) => {
@@ -23,13 +23,17 @@ const findByBookingId = async (
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookingProducts = rows as BookingProduct[];
     if (!bookingProducts || !bookingProducts.length) {
-        return [] as BookingProduct[];
+        return [];
     }
     const products = await ProductRepository.findByMultipleId(
         bookingProducts.map((bookingProduct) => bookingProduct.product_id!),
         connection
     );
-    return products;
+    return products.map((product, index) => ({
+        ...product,
+        quantity: bookingProducts[index].quantity,
+        unit_price: bookingProducts[index].unit_price,
+    }));
 };
 
 const create = async (

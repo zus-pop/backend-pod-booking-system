@@ -91,23 +91,6 @@ BookingRouter.get("/", BookingController.findAll);
  *                                  type: integer
  *                                  description: id of booking
  *                                  example: 1
- *                              pod_id:
- *                                  type: integer
- *                                  description: id of pod
- *                                  example: 3
- *                              user_id:
- *                                  type: integer
- *                                  description: id of user
- *                                  example: 4
- *                              rating:
- *                                  type: integer
- *                                  format: double
- *                                  description: rating of booking
- *                                  example: 5.0
- *                              comment:
- *                                  type: string
- *                                  description: feedback of booking
- *                                  example: đỉnh nóc, kịch trần, bay phấp phới
  *                              booking_date:
  *                                  type: string
  *                                  format: date-time
@@ -118,6 +101,116 @@ BookingRouter.get("/", BookingController.findAll);
  *                                  description: status of booking
  *                                  enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
  *                                  example: Pending
+ *                              user:
+ *                                  type: object
+ *                                  properties:
+ *                                      user_id:
+ *                                          type: integer
+ *                                          description: id of customer
+ *                                          example: 1
+ *                                      user_name:
+ *                                          type: string
+ *                                          description: name of customer
+ *                                          example: gordon ramsay
+ *                                      email:
+ *                                          type: string
+ *                                          format: email
+ *                                          description: email of customer
+ *                                          example: holy@gmail.com
+ *                              rating:
+ *                                  type: integer
+ *                                  format: double
+ *                                  description: rating of booking
+ *                                  example: 5.0
+ *                              comment:
+ *                                  type: string
+ *                                  description: feedback of booking
+ *                                  example: đỉnh nóc, kịch trần, bay phấp phới
+ *                              pod:
+ *                                  type: object
+ *                                  properties:
+ *                                      pod_id:
+ *                                          type: integer
+ *                                          description: id of POD
+ *                                          example: 1
+ *                                      pod_name:
+ *                                          type: string
+ *                                          description: name of POD
+ *                                          example: Meeting A
+ *                                      type_id:
+ *                                          type: integer
+ *                                          description: id of pod type
+ *                                          example: 2
+ *                                      description:
+ *                                          type: string
+ *                                          description: description of POD
+ *                                          example: heheehhe
+ *                                      image:
+ *                                          type: string
+ *                                          description: image URL of POD
+ *                                          example: https://googleapis/...
+ *                                      is_available:
+ *                                          type: boolean
+ *                                          description: available status of POD
+ *                                          example: true
+ *                              slots:
+ *                                  type: arrays
+ *                                  items:
+ *                                      type: object
+ *                                      properties:
+ *                                          slot_id:
+ *                                              type: integer
+ *                                              description: id of POD
+ *                                              example: 1
+ *                                          pod_id:
+ *                                              type: integer
+ *                                              description: id of POD
+ *                                              example: 1
+ *                                          start_time:
+ *                                              type: string
+ *                                              format: date-time
+ *                                              description: start time of slot
+ *                                              example: 2024-10-01T08:00:00.000Z
+ *                                          end_time:
+ *                                              type: string
+ *                                              format: date-time
+ *                                              description: end time of slot
+ *                                              example: 22024-10-01T12:00:00.000Z
+ *                                          description:
+ *                                              type: string
+ *                                              description: description of POD
+ *                                              example: heheehhe
+ *                                          unit_price:
+ *                                              type: integer
+ *                                              double: double
+ *                                              description: price of slot
+ *                                              example: 80000
+ *                                          is_available:
+ *                                              type: boolean
+ *                                              description: available status of slot
+ *                                              example: false
+ *                              products:
+ *                                  type: arrays
+ *                                  items:
+ *                                      type: object
+ *                                      properties:
+ *                                          product_id:
+ *                                              type: integer
+ *                                              description: id of Product
+ *                                              example: 1
+ *                                          product_name:
+ *                                              type: string
+ *                                              description: name of Product
+ *                                              example: Expresso
+ *                                          price:
+ *                                              type: integer
+ *                                              format: double
+ *                                              description: price of Product
+ *                                              example: 30000
+ *                                          stock:
+ *                                              type: integer
+ *                                              description: remaining amount of slot
+ *                                              example: 100
  *          404:
  *              description: Booking found
  *
@@ -144,28 +237,39 @@ BookingRouter.get("/:id", BookingController.findById);
  *              content:
  *                  application/json:
  *                      schema:
- *                          type: object
- *                          properties:
- *                              booking_id:
- *                                  type: integer
- *                                  description: id of booking
- *                                  example: 1
- *                              product_id:
- *                                  type: integer
- *                                  description: id of product
- *                                  example: 3
- *                              unit_price:
- *                                  type: integer
- *                                  format: double
- *                                  description: unit price of product
- *                                  example: 30000
- *                              quantity:
- *                                  type: integer
- *                                  description: quantity of product
- *                                  example: 2
+ *                          type: arrays
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  product_id:
+ *                                      type: integer
+ *                                      description: id of product
+ *                                      example: 3
+ *                                  product_name:
+ *                                      type: string
+ *                                      description: name of product
+ *                                      example: Expresso
+ *                                  price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: price price of product
+ *                                      example: 30000
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of product
+ *                                      example: 30000
+ *                                  quantity:
+ *                                      type: integer
+ *                                      description: quantity of product
+ *                                      example: 2
+ *                                  stock:
+ *                                      type: integer
+ *                                      description: remaining amount of product
+ *                                      example: 100
  *          404:
  *              description: No booking products found
-*/
+ */
 BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
 
 // GET: api/v1/bookings/:id/slots
@@ -192,18 +296,37 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  *                          items:
  *                              type: object
  *                              properties:
- *                                  id:
- *                                      type: integer
- *                                      description: id of booking slot
- *                                      example: 2
- *                                  booking_id:
- *                                      type: integer
- *                                      description: id of booking
- *                                      example: 4
  *                                  slot_id:
  *                                      type: integer
  *                                      description: id of slot
- *                                      example: 8
+ *                                      example: 1
+ *                                  pod_id:
+ *                                      type: integer
+ *                                      description: id of POD
+ *                                      example: 1
+ *                                  start_time:
+ *                                      type: string
+ *                                      format: date-time
+ *                                      description: start time of slot
+ *                                      example: 2024-10-01T08:00:00.000Z
+ *                                  end_time:
+ *                                      type: string
+ *                                      format: date-time
+ *                                      description: end time of slot
+ *                                      example: 2024-10-01T12:00:00.000Z
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of slot
+ *                                      example: 100000
+ *                                  is_available:
+ *                                      type: boolean
+ *                                      description: available status of slot
+ *                                      example: false
+ *                                  price:
+ *                                      type: integer
+ *                                      description: price of slot
+ *                                      example: 100000
  *          404:
  *              description: No POD found
  *              content:
@@ -221,7 +344,7 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
 
 // POST: api/v1/bookings
 /**
-* @openapi
+ * @openapi
  * /api/v1/bookings:
  *  post:
  *      summary: Create a new booking

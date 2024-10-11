@@ -66,6 +66,22 @@ const findByType = async (pod_type: number, connection: PoolConnection) => {
     return pods as POD[];
 };
 
+const findByStoreId = async (store_id: number, connection: PoolConnection) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "pod_id",
+        "pod_name",
+        "type_id",
+        "description",
+        "image",
+        "is_available",
+        "store_id",
+    ];
+    const values = [columns, "POD", "store_id", store_id];
+    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
+    return pods as POD[];
+};
+
 const createNewPod = async (pod: POD, connection: PoolConnection) => {
     const sql = "INSERT INTO POD SET ?";
     const [result] = await connection.query<ResultSetHeader>(sql, [pod]);
@@ -98,6 +114,7 @@ export default {
     findById,
     findByName,
     findByType,
+    findByStoreId,
     createNewPod,
     deleteOnePod,
     updatePOD,
