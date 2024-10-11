@@ -123,3 +123,54 @@ UtilityRouter.get("/:id", UtilityController.findById);
  *         description: Internal server error
  */
 UtilityRouter.post("/", UtilityController.createNewUtility);
+
+/**
+ * @openapi
+ * /api/v1/utilities/{id}:
+ *   put:
+ *     summary: Update an existing utility by its ID
+ *     tags: [Utilities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the utility to update
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               utility_name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 utility_id:
+ *                   type: integer
+ *                   description: ID of the utility
+ *                   example: 1
+ *                 utility_name:
+ *                   type: string
+ *                   description: Name of the utility
+ *                   example: Utility A
+ *                 utility_description:
+ *                   type: string
+ *                   description: Description of the utility
+ *                   example: Updated description of Utility A
+ *       400:
+ *         description: Missing required fields
+ *       404:
+ *         description: Utility not found
+ */
+UtilityRouter.put("/:id", UtilityController.updateUtility);

@@ -37,8 +37,32 @@ const createNewUtility = async (req: Request, res: Response) => {
   }
 };
 
+const updateUtility = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { utility_name, description } = req.body;
+
+  if (!utility_name || !description) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const updatedData = { utility_name, description };
+  const updatedUtility = await UtilityService.updateUtilityById(
+    +id,
+    updatedData
+  );
+
+  if (!updatedUtility) {
+    return res
+      .status(404)
+      .json({ message: "Utility not found or update failed" });
+  }
+
+  return res.status(200).json(updatedUtility);
+};
+
 export default {
   findAll,
   findById,
   createNewUtility,
+  updateUtility,
 };

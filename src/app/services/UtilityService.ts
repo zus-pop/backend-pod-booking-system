@@ -48,8 +48,28 @@ const createNewUtility = async (utilityData: Utility) => {
   }
 };
 
+const updateUtilityById = async (id: number, utilityData: Partial<Utility>) => {
+  const connection = await pool.getConnection();
+  try {
+    const isUpdated = await UtilityRepository.updateUtility(
+      id,
+      utilityData,
+      connection
+    );
+    if (!isUpdated) return null;
+    const updatedUtility = await UtilityRepository.findById(id, connection);
+    return updatedUtility;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAll,
   findUtilityById,
   createNewUtility,
+  updateUtilityById,
 };

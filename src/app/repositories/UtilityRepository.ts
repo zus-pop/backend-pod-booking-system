@@ -26,8 +26,22 @@ const createNewUtility = async (
   return result.insertId;
 };
 
+const updateUtility = async (
+  id: number,
+  utilityData: Partial<Utility>,
+  connection: PoolConnection
+) => {
+  const sql = "UPDATE Utility SET ? WHERE utility_id = ?";
+  const [result] = await connection.query<ResultSetHeader>(sql, [
+    utilityData,
+    id,
+  ]);
+  return result.affectedRows > 0;
+};
+
 export default {
   findAll,
   findById,
   createNewUtility,
+  updateUtility,
 };
