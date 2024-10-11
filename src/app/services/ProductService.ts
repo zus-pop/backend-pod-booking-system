@@ -90,6 +90,19 @@ const updateProduct = async (product: Product) => {
   }
 };
 
+const deleteProductById = async (id: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const isDeleted = await ProductRepository.deleteById(id, connection);
+    return isDeleted;
+  } catch (err) {
+    console.error(err);
+    return false;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAllProducts,
   findProductById,
@@ -97,4 +110,5 @@ export default {
   findProductByCategory,
   createNewProduct,
   updateProduct,
+  deleteProductById,
 };

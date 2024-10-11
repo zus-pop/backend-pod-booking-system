@@ -194,3 +194,24 @@ ProductRouter.post("/", ProductController.createNewProduct);
  *              description: Product not found
  */
 ProductRouter.put("/:id", ProductController.updateProduct);
+
+/**
+ * @openapi
+ * /api/v1/products/{id}:
+ *   delete:
+ *     summary: Delete a Product by its id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the product to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found or deletion failed
+ */
+ProductRouter.delete("/:id", ProductController.deleteProduct);

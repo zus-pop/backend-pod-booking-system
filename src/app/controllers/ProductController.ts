@@ -97,9 +97,23 @@ const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
+const deleteProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const isDeleted = await ProductService.deleteProductById(+id);
+
+  if (isDeleted) {
+    return res.status(200).json({ message: "Product deleted successfully" });
+  } else {
+    return res
+      .status(404)
+      .json({ message: "Product not found or deletion failed" });
+  }
+};
+
 export default {
   find,
   findById,
   createNewProduct,
   updateProduct,
+  deleteProduct,
 };
