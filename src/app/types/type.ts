@@ -88,10 +88,11 @@ export interface OnlinePaymentResponse {
 }
 
 export interface Store {
-    store_id: number;
-    store_name: string;
-    address: string;
-    hotline: string;
+    store_id?: number;
+    store_name?: string;
+    address?: string;
+    hotline?: string;
+    image?: string;
 }
 
 export interface Slot {

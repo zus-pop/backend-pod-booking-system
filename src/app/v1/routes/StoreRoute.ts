@@ -34,10 +34,16 @@ export const StoreRouter = Router();
  *                                      example: 2
  *                                  address:
  *                                      type: string
+ *                                      description: address of store
  *                                      example: Quan 1, TP.Ho Chi Minh
  *                                  hotline:
  *                                      type: string
+ *                                      description: hotline of store
  *                                      example: 0123456789
+ *                                  image:
+ *                                      type: string
+ *                                      description: imageUrl of store
+ *                                      example: https://googleapis/...
  *          404:
  *              description: No stores found
  */
@@ -75,10 +81,16 @@ StoreRouter.get("/", StoreController.findAll);
  *                                      example: 2
  *                                  address:
  *                                      type: string
+ *                                      description: address of store
  *                                      example: Quan 1, TP.Ho Chi Minh
  *                                  hotline:
  *                                      type: string
+ *                                      description: hotline of store
  *                                      example: 0123456789
+ *                                  image:
+ *                                      type: string
+ *                                      description: imageUrl of store
+ *                                      example: https://googleapis/...
  *          404:
  *              description: Store not found
  *
