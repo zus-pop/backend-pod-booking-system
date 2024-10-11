@@ -78,3 +78,48 @@ UtilityRouter.get("/", UtilityController.findAll);
  *         description: Utility not found
  */
 UtilityRouter.get("/:id", UtilityController.findById);
+
+//POST: api/v1/utilities
+/**
+ * @openapi
+ * /api/v1/utilities:
+ *   post:
+ *     summary: Create a new utility
+ *     tags: [Utilities]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               utility_name:
+ *                 type: string
+ *               utility_description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 utility_id:
+ *                   type: integer
+ *                   description: ID of the utility
+ *                   example: 1
+ *                 utility_name:
+ *                   type: string
+ *                   description: Name of the utility
+ *                   example: Utility A
+ *                 utility_description:
+ *                   type: string
+ *                   description: Description of the utility
+ *                   example: This is a description of Utility A
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Internal server error
+ */
+UtilityRouter.post("/", UtilityController.createNewUtility);
