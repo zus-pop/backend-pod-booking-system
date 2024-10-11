@@ -19,14 +19,19 @@ const gc = new Storage({
 });
 const bucket = gc.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME as string);
 
-export const letImageCookToCloud = async (imageFile: Express.Multer.File) => {
+export const letImageCookToCloud = async (
+    imageFile: Express.Multer.File,
+    folder: string
+) => {
     const baseImageUrl = "https://storage.googleapis.com";
     return new Promise<string>((resolve, reject) => {
         if (!imageFile) {
             reject(new Error("No image file provided"));
         }
 
-        const blob = bucket.file(imageFile.originalname.replace(/[\s-]/g, "_"));
+        const blob = bucket.file(
+            `${folder}/${imageFile.originalname.replace(/[\s-]/g, "_")}`
+        );
         const blobStream = blob.createWriteStream({
             resumable: false,
         });

@@ -49,7 +49,7 @@ const createNewPod = async (req: Request, res: Response) => {
 
     if (imageFile) {
         try {
-            const publicUrl = await letImageCookToCloud(imageFile);
+            const publicUrl = await letImageCookToCloud(imageFile, "pods");
             newPod.image = publicUrl;
         } catch (err) {
             console.log(err);
@@ -87,7 +87,7 @@ const updatePOD = async (req: Request, res: Response) => {
     const imageFile = req.file;
     if (imageFile) {
         try {
-            const publicUrl = await letImageCookToCloud(imageFile);
+            const publicUrl = await letImageCookToCloud(imageFile, "pods");
             pod.image = publicUrl;
         } catch (err) {
             console.log(err);
