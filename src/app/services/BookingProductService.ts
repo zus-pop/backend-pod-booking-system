@@ -46,6 +46,7 @@ const findByBookingId = async (booking_id: number) => {
                     price: product.price,
                     unit_price: bookingProduct.unit_price,
                     quantity: bookingProduct.quantity,
+                    stock: product.stock,
                     category,
                     store,
                 };
