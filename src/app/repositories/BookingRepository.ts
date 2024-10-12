@@ -24,7 +24,7 @@ const bookingMapper = async (booking: Booking, connection: PoolConnection) => {
         user: {
             user_id: user.user_id,
             user_name: user.user_name,
-            email: user.email
+            email: user.email,
         },
         rating: booking.rating,
         comment: booking.comment,
@@ -44,8 +44,25 @@ const findAll = async (connection: PoolConnection) => {
         "booking_status",
     ];
     const values = [columns, "Booking"];
-    const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
-    return bookings as Booking[];
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
+    const bookings = rows as Booking[];
+    return await Promise.all(
+        bookings.map(async (booking) => {
+            const user = await UserRepository.findById(booking.user_id!, connection);
+            return {
+                booking_id: booking.booking_id,
+                pod_id: booking.pod_id,
+                user: {
+                    user_id: user.user_id,
+                    user_name: user.user_name,
+                    email: user.email,
+                },
+                booking_date: booking.booking_date,
+                booking_status: booking.booking_status,
+            }
+        } 
+    )
+    );
 };
 
 const findById = async (id: number, connection: PoolConnection) => {

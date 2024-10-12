@@ -1,4 +1,4 @@
-import { Slot } from "../types/type.ts";
+import { Slot, SlotOption } from "../types/type.ts";
 import moment from "moment";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { PoolConnection } from "mysql2/promise";
@@ -64,6 +64,14 @@ const findByPodId = async (pod_id: number, connection: PoolConnection) => {
     const values = [colums, "Slot", "pod_id", pod_id];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
     return slots as Slot[];
+};
+
+const create = async (slot: Slot, connection: PoolConnection) => {
+    const sql = "INSERT INTO ?? SET ?";
+    const values = ["Slot", slot];
+    console.log(connection.format(sql, values));
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
 };
 
 const update = async (slot: Slot, connection: PoolConnection) => {

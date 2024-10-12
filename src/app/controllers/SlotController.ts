@@ -18,7 +18,33 @@ const findById = async (req: Request, res: Response) => {
     return res.status(200).json(slot);
 };
 
+const generateSlots = async (req: Request, res: Response) => {
+    const {
+        startDate,
+        endDate,
+        startHour,
+        endHour,
+        durationMinutes,
+        pod_id,
+        unit_price,
+    } = req.body;
+    const slots = await SlotService.generateSlots({
+        startDate,
+        endDate,
+        startHour,
+        endHour,
+        durationMinutes,
+        podId: pod_id,
+        unitPrice: unit_price,
+    });
+    if (!slots || !slots.length) {
+        return res.status(404).json({ message: "No slots generated" });
+    }
+    return res.status(200).json(slots);
+};
+
 export default {
     findAll,
     findById,
+    generateSlots,
 };
