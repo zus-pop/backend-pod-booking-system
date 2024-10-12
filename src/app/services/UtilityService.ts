@@ -1,5 +1,6 @@
 import { pool } from "../config/pool.ts";
 import UtilityRepository from "../repositories/UtilityRepository.ts";
+import { Utility } from "../types/type.ts";
 
 const findAll = async () => {
   const connection = await pool.getConnection();
@@ -27,7 +28,48 @@ const findUtilityById = async (id: number) => {
   }
 };
 
+const createNewUtility = async (utilityData: Utility) => {
+  const conneciton = await pool.getConnection();
+  try {
+    const newUtilityId = await UtilityRepository.createNewUtility(
+      utilityData,
+      conneciton
+    );
+    const newUtility = await UtilityRepository.findById(
+      newUtilityId,
+      conneciton
+    );
+    return newUtility;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    conneciton.release();
+  }
+};
+
+const updateUtilityById = async (id: number, utilityData: Partial<Utility>) => {
+  const connection = await pool.getConnection();
+  try {
+    const isUpdated = await UtilityRepository.updateUtility(
+      id,
+      utilityData,
+      connection
+    );
+    if (!isUpdated) return null;
+    const updatedUtility = await UtilityRepository.findById(id, connection);
+    return updatedUtility;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAll,
   findUtilityById,
+  createNewUtility,
+  updateUtilityById,
 };

@@ -7,38 +7,54 @@ export const ProductRouter = Router();
 /**
  * @openapi
  * tags:
- *  name: Products
- *  description: The Products managing API
+ *   name: Products
+ *   description: The Products managing API
  * /api/v1/products:
- *  get:
- *      summary: Get list of Products
- *      tags: [Products]
- *      responses:
- *          200:
- *              description: Success
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  id:
- *                                      type: integer
- *                                      description: ID of the product
- *                                      example: 1
- *                                  name:
- *                                      type: string
- *                                      description: Name of the product
- *                                      example: "Product A"
- *                                  price:
- *                                      type: number
- *                                      description: Price of the product
- *                                      example: 100.50
- *          404:
- *              description: No products found
+ *   get:
+ *     summary: Get lists of Products
+ *     tags: [Products]
+ *     parameters:
+ *      - in: query
+ *        name: name
+ *        schema:
+ *          type: string
+ *        description: The name of the Product
+ *      - in: query
+ *        name: category_id
+ *        schema:
+ *          type: number
+ *        description: The id of the Product category
+ *     responses:
+ *       200:
+ *         description: Success.
+ *         content:
+ *           application/json:
+ *             schema:
+ *              type: array
+ *              items:
+ *                  type: object
+ *                  properties:
+ *                      product_id:
+ *                          type: integer
+ *                          description: id of product
+ *                          example: 1
+ *                      product_name:
+ *                          type: string
+ *                          description: name of product
+ *                          example: Product A
+ *                      category_id:
+ *                          type: integer
+ *                          description: id of category
+ *                          example: 2
+ *                      price:
+ *                          type: number
+ *                          description: price of product
+ *                          example: 100.00
+ *       404:
+ *         description: No products found
  */
-ProductRouter.get("/", ProductController.findAll);
+ProductRouter.get("/", ProductController.find);
+
 //GET: api/v1/products/{id}
 /**
  * @openapi
@@ -178,3 +194,24 @@ ProductRouter.post("/", ProductController.createNewProduct);
  *              description: Product not found
  */
 ProductRouter.put("/:id", ProductController.updateProduct);
+
+/**
+ * @openapi
+ * /api/v1/products/{id}:
+ *   delete:
+ *     summary: Delete a Product by its id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the product to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found or deletion failed
+ */
+ProductRouter.delete("/:id", ProductController.deleteProduct);

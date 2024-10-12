@@ -1,4 +1,4 @@
-import { PoolConnection, RowDataPacket } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Utility } from "../types/type.ts";
 
 const findAll = async (connection: PoolConnection) => {
@@ -16,7 +16,32 @@ const findById = async (id: number, connection: PoolConnection) => {
   const [utility] = await connection.query<RowDataPacket[]>(sql, values);
   return utility[0] as Utility;
 };
+
+const createNewUtility = async (
+  utilityData: Utility,
+  connection: PoolConnection
+) => {
+  const sql = "INSERT INTO Utility SET ?";
+  const [result] = await connection.query<ResultSetHeader>(sql, [utilityData]);
+  return result.insertId;
+};
+
+const updateUtility = async (
+  id: number,
+  utilityData: Partial<Utility>,
+  connection: PoolConnection
+) => {
+  const sql = "UPDATE Utility SET ? WHERE utility_id = ?";
+  const [result] = await connection.query<ResultSetHeader>(sql, [
+    utilityData,
+    id,
+  ]);
+  return result.affectedRows > 0;
+};
+
 export default {
   findAll,
   findById,
+  createNewUtility,
+  updateUtility,
 };
