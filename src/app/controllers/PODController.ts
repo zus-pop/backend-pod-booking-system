@@ -43,13 +43,22 @@ const findUtilitiesByPodId = async (req: Request, res: Response) => {
     return res.status(200).json(utilities);
 };
 
+const findByStoreId = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const pods = await PODService.findByStoreId(+id);
+    if (!pods || !pods.length) {
+        return res.status(404).json({ message: "No POD found" });
+    }
+    return res.status(200).json(pods);
+};
+
 const createNewPod = async (req: Request, res: Response) => {
     const newPod = req.body as POD;
     const imageFile = req.file;
 
     if (imageFile) {
         try {
-            const publicUrl = await letImageCookToCloud(imageFile);
+            const publicUrl = await letImageCookToCloud(imageFile, "pods");
             newPod.image = publicUrl;
         } catch (err) {
             console.log(err);
@@ -87,7 +96,7 @@ const updatePOD = async (req: Request, res: Response) => {
     const imageFile = req.file;
     if (imageFile) {
         try {
-            const publicUrl = await letImageCookToCloud(imageFile);
+            const publicUrl = await letImageCookToCloud(imageFile, "pods");
             pod.image = publicUrl;
         } catch (err) {
             console.log(err);
@@ -111,6 +120,7 @@ export default {
     find,
     findById,
     findUtilitiesByPodId,
+    findByStoreId,
     createNewPod,
     deleteOnePod,
     updatePOD,

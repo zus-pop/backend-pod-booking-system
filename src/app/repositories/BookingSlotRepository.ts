@@ -23,7 +23,10 @@ const findAllSlotByBookingId = async (
         bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
         connection
     );
-    return slots;
+    return slots.map((slot, index) => ({
+        ...slot,
+        price: bookingSlots[index].price,
+    }));
 };
 
 const createMany = async (

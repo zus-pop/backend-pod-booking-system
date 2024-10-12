@@ -103,6 +103,7 @@ export const calendarRedirect = async (req: Request, res: Response) => {
           <p>You have successfully authenticated with Google Calendar.</p>
           <p>This window will close automatically in 5 seconds...</p>
           <script>
+            window.opener.postMessage('oath-success', *);
             setTimeout(function() {
               window.close();
             }, 5000); // Close the window after 5 seconds
