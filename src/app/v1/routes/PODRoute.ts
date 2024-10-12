@@ -170,6 +170,10 @@ PODRouter.get("/:id/utilities", PODController.findUtilitiesByPodId);
  *                 store_id:
  *                   type: integer
  *                   description: id store's pod
+ *                 utilities:
+ *                   type: string
+ *                   description: list of id of utilities in a JSON format
+ *                   example: "[1, 2, 3]"
  *       responses:
  *         201:
  *           description: POD created successfully

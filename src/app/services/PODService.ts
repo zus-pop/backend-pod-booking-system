@@ -1,6 +1,7 @@
 import { pool } from "../config/pool.ts";
 import PODRepo from "../repositories/PODRepository.ts";
-import { POD } from "../types/type.ts";
+import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
+import { POD, PODUtility } from "../types/type.ts";
 
 const findAllPOD = async () => {
     const connection = await pool.getConnection();
@@ -67,13 +68,23 @@ const findByStoreId = async (store_id: number) => {
     }
 };
 
-const createNewPOD = async (newPod: POD) => {
+const createNewPOD = async (newPod: POD, utilities: number[]) => {
     const connection = await pool.getConnection();
     try {
+        await connection.beginTransaction();
         const insertId = await PODRepo.createNewPod(newPod, connection);
+        await PODUtilityRepository.create(
+            utilities.map<PODUtility>((utility) => ({
+                pod_id: insertId,
+                utility_id: utility,
+            })),
+            connection
+        );
+        await connection.commit();
         return insertId;
     } catch (err) {
         console.log(err);
+        await connection.rollback();
         return null;
     } finally {
         connection.release();

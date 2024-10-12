@@ -122,23 +122,23 @@ SlotRouter.get("/:id", SlotController.findById);
  *                              description: End date for generating slots
  *                              example: 2024-08-30
  *                          startHour:
- *                              type: number
+ *                              type: integer
  *                              description: Start hour for generating slots
  *                              example: 7
  *                          endHour:
- *                              type: number
+ *                              type: integer
  *                              description: End hour for generating slots
  *                              example: 10
  *                          durationMinutes:
- *                              type: number
+ *                              type: integer
  *                              description: Duration for each slot by minute
  *                              example: 30
  *                          pod_id:
- *                              type: number
+ *                              type: integer
  *                              description: id of the target pod for generating slots
  *                              example: 1
  *                          unit_price:
- *                              type: number
+ *                              type: integer
  *                              format: double
  *                              description: unit price for each slot
  *                              example: 80000
@@ -152,6 +152,6 @@ SlotRouter.get("/:id", SlotController.findById);
  *                          items:
  *                              type: number
  *                              description: id of the generated slot
- *                              example: 1
+ *                              example: [1, 2, 3]
  */
 SlotRouter.post("/", SlotController.generateSlots);

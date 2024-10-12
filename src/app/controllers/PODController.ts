@@ -53,7 +53,15 @@ const findByStoreId = async (req: Request, res: Response) => {
 };
 
 const createNewPod = async (req: Request, res: Response) => {
-    const newPod = req.body as POD;
+    const { pod_name, description, type_id, store_id } = req.body;
+    const utilities = JSON.parse(req.body.utilities) as number[];
+
+    const newPod: POD = {
+        pod_name,
+        description,
+        type_id,
+        store_id,
+    };
     const imageFile = req.file;
 
     if (imageFile) {
@@ -67,7 +75,7 @@ const createNewPod = async (req: Request, res: Response) => {
                 .json({ message: "Error uploading image to cloud storage" });
         }
     }
-    const insertId = await PODService.createNewPOD(newPod);
+    const insertId = await PODService.createNewPOD(newPod, utilities);
     if (!insertId) {
         return res.status(400).json({ message: "Failed to create new POD" });
     }

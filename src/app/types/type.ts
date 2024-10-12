@@ -17,6 +17,12 @@ export interface POD {
     is_available?: boolean;
     store_id?: number;
 }
+
+export interface PODUtility {
+    id?: number;
+    pod_id?: number;
+    utility_id?: number;
+}
 export interface User {
     user_id?: number;
     email: string;

@@ -1,6 +1,28 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { POD } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
+import PODTypeRepository from "./PODTypeRepository.ts";
+import StoreRepository from "./StoreRepository.ts";
+import PODUtilityRepository from "./PODUtilityRepository.ts";
+
+const podMapping = async (pod: POD, connection: PoolConnection) => {
+    const type = await PODTypeRepository.findById(pod.type_id!, connection);
+    const store = await StoreRepository.findById(pod.store_id!, connection);
+    const utilities = await PODUtilityRepository.findByPodId(
+        pod.pod_id!,
+        connection
+    );
+    return {
+        pod_id: pod.pod_id,
+        pod_name: pod.pod_name,
+        description: pod.description,
+        image: pod.image,
+        utilities: utilities,
+        is_available: pod.is_available,
+        type: type,
+        store: store,
+    };
+};
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
@@ -31,7 +53,7 @@ const findById = async (id: number, connection: PoolConnection) => {
     ];
     const values = [columns, "POD", "pod_id", id];
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return pods[0] as POD;
+    return podMapping(pods[0] as POD, connection);
 };
 
 const findByName = async (name: string, connection: PoolConnection) => {
