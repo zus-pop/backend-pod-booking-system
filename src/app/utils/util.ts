@@ -7,7 +7,7 @@ import { PoolConnection } from "mysql2/promise";
 // const conn = await pool.getConnection();
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-export const generateSlots = async (
+const generateSlots = async (
     connection: PoolConnection,
     options: SlotOption
 ) => {

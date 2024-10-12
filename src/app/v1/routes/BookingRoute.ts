@@ -418,10 +418,17 @@ BookingRouter.post(
 // PUT: api/v1/bookings
 /**
  * @openapi
- * /api/v1/bookings:
+ * /api/v1/bookings/{id}:
  *  put:
  *      summary: Update Booking status
  *      tags: [Bookings]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The booking id
  *      requestBody:
  *          required: true
  *          content:
@@ -429,9 +436,6 @@ BookingRouter.post(
  *                  schema:
  *                      type: object
  *                      properties:
- *                          booking_id:
- *                              type: integer
- *                              required: true
  *                          booking_status:
  *                              type: string
  *                              required: true
@@ -463,4 +467,4 @@ BookingRouter.post(
  *                                  description: update message response
  *                                  example: Booking not found
  */
-BookingRouter.put("/", validateEmptyObject, BookingController.update);
+BookingRouter.put("/:id", validateEmptyObject, BookingController.update);

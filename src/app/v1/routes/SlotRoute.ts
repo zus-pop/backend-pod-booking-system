@@ -96,3 +96,62 @@ SlotRouter.get("/", SlotController.findAll);
  *                                      example: 1
  */
 SlotRouter.get("/:id", SlotController.findById);
+
+// POST: api/v1/slots
+/**
+ * @openapi
+ * /api/v1/slots:
+ *  post:
+ *      summary: Generate slots
+ *      tags: [Slots]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          startDate:
+ *                              type: string
+ *                              format: date
+ *                              description: Start date for generating slots
+ *                              example: 2024-08-30
+ *                          endDate:
+ *                              type: string
+ *                              format: date
+ *                              description: End date for generating slots
+ *                              example: 2024-08-30
+ *                          startHour:
+ *                              type: number
+ *                              description: Start hour for generating slots
+ *                              example: 7
+ *                          endHour:
+ *                              type: number
+ *                              description: End hour for generating slots
+ *                              example: 10
+ *                          durationMinutes:
+ *                              type: number
+ *                              description: Duration for each slot by minute
+ *                              example: 30
+ *                          pod_id:
+ *                              type: number
+ *                              description: id of the target pod for generating slots
+ *                              example: 1
+ *                          unit_price:
+ *                              type: number
+ *                              format: double
+ *                              description: unit price for each slot
+ *                              example: 80000
+ *      responses:
+ *          200:
+ *              description: Slots created
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              type: number
+ *                              description: id of the generated slot
+ *                              example: 1
+ */
+SlotRouter.post("/", SlotController.generateSlots);
