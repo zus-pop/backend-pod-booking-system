@@ -10,7 +10,7 @@ describe("Select multiple slot", () => {
         expect(slots).toHaveLength(slot_ids.length);
     });
     test("should return list of available slot by date and pod id", async () => {
-        const slots = await SlotService.findAvailableSlotByDateAndPodId(
+        const slots = await SlotService.findSlotByDateAndPodId(
             3,
             moment("2024-10-01").format("YYYY-MM-DD")
         );
