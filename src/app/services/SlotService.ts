@@ -67,13 +67,13 @@ const findAvailableSlotByDate = async (date: Date | string) => {
     }
 };
 
-const findAvailableSlotByDateAndPodId = async (
+const findSlotByDateAndPodId = async (
     pod_id: number,
     date: Date | string
 ) => {
     const connection = await pool.getConnection();
     try {
-        const slots = await SlotRepo.findAvailableSlotByDateAndPodId(
+        const slots = await SlotRepo.findSlotByDateAndPodId(
             pod_id,
             date,
             connection
@@ -215,7 +215,7 @@ export default {
     findSlotByRangeOfId,
     // findByPodId,
     // findAvailableSlotByDate,
-    findAvailableSlotByDateAndPodId,
+    findSlotByDateAndPodId,
     generateSlots,
     checkAllAvailableSlot,
     updateSlot,

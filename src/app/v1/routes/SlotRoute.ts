@@ -13,6 +13,18 @@ export const SlotRouter = Router();
  *  get:
  *      summary: Get list of Slots
  *      tags: [Slots]
+ *      parameters:
+ *          - in: query
+ *            name: pod_id
+ *            schema:
+ *              type: integer
+ *            description: id of the pod
+ *          - in: query
+ *            name: date
+ *            schema:
+ *              type: string
+ *              format: date
+ *            description: selected date for list of slots
  *      responses:
  *          200:
  *              description: Success
@@ -47,7 +59,7 @@ export const SlotRouter = Router();
  *                                      type: number
  *                                      example: 1
  */
-SlotRouter.get("/", SlotController.findAll);
+SlotRouter.get("/", SlotController.findSlotByDateAndPodId, SlotController.findAll);
 
 // GET: api/v1/slots/:id
 /**
