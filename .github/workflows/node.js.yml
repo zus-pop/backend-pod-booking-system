@@ -30,3 +30,4 @@ jobs:
         echo "${{ secrets.PODDY_ENV_FILE }}" > .env
     - run: npm run build --if-present
     - run: npm test
+    - run: pm2 restart poddy
