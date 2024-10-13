@@ -53,6 +53,8 @@ const findByPodId = async (pod_id: number) => {
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
@@ -64,6 +66,8 @@ const findAvailableSlotByDate = async (date: Date | string) => {
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
@@ -82,6 +86,8 @@ const findSlotByDateAndPodId = async (
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
