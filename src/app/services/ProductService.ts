@@ -57,21 +57,20 @@ const findProductByCategory = async (category_id: number) => {
   }
 };
 
-const createNewProduct = async (productData: Product) => {
+const createNewProduct = async (newProduct: Product) => {
   const connection = await pool.getConnection();
   try {
-    const newProductId = await ProductRepository.createNewProduct(
-      productData,
+    await connection.beginTransaction();
+    const insertId = await ProductRepository.createNewProduct(
+      newProduct,
       connection
     );
-    const newProduct = await ProductRepository.findById(
-      newProductId,
-      connection
-    );
-    return newProduct;
+    await connection.commit();
+    return insertId;
   } catch (err) {
-    console.error("Error creating new product:", err);
-    throw new Error("Unable to create new product");
+    console.log(err);
+    await connection.rollback();
+    return null;
   } finally {
     connection.release();
   }
