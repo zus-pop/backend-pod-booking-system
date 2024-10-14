@@ -10,7 +10,7 @@ const findAll = async (connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot"];
@@ -25,7 +25,7 @@ const findById = async (id: number, connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "slot_id", id];
@@ -43,7 +43,7 @@ const findByMultipleId = async (
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "slot_id", slot_ids];
@@ -58,7 +58,7 @@ const findByPodId = async (pod_id: number, connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "pod_id", pod_id];
@@ -102,7 +102,7 @@ const findAvailableSlotByDate = async (
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [
@@ -129,7 +129,7 @@ const findSlotByDateAndPodId = async (
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [
@@ -154,6 +154,7 @@ export default {
     findByPodId, //haven't been used yet
     findAvailableSlotByDate, //haven't been used yet
     findSlotByDateAndPodId,
+    create,
     update,
     updateStatusMultipleSlot,
 };

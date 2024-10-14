@@ -71,10 +71,7 @@ const findAvailableSlotByDate = async (date: Date | string) => {
     }
 };
 
-const findSlotByDateAndPodId = async (
-    pod_id: number,
-    date: Date | string
-) => {
+const findSlotByDateAndPodId = async (pod_id: number, date: Date | string) => {
     const connection = await pool.getConnection();
     try {
         const slots = await SlotRepo.findSlotByDateAndPodId(
@@ -148,16 +145,11 @@ const generateSlots = async (options: SlotOption) => {
                 end_time: startDatetime
                     .add(options.durationMinutes, "minutes")
                     .format(FORMAT_TYPE),
-                unit_price: options.unitPrice,
+                price: options.price,
                 is_available: true,
             };
-            const sql = "INSERT INTO ?? SET ?";
-            const values = ["Slot", slot];
-            console.log(connection.format(sql, values));
-            const [result] = await connection.query<ResultSetHeader>(
-                sql,
-                values
-            );
+         
+            const result = await SlotRepo.create(slot, connection);
             slots.push(result.insertId);
 
             if (options.gap) {

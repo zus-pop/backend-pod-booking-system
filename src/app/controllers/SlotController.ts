@@ -26,7 +26,7 @@ const generateSlots = async (req: Request, res: Response) => {
         endHour,
         durationMinutes,
         pod_id,
-        unit_price,
+        price,
     } = req.body;
     const slots = await SlotService.generateSlots({
         startDate,
@@ -35,7 +35,7 @@ const generateSlots = async (req: Request, res: Response) => {
         endHour,
         durationMinutes,
         podId: pod_id,
-        unitPrice: unit_price,
+        price: price,
     });
     if (!slots || !slots.length) {
         return res.status(404).json({ message: "No slots generated" });

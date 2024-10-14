@@ -51,7 +51,7 @@ export const SlotRouter = Router();
  *                                      type: string
  *                                      format: date-time
  *                                      example: 2024-08-30T08:00:00Z
- *                                  unit_price:
+ *                                  price:
  *                                      type: number
  *                                      format: double
  *                                      example: 80000
@@ -99,7 +99,7 @@ SlotRouter.get("/", SlotController.findSlotByDateAndPodId, SlotController.findAl
  *                                      type: string
  *                                      format: date-time
  *                                      example: 2024-08-30T08:00:00Z
- *                                  unit_price:
+ *                                  price:
  *                                      type: number
  *                                      format: double
  *                                      example: 80000
@@ -149,7 +149,7 @@ SlotRouter.get("/:id", SlotController.findById);
  *                              type: integer
  *                              description: id of the target pod for generating slots
  *                              example: 1
- *                          unit_price:
+ *                          price:
  *                              type: integer
  *                              format: double
  *                              description: unit price for each slot
