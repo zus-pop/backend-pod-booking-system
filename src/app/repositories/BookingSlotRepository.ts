@@ -1,10 +1,10 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { Booking, BookingSlot } from "../types/type.ts";
+import { BookingSlot } from "../types/type.ts";
 import SlotRepository from "./SlotRepository.ts";
 
 const findAllSlot = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const columns = ["id", "booking_id", "slot_id", "price"];
+    const columns = ["id", "booking_id", "slot_id", "unit_price"];
     const values = [columns, "Booking_Slot"];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     return rows as BookingSlot[];
@@ -15,7 +15,7 @@ const findAllSlotByBookingId = async (
     connection: PoolConnection
 ) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["id", "booking_id", "slot_id", "price"];
+    const columns = ["id", "booking_id", "slot_id", "unit_price"];
     const values = [columns, "Booking_Slot", "booking_id", booking_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookingSlots = rows as BookingSlot[];
@@ -25,7 +25,7 @@ const findAllSlotByBookingId = async (
     );
     return slots.map((slot, index) => ({
         ...slot,
-        price: bookingSlots[index].price,
+        price: bookingSlots[index].unit_price,
     }));
 };
 
@@ -36,11 +36,11 @@ const createMany = async (
     const sql = "INSERT INTO ?? (??) VALUES ?";
     const values = [
         "Booking_Slot",
-        ["booking_id", "slot_id", "price"],
+        ["booking_id", "slot_id", "unit_price"],
         bookingSlots.map((bookingSlot) => [
             bookingSlot.booking_id,
             bookingSlot.slot_id,
-            bookingSlot.price,
+            bookingSlot.unit_price,
         ]),
     ];
     const [rows] = await connection.query<ResultSetHeader>(sql, values);

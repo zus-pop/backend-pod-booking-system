@@ -256,6 +256,59 @@ UserRouter.get("/users", UserController.findAll);
 UserRouter.get("/profile", authenticateToken, UserController.getUser);
 
 // GET: api/v1/auth/bookings
+/**
+ * @openapi
+ * /api/v1/auth/bookings:
+ *  get:
+ *      summary: Get bookings from user_id in token
+ *      security:
+ *          - Authorization: []
+ *      tags: [Users]
+ *      responses:
+ *        200:
+ *          description: Success.
+ *          content:
+ *            application/json:
+ *              schema:
+ *               type: array
+ *               items:
+ *                   type: object
+ *                   properties:
+ *                       booking_id:
+ *                           type: integer
+ *                           description: id of booking
+ *                           example: 1
+ *                       pod_id:
+ *                           type: integer
+ *                           description: id of pod
+ *                           example: 3
+ *                       user_id:
+ *                           type: integer
+ *                           description: id of user
+ *                           example: 4
+ *                       rating:
+ *                           type: integer
+ *                           format: double
+ *                           description: rating of booking
+ *                           example: 5.0
+ *                       comment:
+ *                           type: string
+ *                           description: feedback of booking
+ *                           example: đỉnh nóc, kịch trần, bay phấp phới
+ *                       booking_date:
+ *                           type: string
+ *                           format: date-time
+ *                           description: date-time of booking
+ *                           example: 2024-05-28T12:30:08Z
+ *                       booking_status:
+ *                           type: string
+ *                           description: status of booking
+ *                           enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *                           example: Pending
+ *          404:
+ *              description: Booking found
+ *
+ */
 UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
 
 // POST: api/v1/auth/forgot-password
