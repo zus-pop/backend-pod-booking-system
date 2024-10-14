@@ -5,7 +5,7 @@ export interface SlotOption {
     endHour: number;
     durationMinutes: number;
     podId: number;
-    unitPrice: number;
+    price: number;
     gap?: number;
 }
 export interface POD {
@@ -57,7 +57,7 @@ export interface BookingSlot {
     id?: number;
     booking_id?: number;
     slot_id?: number;
-    price?: number;
+    unit_price?: number;
 }
 
 export interface Category {
@@ -106,7 +106,7 @@ export interface Slot {
     pod_id?: number;
     start_time?: Date | string;
     end_time?: Date | string;
-    unit_price?: number;
+    price?: number;
     is_available?: boolean;
 }
 

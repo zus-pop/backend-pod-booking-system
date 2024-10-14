@@ -10,7 +10,7 @@ const findAll = async (connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot"];
@@ -25,7 +25,7 @@ const findById = async (id: number, connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "slot_id", id];
@@ -43,7 +43,7 @@ const findByMultipleId = async (
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "slot_id", slot_ids];
@@ -58,7 +58,7 @@ const findByPodId = async (pod_id: number, connection: PoolConnection) => {
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [colums, "Slot", "pod_id", pod_id];
@@ -102,7 +102,7 @@ const findAvailableSlotByDate = async (
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [
@@ -118,18 +118,18 @@ const findAvailableSlotByDate = async (
     return slots as Slot[];
 };
 
-const findAvailableSlotByDateAndPodId = async (
+const findSlotByDateAndPodId = async (
     pod_id: number,
     date: Date | string,
     connection: PoolConnection
 ) => {
-    const sql = "SELECT ?? FROM ?? WHERE DATE(??) = ? AND ?? = ? AND ?? = ?";
+    const sql = "SELECT ?? FROM ?? WHERE DATE(??) = ? AND ?? = ?";
     const colums = [
         "slot_id",
         "pod_id",
         "start_time",
         "end_time",
-        "unit_price",
+        "price",
         "is_available",
     ];
     const values = [
@@ -137,10 +137,10 @@ const findAvailableSlotByDateAndPodId = async (
         "Slot",
         "start_time",
         moment(date).format("YYYY-MM-DD"),
-        "is_available",
-        true,
         "pod_id",
         pod_id,
+        // "is_available",
+        // true,
     ];
     console.log(connection.format(sql, values));
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
@@ -153,7 +153,8 @@ export default {
     findByMultipleId,
     findByPodId, //haven't been used yet
     findAvailableSlotByDate, //haven't been used yet
-    findAvailableSlotByDateAndPodId,
+    findSlotByDateAndPodId,
+    create,
     update,
     updateStatusMultipleSlot,
 };

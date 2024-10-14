@@ -53,6 +53,8 @@ const findByPodId = async (pod_id: number) => {
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
@@ -64,16 +66,15 @@ const findAvailableSlotByDate = async (date: Date | string) => {
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
-const findAvailableSlotByDateAndPodId = async (
-    pod_id: number,
-    date: Date | string
-) => {
+const findSlotByDateAndPodId = async (pod_id: number, date: Date | string) => {
     const connection = await pool.getConnection();
     try {
-        const slots = await SlotRepo.findAvailableSlotByDateAndPodId(
+        const slots = await SlotRepo.findSlotByDateAndPodId(
             pod_id,
             date,
             connection
@@ -82,6 +83,8 @@ const findAvailableSlotByDateAndPodId = async (
     } catch (err) {
         console.log(err);
         return null;
+    } finally {
+        connection.release();
     }
 };
 
@@ -142,16 +145,11 @@ const generateSlots = async (options: SlotOption) => {
                 end_time: startDatetime
                     .add(options.durationMinutes, "minutes")
                     .format(FORMAT_TYPE),
-                unit_price: options.unitPrice,
+                price: options.price,
                 is_available: true,
             };
-            const sql = "INSERT INTO ?? SET ?";
-            const values = ["Slot", slot];
-            console.log(connection.format(sql, values));
-            const [result] = await connection.query<ResultSetHeader>(
-                sql,
-                values
-            );
+         
+            const result = await SlotRepo.create(slot, connection);
             slots.push(result.insertId);
 
             if (options.gap) {
@@ -215,7 +213,7 @@ export default {
     findSlotByRangeOfId,
     // findByPodId,
     // findAvailableSlotByDate,
-    findAvailableSlotByDateAndPodId,
+    findSlotByDateAndPodId,
     generateSlots,
     checkAllAvailableSlot,
     updateSlot,

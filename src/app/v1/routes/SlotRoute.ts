@@ -13,6 +13,18 @@ export const SlotRouter = Router();
  *  get:
  *      summary: Get list of Slots
  *      tags: [Slots]
+ *      parameters:
+ *          - in: query
+ *            name: pod_id
+ *            schema:
+ *              type: integer
+ *            description: id of the pod
+ *          - in: query
+ *            name: date
+ *            schema:
+ *              type: string
+ *              format: date
+ *            description: selected date for list of slots
  *      responses:
  *          200:
  *              description: Success
@@ -39,7 +51,7 @@ export const SlotRouter = Router();
  *                                      type: string
  *                                      format: date-time
  *                                      example: 2024-08-30T08:00:00Z
- *                                  unit_price:
+ *                                  price:
  *                                      type: number
  *                                      format: double
  *                                      example: 80000
@@ -47,7 +59,7 @@ export const SlotRouter = Router();
  *                                      type: number
  *                                      example: 1
  */
-SlotRouter.get("/", SlotController.findAll);
+SlotRouter.get("/", SlotController.findSlotByDateAndPodId, SlotController.findAll);
 
 // GET: api/v1/slots/:id
 /**
@@ -87,7 +99,7 @@ SlotRouter.get("/", SlotController.findAll);
  *                                      type: string
  *                                      format: date-time
  *                                      example: 2024-08-30T08:00:00Z
- *                                  unit_price:
+ *                                  price:
  *                                      type: number
  *                                      format: double
  *                                      example: 80000
@@ -137,7 +149,7 @@ SlotRouter.get("/:id", SlotController.findById);
  *                              type: integer
  *                              description: id of the target pod for generating slots
  *                              example: 1
- *                          unit_price:
+ *                          price:
  *                              type: integer
  *                              format: double
  *                              description: unit price for each slot
