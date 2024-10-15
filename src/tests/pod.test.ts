@@ -1,4 +1,3 @@
-import "dotenv/config";
 import PODService from "../app/services/PODService";
 import { pool } from "../app/config/pool";
 

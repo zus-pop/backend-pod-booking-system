@@ -1,10 +1,24 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import UserService from "../services/UserService.ts";
 import { Roles } from "../types/type.ts";
 
-const findAll = async (_: Request, res: Response) => {
+const find = async (_: Request, res: Response) => {
     const users = await UserService.findAll();
     if (!users) {
+        return res.status(404).json({ message: "No users found" });
+    }
+    return res.status(200).json(users);
+};
+
+const findByUsernameOrEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { search } = req.query;
+    if (!search) return next();
+    const users = await UserService.findByUsernameOrEmail(search as string);
+    if (!users || !users.length) {
         return res.status(404).json({ message: "No users found" });
     }
     return res.status(200).json(users);
@@ -58,10 +72,9 @@ const getUser = async (req: Request, res: Response) => {
     res.status(200).json(user);
 };
 
-
-
 export default {
-    findAll,
+    find,
+    findByUsernameOrEmail,
     login,
     register,
     getUser,

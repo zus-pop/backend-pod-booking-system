@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { pool } from "../app/config/pool";
 import { Roles, User } from "../app/types/type";
 import "../app/services/UserService";
