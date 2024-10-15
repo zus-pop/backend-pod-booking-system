@@ -4,6 +4,40 @@ import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const PODRouter = Router();
 
+// GET: api/v1/pods/sorted-by-rating
+/**
+ * @openapi
+ * /api/v1/pods/sorted-by-rating:
+ *   get:
+ *     summary: Get PODs sorted by average rating
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: List of PODs sorted by average rating
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   pod_id:
+ *                     type: integer
+ *                     description: The POD ID
+ *                     example: 1
+ *                   pod_name:
+ *                     type: string
+ *                     description: The name of the POD
+ *                     example: "Pod A"
+ *                   avg_rating:
+ *                     type: number
+ *                     description: The average rating of the POD
+ *                     example: 4.5
+ *       500:
+ *         description: Failed to fetch PODs
+ */
+PODRouter.get("/sorted-by-rating", PODController.sortPODByRating);
+
 // GET: api/v1/pods
 /**
  * @openapi

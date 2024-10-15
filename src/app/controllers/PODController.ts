@@ -25,6 +25,10 @@ const find = async (req: Request, res: Response) => {
 
 const findById = async (req: Request, res: Response) => {
   const { id } = req.params;
+  console.log("Received ID: ", id);
+  if (isNaN(+id)) {
+    return res.status(400).json({ message: "Invalid POD ID" });
+  }
   const pod = await PODService.findPODById(+id);
   if (!pod) {
     return res.status(404).json({ message: "No POD found" });
@@ -120,6 +124,16 @@ const updatePOD = async (req: Request, res: Response) => {
   }
 };
 
+const sortPODByRating = async (req: Request, res: Response) => {
+  const sortedPODs = await PODService.sortPODByRating();
+
+  if (sortedPODs && sortedPODs.length > 0) {
+    return res.status(200).json(sortedPODs);
+  } else {
+    return res.status(404).json({ message: "No PODs found" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -128,4 +142,5 @@ export default {
   createNewPod,
   deleteOnePod,
   updatePOD,
+  sortPODByRating,
 };
