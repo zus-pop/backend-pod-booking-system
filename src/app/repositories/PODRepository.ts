@@ -4,7 +4,6 @@ import { PoolConnection } from "mysql2/promise";
 import PODTypeRepository from "./PODTypeRepository.ts";
 import StoreRepository from "./StoreRepository.ts";
 import PODUtilityRepository from "./PODUtilityRepository.ts";
-import { parseArgs } from "util";
 
 const podMapping = async (pod: POD, connection: PoolConnection) => {
     const type = await PODTypeRepository.findById(pod.type_id!, connection);
