@@ -25,6 +25,17 @@ const findByEmail = async (email: string, connection: PoolConnection) => {
     return user[0] as User;
 };
 
+const findByUsernameOrEmail = async (
+    search: string,
+    connection: PoolConnection
+) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? LIKE ? OR ?? LIKE ?";
+    const columns = ["user_id", "email", "user_name", "role_id"];
+    const values = [columns, "User", "user_name", `%${search}%`, "email", `%${search}%`];
+    const [users] = await connection.query<RowDataPacket[]>(sql, values);
+    return users;
+};
+
 const persist = async (
     user: {
         email: string;
@@ -46,5 +57,6 @@ export default {
     findAll,
     findById,
     findByEmail,
+    findByUsernameOrEmail,
     persist,
 };

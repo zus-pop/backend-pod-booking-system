@@ -186,7 +186,11 @@ UserRouter.post("/register", UserController.register);
  *                                  type: string
  *                                  example: No users found
  */
-UserRouter.get("/users", UserController.findAll);
+UserRouter.get(
+    "/users",
+    UserController.findByUsernameOrEmail,
+    UserController.find
+);
 
 // GET: api/v1/auth/profile
 /**

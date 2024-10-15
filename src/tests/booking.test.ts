@@ -1,4 +1,3 @@
-import "dotenv/config";
 import BookingService from "../app/services/BookingService";
 import { pool } from "../app/config/pool";
 describe("booking id", () => {

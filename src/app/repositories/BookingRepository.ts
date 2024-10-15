@@ -5,6 +5,7 @@ import PODRepository from "./PODRepository.ts";
 import BookingSlotRepository from "./BookingSlotRepository.ts";
 import BookingProductRepository from "./BookingProductRepository.ts";
 import UserRepository from "./UserRepository.ts";
+import PaymentRepository from "./PaymentRepository.ts";
 
 const bookingMapper = async (booking: Booking, connection: PoolConnection) => {
     const pod = await PODRepository.findById(booking.pod_id!, connection);
@@ -17,6 +18,11 @@ const bookingMapper = async (booking: Booking, connection: PoolConnection) => {
         connection
     );
     const user = await UserRepository.findById(booking.user_id!, connection);
+
+    const payment = await PaymentRepository.findByBookingId(
+        booking.booking_id!,
+        connection
+    );
     return {
         booking_id: booking.booking_id,
         booking_date: booking.booking_date,
@@ -31,6 +37,7 @@ const bookingMapper = async (booking: Booking, connection: PoolConnection) => {
         pod,
         slots,
         products,
+        payment,
     };
 };
 

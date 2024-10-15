@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { pool } from "../app/config/pool.ts";
 import SlotService from "../app/services/SlotService.ts";
 import moment from "moment";

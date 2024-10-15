@@ -9,6 +9,7 @@ const findAll = async (connection: PoolConnection) => {
         "booking_id",
         "transaction_id",
         "total_cost",
+        "payment_url",
         "payment_date",
         "payment_status",
     ];
@@ -24,6 +25,7 @@ const findById = async (id: number, connection: PoolConnection) => {
         "booking_id",
         "transaction_id",
         "total_cost",
+        "payment_url",
         "payment_date",
         "payment_status",
     ];
@@ -42,6 +44,7 @@ const findByBookingId = async (
         "booking_id",
         "transaction_id",
         "total_cost",
+        "payment_url",
         "payment_date",
         "payment_status",
     ];
@@ -60,6 +63,7 @@ const findByTransactionId = async (
         "booking_id",
         "transaction_id",
         "total_cost",
+        "payment_url",
         "payment_date",
         "payment_status",
     ];
