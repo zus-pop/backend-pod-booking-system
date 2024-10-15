@@ -1,6 +1,7 @@
 import PODController from "../../controllers/PODController.ts";
 import StoreController from "../../controllers/StoreController.ts";
 import { Router } from "express";
+import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const StoreRouter = Router();
 
@@ -140,3 +141,114 @@ StoreRouter.get("/:id", StoreController.findById);
  *          description: No PODs found
  */
 StoreRouter.get("/:id/pods", PODController.findByStoreId);
+
+// POST: api/v1/stores
+/**
+ * @openapi
+ * /api/v1/stores:
+ *   post:
+ *     summary: Create a new Store
+ *     tags: [Stores]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               store_name:
+ *                 type: string
+ *                 description: name of the store
+ *               address:
+ *                 type: string
+ *                 description: address of the store
+ *               hotline:
+ *                 type: string
+ *                 description: hotline of the store
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: image of the store
+ *     responses:
+ *       201:
+ *         description: Store created successfully
+ *       400:
+ *         description: Failed to create new Store
+ */
+StoreRouter.post("/", upload.single("image"), StoreController.createNewStore);
+
+/**
+ * @openapi
+ * /api/v1/stores/{id}:
+ *  put:
+ *      summary: Update a Store by ID
+ *      tags: [Stores]
+ *      parameters:
+ *        - name: id
+ *          in: path
+ *          required: true
+ *          description: The ID of the Store
+ *          schema:
+ *            type: integer
+ *      requestBody:
+ *          required: true
+ *          content:
+ *           multipart/form-data:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 store_name:
+ *                   type: string
+ *                   description: name of store
+ *                 address:
+ *                   type: string
+ *                   description: address of store
+ *                 hotline:
+ *                   type: string
+ *                   description: contact hotline of store
+ *                 image:
+ *                   type: string
+ *                   format: binary
+ *                   description: image of store
+ *      responses:
+ *          200:
+ *              description: Store updated
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              store_id:
+ *                                  type: integer
+ *                                  description: ID of the updated Store
+ *                                  example: 1
+ *                              store_name:
+ *                                  type: string
+ *                                  description: Name of the Store
+ *                                  example: "Updated Store A"
+ *          404:
+ *              description: Store not found
+ */
+StoreRouter.put("/:id", upload.single("image"), StoreController.updateStore);
+
+// DELETE: api/v1/stores/:id
+/**
+ * @openapi
+ * /api/v1/stores/{id}:
+ *   delete:
+ *     summary: Delete a Store by ID
+ *     tags: [Stores]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The Store id
+ *     responses:
+ *       200:
+ *         description: Store deleted
+ *       404:
+ *         description: Store not found
+ */
+StoreRouter.delete("/:id", StoreController.deleteStore);

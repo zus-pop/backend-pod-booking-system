@@ -1,5 +1,6 @@
 import { Router } from "express";
 import ProductController from "../../controllers/ProductController.ts";
+import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const ProductRouter = Router();
 
@@ -97,56 +98,61 @@ ProductRouter.get("/", ProductController.find);
  *              description: Internal server error
  */
 ProductRouter.get("/:id", ProductController.findById);
-//POST: api/v1/products
+
+// POST: api/v1/products
 /**
  * @openapi
  * /api/v1/products:
- *  post:
- *      summary: Create a new Product
- *      tags: [Products]
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          name:
- *                              type: string
- *                              description: Name of the product
- *                              example: "Product A"
- *                          price:
- *                              type: number
- *                              description: Price of the product
- *                              example: 100.50
- *      responses:
- *          201:
- *              description: Product created
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              id:
- *                                  type: integer
- *                                  description: ID of the new product
- *                                  example: 1
- *                              name:
- *                                  type: string
- *                                  description: Name of the product
- *                                  example: "Product A"
- *                              price:
- *                                  type: number
- *                                  description: Price of the product
- *                                  example: 100.50
+ *     post:
+ *       summary: Create a new Product
+ *       tags: [Products]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           multipart/form-data:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 product_name:
+ *                   type: string
+ *                   description: name of product
+ *                 description:
+ *                   type: string
+ *                   description: description of product
+ *                 image:
+ *                   type: string
+ *                   format: binary
+ *                   description: image of product
+ *                 category_id:
+ *                   type: integer
+ *                   description: id category of product
+ *                 price:
+ *                   type: number
+ *                   description: price of product
+ *                 store_id:
+ *                   type: integer
+ *                   description: id store's product
+ *                 stock:
+ *                   type: integer
+ *                   description: stock of product
+ *       responses:
+ *         201:
+ *           description: Product created successfully
+ *         400:
+ *           description: Failed to create new Product
  */
-ProductRouter.post("/", ProductController.createNewProduct);
-//PUT: api/v1/products/{id}
+ProductRouter.post(
+  "/",
+  upload.single("image"),
+  ProductController.createNewProduct
+);
+
+// PUT: api/v1/products/{id}
 /**
  * @openapi
  * /api/v1/products/{id}:
  *  put:
- *      summary: Update a Product by ID
+ *      summary: Update a product by ID
  *      tags: [Products]
  *      parameters:
  *        - name: id
@@ -158,18 +164,32 @@ ProductRouter.post("/", ProductController.createNewProduct);
  *      requestBody:
  *          required: true
  *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          name:
- *                              type: string
- *                              description: Name of the product
- *                              example: "Updated Product A"
- *                          price:
- *                              type: number
- *                              description: Price of the product
- *                              example: 120.00
+ *           multipart/form-data:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 product_name:
+ *                   type: string
+ *                   description: name of product
+ *                 description:
+ *                   type: string
+ *                   description: description of product
+ *                 image:
+ *                   type: string
+ *                   format: binary
+ *                   description: image of product
+ *                 category_id:
+ *                   type: integer
+ *                   description: id category of product
+ *                 store_id:
+ *                   type: integer
+ *                   description: id store's product
+ *                 price:
+ *                   type: number
+ *                   description: price of the product
+ *                 stock:
+ *                   type: number
+ *                   description: stock of the product
  *      responses:
  *          200:
  *              description: Product updated
@@ -178,23 +198,24 @@ ProductRouter.post("/", ProductController.createNewProduct);
  *                      schema:
  *                          type: object
  *                          properties:
- *                              id:
+ *                              product_id:
  *                                  type: integer
  *                                  description: ID of the updated product
  *                                  example: 1
- *                              name:
+ *                              product_name:
  *                                  type: string
  *                                  description: Name of the product
  *                                  example: "Updated Product A"
- *                              price:
- *                                  type: number
- *                                  description: Price of the product
- *                                  example: 120.00
  *          404:
  *              description: Product not found
  */
-ProductRouter.put("/:id", ProductController.updateProduct);
+ProductRouter.put(
+  "/:id",
+  upload.single("image"),
+  ProductController.updateProduct
+);
 
+// DELETE: api/v1/products/{id}
 /**
  * @openapi
  * /api/v1/products/{id}:
