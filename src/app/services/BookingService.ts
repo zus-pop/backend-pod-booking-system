@@ -4,21 +4,17 @@ import BookingRepo from "../repositories/BookingRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
-import { Booking, BookingSlot } from "../types/type.ts";
+import { Booking, BookingQueries, BookingSlot } from "../types/type.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
-import PODService from "./PODService.ts";
-import SlotService from "./SlotService.ts";
-import BookingSlotService from "./BookingSlotService.ts";
-import BookingProductService from "./BookingProductService.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-const findAllBooking = async () => {
+const find = async (filters: BookingQueries) => {
     const connection = await pool.getConnection();
     try {
-        const bookings = await BookingRepo.findAll(connection);
+        const bookings = await BookingRepo.find(filters, connection);
         return bookings;
     } catch (err) {
         console.log(err);
@@ -124,7 +120,7 @@ const updateABooking = async (booking: Booking) => {
 };
 
 export default {
-    findAllBooking,
+    find,
     findBookingById,
     findByUserId,
     createABooking,

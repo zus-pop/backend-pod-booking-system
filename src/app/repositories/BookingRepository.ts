@@ -1,5 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { Booking } from "../types/type.ts";
+import { Booking, BookingQueries } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
 import PODRepository from "./PODRepository.ts";
 import BookingSlotRepository from "./BookingSlotRepository.ts";
@@ -41,8 +41,31 @@ const bookingMapper = async (booking: Booking, connection: PoolConnection) => {
     };
 };
 
-const findAll = async (connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ??";
+const find = async (
+    filters: BookingQueries = {},
+    connection: PoolConnection
+) => {
+    const conditions: string[] = [];
+    const queryParams: string[] = [];
+    let sql = "SELECT ?? FROM ??";
+
+    Object.keys(filters).forEach((filter) => {
+        const key = filter;
+        const value = filters[filter as keyof BookingQueries];
+        if (value) {
+            if (key === "booking_date") {
+                conditions.push(`DATE(${key}) = ?`);
+            } else {
+                conditions.push(`${key} = ?`);
+            }
+            queryParams.push(value);
+        }
+    });
+
+    if (conditions.length) {
+        sql += ` WHERE ${conditions.join(" AND ")}`;
+    }
+
     const columns = [
         "booking_id",
         "pod_id",
@@ -50,7 +73,7 @@ const findAll = async (connection: PoolConnection) => {
         "booking_date",
         "booking_status",
     ];
-    const values = [columns, "Booking"];
+    const values = [columns, "Booking", ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
     return await Promise.all(
@@ -135,7 +158,7 @@ const update = async (booking: Booking, connection: PoolConnection) => {
 // };
 
 export default {
-    findAll,
+    find,
     findById,
     findByUserId,
     create,

@@ -21,7 +21,6 @@ const find = async (filters: UserQueries = {}, connection: PoolConnection) => {
 
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", ...queryParams];
-    console.log(connection.format(sql, values));
     const [users] = await connection.query<RowDataPacket[]>(sql, values);
     return users as User[];
 };
