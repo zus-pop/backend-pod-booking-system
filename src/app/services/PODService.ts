@@ -149,6 +149,19 @@ const sortPODByNameAZ = async () => {
   }
 };
 
+const sortPODByNameZA = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const sortedPODs = await PODRepo.sortPODByNameZA(connection);
+    return sortedPODs;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAllPOD,
   findPODById,
@@ -160,4 +173,5 @@ export default {
   updatePOD,
   sortPODByRating,
   sortPODByNameAZ,
+  sortPODByNameZA,
 };

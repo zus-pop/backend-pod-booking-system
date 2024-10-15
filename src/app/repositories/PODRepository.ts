@@ -150,6 +150,12 @@ const sortPODByNameAZ = async (connection: PoolConnection) => {
   return rows;
 };
 
+const sortPODByNameZA = async (connection: PoolConnection) => {
+  const sql = "SELECT * FROM POD ORDER BY pod_name DESC";
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows;
+};
+
 export default {
   findAll,
   findById,
@@ -161,4 +167,5 @@ export default {
   updatePOD,
   sortPODByRating,
   sortPODByNameAZ,
+  sortPODByNameZA,
 };

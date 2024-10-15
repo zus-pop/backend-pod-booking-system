@@ -144,6 +144,16 @@ const sortPODByNameAZ = async (req: Request, res: Response) => {
   }
 };
 
+const sortPODByNameZA = async (req: Request, res: Response) => {
+  const sortedPODs = await PODService.sortPODByNameZA();
+
+  if (sortedPODs && sortedPODs.length > 0) {
+    return res.status(200).json(sortedPODs);
+  } else {
+    return res.status(404).json({ message: "No PODs found" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -154,4 +164,5 @@ export default {
   updatePOD,
   sortPODByRating,
   sortPODByNameAZ,
+  sortPODByNameZA,
 };
