@@ -3,7 +3,14 @@ import { Product } from "../types/type.ts";
 
 const findAll = async (connection: PoolConnection) => {
   const sql = "SELECT ?? FROM ??";
-  const columns = ["product_id", "product_name", "price", "stock"];
+  const columns = [
+    "product_id",
+    "product_name",
+    "image",
+    "description",
+    "price",
+    "stock",
+  ];
   const values = [columns, "Product"];
   const [products] = await connection.query<RowDataPacket[]>(sql, values);
   return products as Product[];
@@ -11,7 +18,14 @@ const findAll = async (connection: PoolConnection) => {
 
 const findById = async (id: number, connection: PoolConnection) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-  const columns = ["product_id", "product_name", "price", "stock"];
+  const columns = [
+    "product_id",
+    "product_name",
+    "image",
+    "description",
+    "price",
+    "stock",
+  ];
   const values = [columns, "Product", "product_id", id];
   const [product] = await connection.query<RowDataPacket[]>(sql, values);
   return product[0] as Product;
@@ -22,7 +36,14 @@ const findByMultipleId = async (
   connection: PoolConnection
 ) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? IN ( ? )";
-  const columns = ["product_id", "product_name", "price", "stock"];
+  const columns = [
+    "product_id",
+    "product_name",
+    "image",
+    "description",
+    "price",
+    "stock",
+  ];
   const values = [columns, "Product", "product_id", product_ids];
   const [products] = await connection.query<RowDataPacket[]>(sql, values);
   return products as Product[];
@@ -34,10 +55,10 @@ const findByName = async (name: string, connection: PoolConnection) => {
     "product_id",
     "product_name",
     "category_id",
-    "price",
-    "stock",
     "image",
     "description",
+    "price",
+    "stock",
   ];
   const values = [columns, "Product", "product_name", `%${name}%`];
   const [products] = await connection.query<RowDataPacket[]>(sql, values);
@@ -53,10 +74,10 @@ const findByCategory = async (
     "product_id",
     "product_name",
     "category_id",
-    "price",
-    "stock",
     "image",
     "description",
+    "price",
+    "stock",
   ];
   const values = [columns, "Product", "category_id", category_id];
   const [products] = await connection.query<RowDataPacket[]>(sql, values);
@@ -85,7 +106,7 @@ const deleteById = async (id: number, connection: PoolConnection) => {
   const sql = "DELETE FROM Product WHERE product_id = ?";
   const values = [id];
   const [result] = await connection.query<ResultSetHeader>(sql, values);
-  return result.affectedRows > 0; // Trả về true nếu xóa thành công, ngược lại false
+  return result.affectedRows > 0;
 };
 
 export default {

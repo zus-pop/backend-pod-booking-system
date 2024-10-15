@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ProductService from "../services/ProductService.ts";
 import { Product } from "../types/type.ts";
+import { letImageCookToCloud } from "../utils/google-cloud-storage.ts";
 
 const find = async (req: Request, res: Response) => {
   const { name, category_id } = req.query;
@@ -36,56 +37,61 @@ const findById = async (req: Request, res: Response) => {
 };
 
 const createNewProduct = async (req: Request, res: Response) => {
-  try {
-    const {
-      product_name,
-      category_id,
-      image,
-      description,
-      price,
-      store_id,
-      stock,
-    } = req.body;
-    if (
-      !product_name ||
-      !category_id ||
-      price === undefined ||
-      !store_id ||
-      stock === undefined
-    ) {
-      return res.status(400).json({ message: "Missing required fields" });
+  const { product_name, description, category_id, price, store_id, stock } =
+    req.body;
+
+  const newProduct: Product = {
+    product_name,
+    description,
+    category_id,
+    price,
+    store_id,
+    stock,
+  };
+
+  const imageFile = req.file;
+
+  if (imageFile) {
+    try {
+      const publicUrl = await letImageCookToCloud(imageFile, "products");
+      newProduct.image = publicUrl;
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: "Error uploading image to cloud storage" });
     }
-
-    const newProduct: any = {
-      product_name,
-      category_id,
-      image,
-      description,
-      price,
-      store_id,
-      stock,
-    };
-
-    const createdProduct = await ProductService.createNewProduct(newProduct);
-
-    return res.status(201).json(createdProduct);
-  } catch (err) {
-    console.error("Error in ProductController create:", err);
-    return res.status(500).json({ message: "Internal server error" });
   }
+
+  const insertId = await ProductService.createNewProduct(newProduct);
+  if (!insertId) {
+    return res.status(400).json({ message: "Failed to create new Product" });
+  }
+
+  return res
+    .status(201)
+    .json({ message: "Product created successfully", product_id: insertId });
 };
 
 const updateProduct = async (req: Request, res: Response) => {
-  const product: any = {
-    product_id: +req.params.id,
-    product_name: req.body.product_name,
-    category_id: req.body.category_id,
-    image: req.body.image,
-    description: req.body.description,
-    price: req.body.price,
-    store_id: req.body.store_id,
-    stock: req.body.stock,
+  const { id } = req.params;
+  const product: Product = {
+    ...(req.body as Product),
+    product_id: +id, // Lấy ID từ URL
   };
+
+  const imageFile = req.file;
+  if (imageFile) {
+    try {
+      const publicUrl = await letImageCookToCloud(imageFile, "products");
+      product.image = publicUrl;
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: "Error uploading image to cloud storage" });
+    }
+  }
 
   const updated = await ProductService.updateProduct(product);
   if (updated) {
