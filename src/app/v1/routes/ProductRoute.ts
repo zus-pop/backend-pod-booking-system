@@ -215,6 +215,7 @@ ProductRouter.put(
   ProductController.updateProduct
 );
 
+// DELETE: api/v1/products/{id}
 /**
  * @openapi
  * /api/v1/products/{id}:

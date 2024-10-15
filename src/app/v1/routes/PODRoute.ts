@@ -4,6 +4,36 @@ import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const PODRouter = Router();
 
+//GET: api/v1/pods/sorted-by-name
+/**
+ * @openapi
+ * /api/v1/pods/sorted-by-name:
+ *   get:
+ *     summary: Get PODs sorted by name
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: List of PODs sorted by name
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   pod_id:
+ *                     type: integer
+ *                     description: The POD ID
+ *                     example: 1
+ *                   pod_name:
+ *                     type: string
+ *                     description: The name of the POD
+ *                     example: "Pod A"
+ *       500:
+ *         description: Failed to fetch PODs
+ */
+PODRouter.get("/sorted-by-name", PODController.sortPODByNameAZ);
+
 // GET: api/v1/pods/sorted-by-rating
 /**
  * @openapi

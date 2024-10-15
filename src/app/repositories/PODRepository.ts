@@ -131,18 +131,6 @@ const updatePOD = async (pod: POD, connection: PoolConnection) => {
   return result.affectedRows > 0;
 };
 
-// const sortPODByRating = async (connection: PoolConnection) => {
-//   const sql = `
-//     SELECT pod_id, pod_name, IFNULL(avg_rating, 0) AS avg_rating
-//     FROM POD_Average_Rating
-//     ORDER BY avg_rating DESC;
-//   `;
-//   const [rows] = await connection.query<RowDataPacket[]>(sql);
-//   console.log("Sorted PODs by rating: ", rows);
-
-//   return rows;
-// };
-
 const sortPODByRating = async (connection: PoolConnection) => {
   const sql = `
     SELECT POD.pod_id, POD.pod_name, AVG(Booking.rating) AS avg_rating
@@ -155,6 +143,13 @@ const sortPODByRating = async (connection: PoolConnection) => {
   const [rows] = await connection.query<RowDataPacket[]>(sql);
   return rows;
 };
+
+const sortPODByNameAZ = async (connection: PoolConnection) => {
+  const sql = "SELECT * FROM POD ORDER BY pod_name ASC";
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows;
+};
+
 export default {
   findAll,
   findById,
@@ -165,4 +160,5 @@ export default {
   deleteOnePod,
   updatePOD,
   sortPODByRating,
+  sortPODByNameAZ,
 };
