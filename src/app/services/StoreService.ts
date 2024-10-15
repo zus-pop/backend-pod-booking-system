@@ -57,9 +57,23 @@ const updateStore = async (store: Store) => {
   }
 };
 
+const deleteStoreById = async (id: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const isdeleted = await StoreRepo.deleteById(id, connection);
+    return isdeleted;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAllStore,
   findStoreById,
   createNewStore,
   updateStore,
+  deleteStoreById,
 };

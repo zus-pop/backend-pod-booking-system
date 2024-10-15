@@ -230,3 +230,25 @@ StoreRouter.post("/", upload.single("image"), StoreController.createNewStore);
  *              description: Store not found
  */
 StoreRouter.put("/:id", upload.single("image"), StoreController.updateStore);
+
+// DELETE: api/v1/stores/:id
+/**
+ * @openapi
+ * /api/v1/stores/{id}:
+ *   delete:
+ *     summary: Delete a Store by ID
+ *     tags: [Stores]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The Store id
+ *     responses:
+ *       200:
+ *         description: Store deleted
+ *       404:
+ *         description: Store not found
+ */
+StoreRouter.delete("/:id", StoreController.deleteStore);

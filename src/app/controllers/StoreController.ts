@@ -82,9 +82,22 @@ const updateStore = async (req: Request, res: Response) => {
   }
 };
 
+const deleteStore = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const isdeleted = await StoreService.deleteStoreById(+id);
+  if (isdeleted) {
+    return res.status(200).json({ message: "Store deleted successfully" });
+  } else {
+    return res
+      .status(404)
+      .json({ message: "Store not found or delete failed" });
+  }
+};
+
 export default {
   findAll,
   findById,
   createNewStore,
   updateStore,
+  deleteStore,
 };

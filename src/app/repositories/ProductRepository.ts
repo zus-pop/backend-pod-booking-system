@@ -106,7 +106,7 @@ const deleteById = async (id: number, connection: PoolConnection) => {
   const sql = "DELETE FROM Product WHERE product_id = ?";
   const values = [id];
   const [result] = await connection.query<ResultSetHeader>(sql, values);
-  return result.affectedRows > 0; // Trả về true nếu xóa thành công, ngược lại false
+  return result.affectedRows > 0;
 };
 
 export default {
