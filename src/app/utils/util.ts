@@ -60,7 +60,7 @@ import { PoolConnection } from "mysql2/promise";
 
 export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
     let totalCost = 0;
-    totalCost = bookingSlots.reduce((acc, curr) => acc + curr.price!, 0);
+    totalCost = bookingSlots.reduce((acc, curr) => acc + curr.unit_price!, 0);
     return totalCost;
 };
 

@@ -18,6 +18,19 @@ export const BookingRouter = Router();
  *   get:
  *     summary: Get list of Bookings
  *     tags: [Bookings]
+ *     parameters:
+ *       - in: query
+ *         name: booking_status
+ *         schema:
+ *           type: string
+ *           enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *         description: Status of the booking
+ *       - in: query
+ *         name: booking_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date of the booking
  *     responses:
  *       200:
  *         description: Success.
@@ -63,7 +76,7 @@ export const BookingRouter = Router();
  *         description: No bookings found
  *
  */
-BookingRouter.get("/", BookingController.findAll);
+BookingRouter.get("/", BookingController.find);
 
 // GET: api/v1/bookings/:id
 /**

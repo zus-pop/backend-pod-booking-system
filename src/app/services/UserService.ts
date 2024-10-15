@@ -3,14 +3,15 @@ import jwt from "jsonwebtoken";
 import UserRepo from "../repositories/UserRepository.ts";
 import RoleRepo from "../repositories/RoleRepository.ts";
 import { pool } from "../config/pool.ts";
+import { UserQueries } from "../types/type.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
 
-const findAll = async () => {
+const find = async (filters: UserQueries) => {
     const connection = await pool.getConnection();
     try {
-        const users = await UserRepo.findAll(connection);
+        const users = await UserRepo.find(filters, connection);
         return await Promise.all(
             users.map(async (user) => ({
                 user_id: user.user_id,
@@ -52,18 +53,6 @@ const findByEmail = async (email: string) => {
     } catch (err) {
         console.log(err);
         return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findByUsernameOrEmail = async (search: string) => {
-    const connection = await pool.getConnection();
-    try {
-        const users = await UserRepo.findByUsernameOrEmail(search, connection);
-        return users;
-    } catch (err) {
-        console.error(err);
     } finally {
         connection.release();
     }
@@ -114,10 +103,9 @@ const verifyToken = (token: string) => {
 };
 
 export default {
-    findAll,
+    find,
     findById,
     findByEmail,
-    findByUsernameOrEmail,
     persist,
     hashPassword,
     comparePassword,

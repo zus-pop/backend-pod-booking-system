@@ -1,9 +1,13 @@
 import BookingService from "../services/BookingService.ts";
 import { Request, Response } from "express";
-import { Booking, BookingSlot } from "../types/type.ts";
+import { Booking, BookingSlot, BookingStatus } from "../types/type.ts";
 
-const findAll = async (_: Request, res: Response) => {
-    const bookings = await BookingService.findAllBooking();
+const find = async (req: Request, res: Response) => {
+    const { booking_status, booking_date } = req.query;
+    const bookings = await BookingService.find({
+        booking_status: booking_status as keyof typeof BookingStatus,
+        booking_date: booking_date as string,
+    });
     if (!bookings || !bookings.length) {
         return res.status(404).json({ message: "No bookings found" });
     }
@@ -59,7 +63,7 @@ const update = async (req: Request, res: Response) => {
 };
 
 export default {
-    findAll,
+    find,
     findById,
     findByUserId,
     create,

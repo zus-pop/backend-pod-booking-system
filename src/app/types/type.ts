@@ -141,6 +141,26 @@ export interface Role {
     role_name: string;
 }
 
+export interface UserQueries {
+    user_name?: string;
+    email?: string;
+}
+
+export interface BookingQueries {
+    booking_status?: keyof typeof BookingStatus;
+    booking_date?: string;
+}
+
+export interface PODQueries {
+    pod_name?: string;
+    type_id?: number;
+}
+
+export interface SortCriteria {
+    column?: string;
+    order?: "ASC" | "asc" | "DESC" | "desc";
+}
+
 export enum BookingStatus {
     Pending = "Pending",
     Confirmed = "Confirmed",
