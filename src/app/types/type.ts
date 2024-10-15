@@ -141,6 +141,11 @@ export interface Role {
     role_name: string;
 }
 
+export interface UserQueries {
+    user_name?: string;
+    email?: string;
+}
+
 export enum BookingStatus {
     Pending = "Pending",
     Confirmed = "Confirmed",
