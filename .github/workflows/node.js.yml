@@ -34,7 +34,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node_modules-
     
-    - run: npm i
+    - run: npm ci
 
     - run: |
         touch .env
