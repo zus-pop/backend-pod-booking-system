@@ -142,6 +142,12 @@ UserRouter.post("/register", UserController.register);
  *  get:
  *      summary: Get list of Users
  *      tags: [Users]
+ *      parameters:
+ *        - in: query
+ *          name: search
+ *          schema:
+ *              type: string
+ *          description: The username/email of user
  *      responses:
  *          200:
  *              description: Success
