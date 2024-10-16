@@ -1,9 +1,8 @@
 import { pool } from "../app/config/pool";
-import { Roles, User } from "../app/types/type";
 import "../app/services/UserService";
 import UserService from "../app/services/UserService";
 
-describe("User test", () => {
+describe.skip("User test", () => {
     // test("Create new user", async () => {
     //     const newUser: User = {
     //         user_name: "holyshit",

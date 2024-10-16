@@ -17,6 +17,7 @@ export const pool = mysql2.createPool({
         }
         return next();
     },
+    namedPlaceholders: true,
 });
 
 pool.on("connection", (connection: PoolConnection) => {

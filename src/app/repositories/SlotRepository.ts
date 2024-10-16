@@ -1,7 +1,7 @@
-import { Slot, SlotOption } from "../types/type.ts";
 import moment from "moment";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { PoolConnection } from "mysql2/promise";
+import { Slot } from "../types/type.ts";
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
@@ -118,6 +118,34 @@ const findAvailableSlotByDate = async (
     return slots as Slot[];
 };
 
+const checkOverlappingSlots = async (
+    pod_id: number,
+    start_time: string,
+    end_time: string,
+    connection: PoolConnection
+) => {
+    const sql = `
+    SELECT slot_id, start_time, end_time FROM Slot
+    WHERE pod_id = :pod_id
+    AND (
+        (:start_time <= start_time AND end_time <= :end_time) OR
+        (start_time <= :start_time AND :end_time <= end_time) OR
+        (start_time <= :start_time AND :start_time < end_time) OR
+        (start_time < :end_time AND :end_time <= end_time) 
+        )
+    `;
+    const values = {
+        pod_id,
+        start_time,
+        end_time,
+    };
+    const [overlappingSlots] = await connection.query<RowDataPacket[]>(
+        sql,
+        values
+    );
+    return overlappingSlots as Slot[];
+};
+
 const findSlotByDateAndPodId = async (
     pod_id: number,
     date: Date | string,
@@ -154,6 +182,7 @@ export default {
     findByPodId, //haven't been used yet
     findAvailableSlotByDate, //haven't been used yet
     findSlotByDateAndPodId,
+    checkOverlappingSlots,
     create,
     update,
     updateStatusMultipleSlot,

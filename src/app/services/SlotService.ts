@@ -3,6 +3,7 @@ import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot, SlotOption } from "../types/type.ts";
 import { ResultSetHeader } from "mysql2/promise";
+import { formatDate, formatDateTime } from "../utils/util.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -148,7 +149,62 @@ const generateSlots = async (options: SlotOption) => {
                 price: options.price,
                 is_available: true,
             };
-         
+
+            const overlappingSlots = await SlotRepo.checkOverlappingSlots(
+                slot.pod_id,
+                slot.start_time,
+                slot.end_time,
+                connection
+            );
+
+            if (overlappingSlots.length) {
+                const overlappingSlot = overlappingSlots[0];
+                let overlapType: string;
+                if (
+                    moment(slot.start_time).isSameOrBefore(
+                        overlappingSlot.start_time
+                    ) &&
+                    moment(slot.end_time).isSameOrAfter(
+                        overlappingSlot.end_time
+                    )
+                ) {
+                    overlapType = `New slot completely encompasses the existing slot`;
+                } else if (
+                    moment(overlappingSlot.start_time).isSameOrBefore(
+                        slot.start_time
+                    ) &&
+                    moment(overlappingSlot.end_time).isSameOrAfter(
+                        slot.end_time
+                    )
+                ) {
+                    overlapType = `Existing slot completely encompasses the new slot`;
+                } else if (
+                    moment(slot.start_time).isBetween(
+                        overlappingSlot.start_time,
+                        overlappingSlot.end_time,
+                        null,
+                        "[)"
+                    )
+                ) {
+                    overlapType = `New slot starts inside the existing slot`;
+                } else {
+                    overlapType = `New slot ends inside the existing slot`;
+                }
+
+                const message = `Found overlapping slot with id: ${
+                    overlappingSlot.slot_id
+                }: (${formatDateTime(
+                    overlappingSlot.start_time!
+                )} -> ${formatDateTime(
+                    overlappingSlot.end_time!
+                )}) that overlapped with new slot (${formatDateTime(
+                    slot.start_time
+                )} - ${formatDateTime(
+                    slot.end_time
+                )}). Overlap type: ${overlapType}`;
+                throw new Error(message);
+            }
+
             const result = await SlotRepo.create(slot, connection);
             slots.push(result.insertId);
 
@@ -166,8 +222,8 @@ const generateSlots = async (options: SlotOption) => {
         }
         await connection.commit();
     } catch (err) {
-        console.error("Error in generating slot: ", err);
         await connection.rollback();
+        throw err;
     } finally {
         connection.release();
     }

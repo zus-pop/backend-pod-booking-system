@@ -27,20 +27,25 @@ const generateSlots = async (req: Request, res: Response) => {
         durationMinutes,
         pod_id,
         price,
+        gap,
     } = req.body;
-    const slots = await SlotService.generateSlots({
-        startDate,
-        endDate,
-        startHour,
-        endHour,
-        durationMinutes,
-        podId: pod_id,
-        price: price,
-    });
-    if (!slots || !slots.length) {
-        return res.status(404).json({ message: "No slots generated" });
+    try {
+        const slots = await SlotService.generateSlots({
+            startDate,
+            endDate,
+            startHour,
+            endHour,
+            durationMinutes,
+            podId: pod_id,
+            price: price,
+            gap,
+        });
+        res.status(201).json({
+            message: `${slots.length} slots are added successfully!`,
+        });
+    } catch (err: any) {
+        res.status(400).json({ message: err.message });
     }
-    return res.status(200).json(slots);
 };
 
 const findSlotByDateAndPodId = async (
