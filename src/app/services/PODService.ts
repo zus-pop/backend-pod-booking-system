@@ -1,12 +1,27 @@
 import { pool } from "../config/pool.ts";
 import PODRepo from "../repositories/PODRepository.ts";
 import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
-import { POD, SortCriteria, PODQueries, PODUtility } from "../types/type.ts";
+import {
+    POD,
+    SortCriteria,
+    PODQueries,
+    PODUtility,
+    Pagination,
+} from "../types/type.ts";
 
-const find = async (filters: PODQueries, comparator: SortCriteria) => {
+const find = async (
+    filters: PODQueries,
+    comparator: SortCriteria,
+    pagination: Pagination
+) => {
     const connection = await pool.getConnection();
     try {
-        const PODs = await PODRepo.find(filters, comparator, connection);
+        const PODs = await PODRepo.find(
+            filters,
+            comparator,
+            pagination,
+            connection
+        );
         return PODs;
     } catch (err) {
         console.log(err);

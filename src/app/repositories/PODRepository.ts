@@ -1,5 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { POD, SortCriteria, PODQueries } from "../types/type.ts";
+import { POD, SortCriteria, PODQueries, Pagination } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
 import PODTypeRepository from "./PODTypeRepository.ts";
 import StoreRepository from "./StoreRepository.ts";
@@ -27,12 +27,15 @@ const podMapping = async (pod: POD, connection: PoolConnection) => {
 const find = async (
     filters: PODQueries = {},
     comparator: SortCriteria,
+    pagination: Pagination,
     connection: PoolConnection
 ) => {
     const conditions: string[] = [];
     const queryParams: any[] = [];
-    const { column, order } = comparator;
+    const { orderBy, direction } = comparator;
     let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM POD";
+
     Object.keys(filters).forEach((filter) => {
         const key = filter;
         const value = filters[filter as keyof PODQueries];
@@ -48,12 +51,17 @@ const find = async (
     });
 
     if (conditions.length) {
-        sql += ` WHERE ${conditions.join(" AND ")}`;
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
+        countSql += where;
     }
 
-    if (column && order) {
-        sql += ` ORDER BY ${column} ${order}`;
-    }
+    sql += ` ORDER BY ${orderBy} ${direction}`;
+
+    const { limit, page } = pagination;
+    const offset = (page! - 1) * limit!;
+    sql += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
 
     const columns = [
         "pod_id",
@@ -65,8 +73,16 @@ const find = async (
         "store_id",
     ];
     const values = [columns, "POD", ...queryParams];
+    console.log(connection.format(sql, values));
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return pods as POD[];
+    const [totalResult] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams.slice(0, conditions.length)
+    );
+    return {
+        pods: pods as POD[],
+        total: totalResult[0].total as number,
+    };
 };
 
 const findById = async (id: number, connection: PoolConnection) => {
