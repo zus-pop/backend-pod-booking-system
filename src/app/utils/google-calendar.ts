@@ -137,15 +137,15 @@ export const syncCalendar = async (req: Request, res: Response) => {
                 summary: `Event for - ${booking.pod?.pod_name}`,
                 description: `Event from booking of ${booking.pod?.pod_name}`,
                 start: {
-                    dateTime: moment
-                        .utc(slot.start_time)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
+                    dateTime: moment(slot.start_time).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    ),
                     timeZone: "Asia/Ho_Chi_Minh",
                 },
                 end: {
-                    dateTime: moment
-                        .utc(slot.end_time)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
+                    dateTime: moment(slot.end_time).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    ),
                     timeZone: "Asia/Ho_Chi_Minh",
                 },
             };

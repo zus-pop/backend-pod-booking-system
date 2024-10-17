@@ -1,10 +1,47 @@
-import { Slot, SlotOption } from "../types/type.ts";
-import moment from "moment";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { PoolConnection } from "mysql2/promise";
+import { Slot, SlotQueries } from "../types/type.ts";
 
-const findAll = async (connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ??";
+const find = async (filters: SlotQueries, connection: PoolConnection) => {
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+    let sql = "SELECT ?? FROM ??";
+
+    Object.keys(filters).forEach((filter) => {
+        const key = filter;
+        const value = filters[filter as keyof SlotQueries];
+        if (value !== undefined && value !== null) {
+            switch (key) {
+                case "pod_id":
+                    conditions.push(`${key} = ?`);
+                    queryParams.push(value);
+                    break;
+                case "date":
+                    conditions.push(`DATE(start_time) = ?`);
+                    queryParams.push(value);
+                    break;
+                case "start_time":
+                    conditions.push(`TIME(${key}) >= ?`);
+                    queryParams.push(value);
+                    break;
+                case "end_time":
+                    conditions.push(`TIME(${key}) <= ?`);
+                    queryParams.push(value);
+                    break;
+                case "is_available":
+                    conditions.push(`${key} = ?`);
+                    queryParams.push(value);
+                    break;
+                default:
+                    throw new Error(`${key} option is not supported`);
+            }
+        }
+    });
+
+    if (conditions.length) {
+        sql += ` WHERE ${conditions.join(" AND ")}`;
+    }
+
     const colums = [
         "slot_id",
         "pod_id",
@@ -13,7 +50,7 @@ const findAll = async (connection: PoolConnection) => {
         "price",
         "is_available",
     ];
-    const values = [colums, "Slot"];
+    const values = [colums, "Slot", ...queryParams];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
     return slots as Slot[];
 };
@@ -51,21 +88,6 @@ const findByMultipleId = async (
     return slots as Slot[];
 };
 
-const findByPodId = async (pod_id: number, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const colums = [
-        "slot_id",
-        "pod_id",
-        "start_time",
-        "end_time",
-        "price",
-        "is_available",
-    ];
-    const values = [colums, "Slot", "pod_id", pod_id];
-    const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-    return slots as Slot[];
-};
-
 const create = async (slot: Slot, connection: PoolConnection) => {
     const sql = "INSERT INTO ?? SET ?";
     const values = ["Slot", slot];
@@ -92,68 +114,39 @@ const updateStatusMultipleSlot = async (
     return result;
 };
 
-const findAvailableSlotByDate = async (
-    date: Date | string,
-    connection: PoolConnection
-) => {
-    const sql = "SELECT ?? FROM ?? WHERE DATE(??) = ? AND ?? = ?";
-    const colums = [
-        "slot_id",
-        "pod_id",
-        "start_time",
-        "end_time",
-        "price",
-        "is_available",
-    ];
-    const values = [
-        colums,
-        "Slot",
-        "start_time",
-        moment(date).format("YYYY-MM-DD"),
-        "is_available",
-        true,
-    ];
-    console.log(connection.format(sql, values));
-    const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-    return slots as Slot[];
-};
-
-const findSlotByDateAndPodId = async (
+const checkOverlappingSlots = async (
     pod_id: number,
-    date: Date | string,
+    start_time: string,
+    end_time: string,
     connection: PoolConnection
 ) => {
-    const sql = "SELECT ?? FROM ?? WHERE DATE(??) = ? AND ?? = ?";
-    const colums = [
-        "slot_id",
-        "pod_id",
-        "start_time",
-        "end_time",
-        "price",
-        "is_available",
-    ];
-    const values = [
-        colums,
-        "Slot",
-        "start_time",
-        moment(date).format("YYYY-MM-DD"),
-        "pod_id",
+    const sql = `
+    SELECT slot_id, start_time, end_time FROM Slot
+    WHERE pod_id = :pod_id
+    AND (
+        (:start_time <= start_time AND end_time <= :end_time) OR
+        (start_time <= :start_time AND :end_time <= end_time) OR
+        (start_time <= :start_time AND :start_time < end_time) OR
+        (start_time < :end_time AND :end_time <= end_time) 
+        )
+    `;
+    const values = {
         pod_id,
-        // "is_available",
-        // true,
-    ];
-    console.log(connection.format(sql, values));
-    const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-    return slots as Slot[];
+        start_time,
+        end_time,
+    };
+    const [overlappingSlots] = await connection.query<RowDataPacket[]>(
+        sql,
+        values
+    );
+    return overlappingSlots as Slot[];
 };
 
 export default {
-    findAll,
+    find,
     findById,
     findByMultipleId,
-    findByPodId, //haven't been used yet
-    findAvailableSlotByDate, //haven't been used yet
-    findSlotByDateAndPodId,
+    checkOverlappingSlots,
     create,
     update,
     updateStatusMultipleSlot,

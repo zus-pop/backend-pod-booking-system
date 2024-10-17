@@ -25,6 +25,21 @@ export const SlotRouter = Router();
  *              type: string
  *              format: date
  *            description: selected date for list of slots
+ *          - in: query
+ *            name: start_time
+ *            schema:
+ *              type: string
+ *            description: time start for list of slots
+ *          - in: query
+ *            name: end_time
+ *            schema:
+ *              type: string
+ *            description: time end for list of slots
+ *          - in: query
+ *            name: is_available
+ *            schema:
+ *              type: boolean
+ *            description: available status for list of slots
  *      responses:
  *          200:
  *              description: Success
@@ -59,7 +74,7 @@ export const SlotRouter = Router();
  *                                      type: number
  *                                      example: 1
  */
-SlotRouter.get("/", SlotController.findSlotByDateAndPodId, SlotController.findAll);
+SlotRouter.get("/", SlotController.find);
 
 // GET: api/v1/slots/:id
 /**
@@ -155,15 +170,25 @@ SlotRouter.get("/:id", SlotController.findById);
  *                              description: unit price for each slot
  *                              example: 80000
  *      responses:
- *          200:
+ *          201:
  *              description: Slots created
  *              content:
  *                  application/json:
  *                      schema:
- *                          type: array
- *                          items:
- *                              type: number
- *                              description: id of the generated slot
- *                              example: [1, 2, 3]
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: the number of slots are generated
+ *          400:
+ *              description: Overlapping slot
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: The overlapping slot and the overlap type
  */
 SlotRouter.post("/", SlotController.generateSlots);

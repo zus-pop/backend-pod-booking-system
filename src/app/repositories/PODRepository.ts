@@ -65,7 +65,6 @@ const find = async (
         "store_id",
     ];
     const values = [columns, "POD", ...queryParams];
-    console.log(connection.format(sql, values));
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
     return pods as POD[];
 };

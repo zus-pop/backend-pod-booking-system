@@ -1,8 +1,5 @@
-import "dotenv/config";
 import moment from "moment";
-import { BookingSlot, SlotOption } from "../types/type.ts";
-import { ResultSetHeader } from "mysql2/promise";
-import { PoolConnection } from "mysql2/promise";
+import { BookingSlot } from "../types/type.ts";
 
 // const conn = await pool.getConnection();
 // const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
@@ -62,6 +59,18 @@ export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
     let totalCost = 0;
     totalCost = bookingSlots.reduce((acc, curr) => acc + curr.unit_price!, 0);
     return totalCost;
+};
+
+export const formatDate = (date: string | Date) => {
+    return moment(date).format("YYYY-MM-DD");
+};
+
+export const formatTime = (date: string | Date) => {
+    return moment(date).format("HH:mm:ss");
+};
+
+export const formatDateTime = (date: string | Date) => {
+    return moment(date).format("YYYY-MM-DD HH:mm:ss");
 };
 
 // await generateSlots(conn, {

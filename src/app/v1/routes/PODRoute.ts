@@ -63,6 +63,7 @@ PODRouter.get("/sorted-by-rating", PODController.sortPODByRating);
  *        name: column
  *        schema:
  *          type: string
+ *          enum: [pod_id, pod_name]
  *        description: The list will be ordered by this column
  *      - in: query
  *        name: order

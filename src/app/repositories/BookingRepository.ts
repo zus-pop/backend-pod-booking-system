@@ -128,7 +128,9 @@ const findByUserId = async (user_id: number, connection: PoolConnection) => {
     const values = [columns, "Booking", "user_id", user_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
-    return bookings;
+    return await Promise.all(
+        bookings.map(async (booking) => bookingMapper(booking, connection))
+    );
 };
 
 const create = async (booking: Booking, connection: PoolConnection) => {

@@ -156,6 +156,14 @@ export interface PODQueries {
     type_id?: number;
 }
 
+export interface SlotQueries {
+    pod_id?: number;
+    date?: string;
+    start_time?: string;
+    end_time?: string;
+    is_available?: boolean;
+}
+
 export interface SortCriteria {
     column?: string;
     order?: "ASC" | "asc" | "DESC" | "desc";
