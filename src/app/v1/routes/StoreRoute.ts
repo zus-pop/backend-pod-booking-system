@@ -35,7 +35,7 @@ export const StoreRouter = Router();
  *          name: limit
  *          schema:
  *              type: number
- *          description: The size of the current page of the Store list
+ *          description: The size for each page of the Store list
  *      responses:
  *          200:
  *              description: Success

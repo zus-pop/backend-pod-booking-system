@@ -5,18 +5,27 @@ import { POD, SortCriteria } from "../types/type.ts";
 import { letImageCookToCloud } from "../utils/google-cloud-storage.ts";
 
 const find = async (req: Request, res: Response) => {
-    const { name, type_id, column, order } = req.query;
-    const pods = await PODService.find(
+    const { name, type_id, orderBy, direction, limit, page } = req.query;
+    const result = await PODService.find(
         {
             pod_name: name as string,
             type_id: +type_id!,
         },
-        { column: column as string, order: order as keyof SortCriteria['order']}
+        {
+            orderBy: orderBy ? (orderBy as string) : "pod_name",
+            direction: direction
+                ? (direction as keyof SortCriteria["direction"])
+                : "ASC",
+        },
+        {
+            limit: limit ? +limit : 4,
+            page: page ? +page : 1,
+        }
     );
-    if (!pods || !pods.length) {
+    if (!result || !result.pods || !result.pods.length) {
         return res.status(404).json({ message: "No PODs found" });
     }
-    return res.status(200).json(pods);
+    return res.status(200).json(result);
 };
 
 const findById = async (req: Request, res: Response) => {

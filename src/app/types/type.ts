@@ -170,8 +170,8 @@ export interface StoreQueries {
 }
 
 export interface SortCriteria {
-    column?: string;
-    order?: "ASC" | "asc" | "DESC" | "desc";
+    orderBy?: string;
+    direction?: "ASC" | "asc" | "DESC" | "desc";
 }
 
 export interface Pagination {
