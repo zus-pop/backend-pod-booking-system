@@ -1,4 +1,3 @@
-import "dotenv/config";
 import moment from "moment";
 import { BookingSlot } from "../types/type.ts";
 
@@ -63,12 +62,12 @@ export const getTotalCost = async (bookingSlots: BookingSlot[]) => {
 };
 
 export const formatDate = (date: string | Date) => {
-    return moment.utc(date).format("YYYY-MM-DD");
-}
+    return moment(date).format("YYYY-MM-DD");
+};
 
 export const formatDateTime = (date: string | Date) => {
-    return moment.utc(date).format("YYYY-MM-DD HH:mm:ss");
-}
+    return moment(date).format("YYYY-MM-DD HH:mm:ss");
+};
 
 // await generateSlots(conn, {
 //     startDate: "2024-09-22",

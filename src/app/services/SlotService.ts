@@ -2,8 +2,7 @@ import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot, SlotOption } from "../types/type.ts";
-import { ResultSetHeader } from "mysql2/promise";
-import { formatDate, formatDateTime } from "../utils/util.ts";
+import { formatDateTime } from "../utils/util.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -105,13 +104,13 @@ const checkAllAvailableSlot = async (slot_ids: number[]) => {
             message: notAvailableSlots
                 .map(
                     (notAvailableSlot) =>
-                        `Slot from ( ${moment
-                            .utc(notAvailableSlot.start_time)
-                            .format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment
-                            .utc(notAvailableSlot.end_time)
-                            .format(
-                                "YYYY-MM-DD HH:mm:ss"
-                            )} ) is taken by other customer`
+                        `Slot from ( ${moment(
+                            notAvailableSlot.start_time
+                        ).format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment(
+                            notAvailableSlot.end_time
+                        ).format(
+                            "YYYY-MM-DD HH:mm:ss"
+                        )} ) is taken by other customer`
                 )
                 .join("\r\n"),
         };
@@ -191,17 +190,11 @@ const generateSlots = async (options: SlotOption) => {
                     overlapType = `New slot ends inside the existing slot`;
                 }
 
-                const message = `Found overlapping slot with id: ${
-                    overlappingSlot.slot_id
-                }: (${formatDateTime(
-                    overlappingSlot.start_time!
-                )} -> ${formatDateTime(
-                    overlappingSlot.end_time!
-                )}) that overlapped with new slot (${formatDateTime(
-                    slot.start_time
-                )} - ${formatDateTime(
-                    slot.end_time
-                )}). Overlap type: ${overlapType}`;
+                const message =
+                    `Overlap detected:<br>` +
+                    `Conflicts with an existing slot (ID: ${overlappingSlot.slot_id}) from ${overlappingSlot.start_time} to ${overlappingSlot.end_time}.<br>` +
+                    `New slot details: from ${slot.start_time} to ${slot.end_time}.<br>` +
+                    `Overlap type: ${overlapType}. Please choose another time range.<br>`;
                 throw new Error(message);
             }
 
@@ -223,6 +216,7 @@ const generateSlots = async (options: SlotOption) => {
         await connection.commit();
     } catch (err) {
         await connection.rollback();
+        console.log(err);
         throw err;
     } finally {
         connection.release();
