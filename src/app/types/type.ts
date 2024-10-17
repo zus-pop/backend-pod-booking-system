@@ -164,9 +164,19 @@ export interface SlotQueries {
     is_available?: boolean;
 }
 
+export interface StoreQueries {
+    store_name?: string;
+    address?: string;
+}
+
 export interface SortCriteria {
     column?: string;
     order?: "ASC" | "asc" | "DESC" | "desc";
+}
+
+export interface Pagination {
+    page?: number;
+    limit?: number;
 }
 
 export enum BookingStatus {
