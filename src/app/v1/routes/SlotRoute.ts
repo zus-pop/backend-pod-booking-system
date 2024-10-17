@@ -25,6 +25,21 @@ export const SlotRouter = Router();
  *              type: string
  *              format: date
  *            description: selected date for list of slots
+ *          - in: query
+ *            name: start_time
+ *            schema:
+ *              type: string
+ *            description: time start for list of slots
+ *          - in: query
+ *            name: end_time
+ *            schema:
+ *              type: string
+ *            description: time end for list of slots
+ *          - in: query
+ *            name: is_available
+ *            schema:
+ *              type: boolean
+ *            description: available status for list of slots
  *      responses:
  *          200:
  *              description: Success
@@ -59,11 +74,7 @@ export const SlotRouter = Router();
  *                                      type: number
  *                                      example: 1
  */
-SlotRouter.get(
-    "/",
-    SlotController.findSlotByDateAndPodId,
-    SlotController.findAll
-);
+SlotRouter.get("/", SlotController.find);
 
 // GET: api/v1/slots/:id
 /**

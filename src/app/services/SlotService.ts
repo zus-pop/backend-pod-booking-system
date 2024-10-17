@@ -1,15 +1,14 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
-import { Slot, SlotOption } from "../types/type.ts";
-import { formatDateTime } from "../utils/util.ts";
+import { Slot, SlotOption, SlotQueries } from "../types/type.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-const findAllSlot = async () => {
+const find = async (filters: SlotQueries) => {
     const connection = await pool.getConnection();
     try {
-        const slots = await SlotRepo.findAll(connection);
+        const slots = await SlotRepo.find(filters, connection);
         return slots;
     } catch (err) {
         console.log(err);
@@ -36,49 +35,6 @@ const findSlotByRangeOfId = async (slot_ids: number[]) => {
     const connection = await pool.getConnection();
     try {
         const slots = await SlotRepo.findByMultipleId(slot_ids, connection);
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findByPodId = async (pod_id: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findByPodId(pod_id, connection);
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findAvailableSlotByDate = async (date: Date | string) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findAvailableSlotByDate(date, connection);
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findSlotByDateAndPodId = async (pod_id: number, date: Date | string) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findSlotByDateAndPodId(
-            pod_id,
-            date,
-            connection
-        );
         return slots;
     } catch (err) {
         console.log(err);
@@ -258,12 +214,9 @@ const updateMultipleSlot = async (
 };
 
 export default {
-    findAllSlot,
+    find,
     findSlotById,
     findSlotByRangeOfId,
-    // findByPodId,
-    // findAvailableSlotByDate,
-    findSlotByDateAndPodId,
     generateSlots,
     checkAllAvailableSlot,
     updateSlot,

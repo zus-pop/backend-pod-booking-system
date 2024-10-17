@@ -3,22 +3,23 @@ import SlotRepository from "../app/repositories/SlotRepository.ts";
 import SlotService from "../app/services/SlotService.ts";
 import moment from "moment";
 
-describe.skip("Select multiple slot", () => {
+describe("Select multiple slot", () => {
     test("should return list of slots by range of slot_ids", async () => {
         const slot_ids: number[] = [1, 2, 3, 4, 5];
         const slots = await SlotService.findSlotByRangeOfId(slot_ids);
         expect(slots).toHaveLength(slot_ids.length);
     });
     test("should return list of available slot by date and pod id", async () => {
-        const slots = await SlotService.findSlotByDateAndPodId(
-            3,
-            moment("2024-10-01").format("YYYY-MM-DD")
-        );
+        const slots = await SlotService.find({
+            pod_id: 3,
+            date: "2024-10-01",
+            is_available: true,
+        });
         expect(slots?.length).toBeGreaterThan(0);
     });
 });
 
-describe.skip("checkAllAvailableSlot", () => {
+describe("checkAllAvailableSlot", () => {
     test("should return true if all slots are available", async () => {
         const slot_ids: number[] = [1, 5, 6, 7];
         const slots = await SlotService.checkAllAvailableSlot(slot_ids);
@@ -33,12 +34,25 @@ describe("check overlappingSlots", () => {
         const start_time = moment("2024-08-30 07:00:00").format(format);
         const end_time = moment("2024-08-30 09:00:00").format(format);
         const pod_id = 1;
-        await SlotRepository.checkOverlappingSlots(
+        const result = await SlotRepository.checkOverlappingSlots(
             pod_id,
             start_time,
             end_time,
             connection
         );
+        expect(result.length).toBeGreaterThan(0);
+    });
+
+    test("slot queries", async () => {
+        const result = await SlotService.find({
+            pod_id: 1,
+            date: "2024-08-30",
+            // start_time: "09:00:00",
+            // end_time: "08:00:00",
+            // is_available: false,
+        });
+        // console.log(result);
+        expect(result?.length).toBeGreaterThan(0);
     });
 });
 

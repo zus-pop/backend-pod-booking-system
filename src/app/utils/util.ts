@@ -65,6 +65,10 @@ export const formatDate = (date: string | Date) => {
     return moment(date).format("YYYY-MM-DD");
 };
 
+export const formatTime = (date: string | Date) => {
+    return moment(date).format("HH:mm:ss");
+};
+
 export const formatDateTime = (date: string | Date) => {
     return moment(date).format("YYYY-MM-DD HH:mm:ss");
 };
