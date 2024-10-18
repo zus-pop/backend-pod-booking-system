@@ -1,27 +1,75 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { POD, SortCriteria, PODQueries, Pagination } from "../types/type.ts";
+import {
+    POD,
+    SortCriteria,
+    PODQueries,
+    Pagination,
+    Utility,
+    PODType,
+    Store,
+    PODUtility,
+} from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
 import PODTypeRepository from "./PODTypeRepository.ts";
 import StoreRepository from "./StoreRepository.ts";
 import PODUtilityRepository from "./PODUtilityRepository.ts";
 
-const podMapping = async (pod: POD, connection: PoolConnection) => {
-    const type = await PODTypeRepository.findById(pod.type_id!, connection);
-    const store = await StoreRepository.findById(pod.store_id!, connection);
-    const utilities = await PODUtilityRepository.findByPodId(
-        pod.pod_id!,
-        connection
-    );
-    return {
+interface MappingOptions {
+    type?: boolean;
+    store?: boolean;
+    utility?: boolean;
+}
+
+interface MappingResponse {
+    pod_id?: number;
+    pod_name?: string;
+    description?: string;
+    image?: string;
+    utilities?: PODUtility[];
+    is_available?: boolean;
+    type?: PODType;
+    store?: Store;
+}
+
+const podMapping = async (
+    pod: POD,
+    connection: PoolConnection,
+    options?: MappingOptions
+) => {
+    const mappingResult: MappingResponse = {
         pod_id: pod.pod_id,
         pod_name: pod.pod_name,
         description: pod.description,
         image: pod.image,
-        utilities: utilities,
         is_available: pod.is_available,
-        type: type,
-        store: store,
     };
+
+    if (options) {
+        if (options.type) {
+            const type = await PODTypeRepository.findById(
+                pod.type_id!,
+                connection
+            );
+            mappingResult.type = type;
+        }
+
+        if (options.store) {
+            const store = await StoreRepository.findById(
+                pod.store_id!,
+                connection
+            );
+            mappingResult.store = store;
+        }
+
+        if (options.utility) {
+            const utilities = await PODUtilityRepository.findByPodId(
+                pod.pod_id!,
+                connection
+            );
+            mappingResult.utilities = utilities;
+        }
+    }
+    return mappingResult;
 };
 
 const find = async (
@@ -74,13 +122,20 @@ const find = async (
     ];
     const values = [columns, "POD", ...queryParams];
     console.log(connection.format(sql, values));
-    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const [totalResult] = await connection.query<RowDataPacket[]>(
         countSql,
         queryParams.slice(0, conditions.length)
     );
+    const pods = rows as POD[];
     return {
-        pods: pods as POD[],
+        pods: await Promise.all(
+            pods.map((pod) =>
+                podMapping(pod, connection, {
+                    type: true,
+                })
+            )
+        ),
         total: totalResult[0].total as number,
     };
 };
@@ -98,39 +153,11 @@ const findById = async (id: number, connection: PoolConnection) => {
     ];
     const values = [columns, "POD", "pod_id", id];
     const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return podMapping(pods[0] as POD, connection);
-};
-
-const findByName = async (name: string, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? LIKE ?";
-    const columns = [
-        "pod_id",
-        "pod_name",
-        "type_id",
-        "description",
-        "image",
-        "is_available",
-        "store_id",
-    ];
-    const values = [columns, "POD", "pod_name", `%${name}%`];
-    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return pods as POD[];
-};
-
-const findByType = async (pod_type: number, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = [
-        "pod_id",
-        "pod_name",
-        "type_id",
-        "description",
-        "image",
-        "is_available",
-        "store_id",
-    ];
-    const values = [columns, "POD", "type_id", pod_type];
-    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return pods as POD[];
+    return podMapping(pods[0] as POD, connection, {
+        type: true,
+        utility: true,
+        store: true,
+    });
 };
 
 const findByStoreId = async (store_id: number, connection: PoolConnection) => {
@@ -192,8 +219,6 @@ const sortPODByRating = async (connection: PoolConnection) => {
 export default {
     find,
     findById,
-    findByName,
-    findByType,
     findByStoreId,
     createNewPod,
     deleteOnePod,
