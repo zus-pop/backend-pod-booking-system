@@ -12,7 +12,7 @@ const find = async (req: Request, res: Response) => {
             type_id: +type_id!,
         },
         {
-            orderBy: orderBy ? (orderBy as string) : "pod_name",
+            orderBy: orderBy ? (orderBy as string) : "pod_id",
             direction: direction
                 ? (direction as keyof SortCriteria["direction"])
                 : "ASC",

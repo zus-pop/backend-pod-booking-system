@@ -47,32 +47,6 @@ const findPODById = async (id: number) => {
     }
 };
 
-const findPODByName = async (name: string) => {
-    const connection = await pool.getConnection();
-    try {
-        const pods = await PODRepo.findByName(name, connection);
-        return pods;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findPODByType = async (pod_type: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const PODs = await PODRepo.findByType(pod_type, connection);
-        return PODs;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
 const findByStoreId = async (store_id: number) => {
     const connection = await pool.getConnection();
     try {
@@ -154,8 +128,6 @@ const sortPODByRating = async () => {
 export default {
     find,
     findPODById,
-    findPODByName,
-    findPODByType,
     findByStoreId,
     createNewPOD,
     deletePODById,

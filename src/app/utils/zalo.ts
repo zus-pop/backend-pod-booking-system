@@ -19,7 +19,7 @@ export const createOnlinePaymentRequest = async (
     amount: number
 ) => {
     const embed_data = {
-        redirecturl: process.env.ZALO_REDIRECT_URL as string,
+        redirecturl: `${process.env.ZALO_REDIRECT_URL}/booking-history`,
     };
     const items = bookingProducts;
     const transID = Math.floor(Math.random() * 1000000);
@@ -32,7 +32,7 @@ export const createOnlinePaymentRequest = async (
         embed_data: JSON.stringify(embed_data),
         amount,
         expire_duration_seconds: 300,
-        callback_url: process.env.ZALO_CALLBACK_URL as string,
+        callback_url: process.env.ZALO_CALLBACK_URL,
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };
