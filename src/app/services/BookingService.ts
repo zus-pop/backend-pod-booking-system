@@ -77,7 +77,11 @@ const createABooking = async (
         );
         const total_cost = await getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
-            await createOnlinePaymentRequest(bookingSlots, total_cost);
+            await createOnlinePaymentRequest(
+                bookingResult.insertId,
+                bookingSlots,
+                total_cost
+            );
         if (return_code === 1) {
             const paymentResult = await PaymentRepo.create(
                 {
@@ -94,6 +98,7 @@ const createABooking = async (
             trackBooking(bookingResult.insertId);
             trackPayment(paymentResult.insertId);
             return {
+                booking_id: bookingResult.insertId,
                 payment_url: order_url,
                 message: sub_return_message,
             };
