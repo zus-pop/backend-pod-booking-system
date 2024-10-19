@@ -25,7 +25,11 @@ const findById = async (req: Request, res: Response) => {
 
 const findByUserId = async (req: Request, res: Response) => {
     const { payload } = req;
-    const bookings = await BookingService.findByUserId(payload.user_id);
+    const { page, limit } = req.query;
+    const bookings = await BookingService.findByUserId(payload.user_id, {
+        page: page ? +page : 1,
+        limit: limit ? +limit : 8,
+    });
     if (!bookings || !bookings.length) {
         return res.status(404).json({ message: "No bookings found" });
     }
