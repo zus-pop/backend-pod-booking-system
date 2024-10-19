@@ -4,146 +4,153 @@ import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
 import { POD, SortCriteria, PODQueries, PODUtility } from "../types/type.ts";
 
 const find = async (filters: PODQueries, comparator: SortCriteria) => {
-    const connection = await pool.getConnection();
-    try {
-        const PODs = await PODRepo.find(filters, comparator, connection);
-        return PODs;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    const PODs = await PODRepo.find(filters, comparator, connection);
+    return PODs;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const findPODById = async (id: number) => {
-    if (isNaN(id)) {
-        throw new Error("Invalid ID");
-    }
-    const connection = await pool.getConnection();
-    try {
-        const POD = await PODRepo.findById(id, connection);
-        return POD;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  if (isNaN(id)) {
+    throw new Error("Invalid ID");
+  }
+  const connection = await pool.getConnection();
+  try {
+    const POD = await PODRepo.findById(id, connection);
+    return POD;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const findPODByName = async (name: string) => {
-    const connection = await pool.getConnection();
-    try {
-        const pods = await PODRepo.findByName(name, connection);
-        return pods;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    const pods = await PODRepo.findByName(name, connection);
+    return pods;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const findPODByType = async (pod_type: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const PODs = await PODRepo.findByType(pod_type, connection);
-        return PODs;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    const PODs = await PODRepo.findByType(pod_type, connection);
+    return PODs;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const findByStoreId = async (store_id: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const pods = await PODRepo.findByStoreId(store_id, connection);
-        return pods;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    const pods = await PODRepo.findByStoreId(store_id, connection);
+    return pods;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const createNewPOD = async (newPod: POD, utilities: number[]) => {
-    const connection = await pool.getConnection();
-    try {
-        await connection.beginTransaction();
-        const insertId = await PODRepo.createNewPod(newPod, connection);
-        await PODUtilityRepository.create(
-            utilities.map<PODUtility>((utility) => ({
-                pod_id: insertId,
-                utility_id: utility,
-            })),
-            connection
-        );
-        await connection.commit();
-        return insertId;
-    } catch (err) {
-        console.log(err);
-        await connection.rollback();
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    const insertId = await PODRepo.createNewPod(newPod, connection);
+    await PODUtilityRepository.create(
+      utilities.map<PODUtility>((utility) => ({
+        pod_id: insertId,
+        utility_id: utility,
+      })),
+      connection
+    );
+    await connection.commit();
+    return insertId;
+  } catch (err) {
+    console.log(err);
+    await connection.rollback();
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const deletePODById = async (id: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const result = await PODRepo.deleteOnePod(id, connection);
-        if (!result) {
-            return null;
-        }
-        return result;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
+  const connection = await pool.getConnection();
+  try {
+    const result = await PODRepo.deleteOnePod(id, connection);
+    if (!result) {
+      return null;
     }
+    return result;
+  } catch (err) {
+    console.log(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 const updatePOD = async (pod: POD) => {
-    const connection = await pool.getConnection();
-    try {
-        const updated = await PODRepo.updatePOD(pod, connection);
-        return updated;
-    } catch (err) {
-        console.error(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    const updated = await PODRepo.updatePOD(pod, connection);
+    return updated;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
-const sortPODByRating = async () => {
-    const connection = await pool.getConnection();
-    try {
-        const sortedPODs = await PODRepo.sortPODByRating(connection);
-        return sortedPODs;
-    } catch (err) {
-        console.error(err);
-        return null;
-    } finally {
-        connection.release();
-    }
+const sortPODByRating = async (
+  filters: PODQueries,
+  comparator: SortCriteria
+) => {
+  const connection = await pool.getConnection();
+  try {
+    const sortedPODs = await PODRepo.sortPODByRating(
+      filters,
+      comparator,
+      connection
+    );
+    return sortedPODs;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
 export default {
-    find,
-    findPODById,
-    findPODByName,
-    findPODByType,
-    findByStoreId,
-    createNewPOD,
-    deletePODById,
-    updatePOD,
-    sortPODByRating,
+  find,
+  findPODById,
+  findPODByName,
+  findPODByType,
+  findByStoreId,
+  createNewPOD,
+  deletePODById,
+  updatePOD,
+  sortPODByRating,
 };
