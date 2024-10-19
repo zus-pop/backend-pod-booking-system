@@ -57,10 +57,11 @@ const createABooking = async (
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
+        console.log(moment().format(FORMAT_TYPE));
         booking = {
             ...booking,
             user_id,
-            booking_date: moment().format(FORMAT_TYPE),
+            booking_date: moment().utcOffset(+7).format(FORMAT_TYPE),
             booking_status: "Pending",
         };
         const bookingResult = await BookingRepo.create(booking, connection);
@@ -84,7 +85,7 @@ const createABooking = async (
                     transaction_id: app_trans_id,
                     total_cost,
                     payment_url: order_url,
-                    payment_date: moment().format(FORMAT_TYPE),
+                    payment_date: moment().utcOffset(+7).format(FORMAT_TYPE),
                     payment_status: "Unpaid",
                 },
                 connection

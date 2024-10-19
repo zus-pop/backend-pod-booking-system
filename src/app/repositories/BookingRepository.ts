@@ -120,7 +120,7 @@ const find = async (
         sql += ` WHERE ${conditions.join(" AND ")}`;
     }
 
-    sql += `ORDER BY ?? DESC`;
+    sql += ` ORDER BY ? DESC `;
 
     const columns = [
         "booking_id",
@@ -133,23 +133,10 @@ const find = async (
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
     return await Promise.all(
-        bookings.map(async (booking) => {
-            const user = await UserRepository.findById(
-                booking.user_id!,
-                connection
-            );
-            return {
-                booking_id: booking.booking_id,
-                pod_id: booking.pod_id,
-                user: {
-                    user_id: user.user_id,
-                    user_name: user.user_name,
-                    email: user.email,
-                },
-                booking_date: booking.booking_date,
-                booking_status: booking.booking_status,
-            };
-        })
+        bookings.map(
+            async (booking) =>
+                await bookingMapper(booking, connection, { user: true })
+        )
     );
 };
 
@@ -191,10 +178,9 @@ const findByUserId = async (user_id: number, connection: PoolConnection) => {
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
     return await Promise.all(
-        bookings.map(async (booking) =>
-            bookingMapper(booking, connection, {
-                user: true,
-            })
+        bookings.map(
+            async (booking) =>
+                await bookingMapper(booking, connection, { user: true })
         )
     );
 };
