@@ -3,6 +3,7 @@ import {
     Booking,
     BookingQueries,
     BookingStatus,
+    Pagination,
     Payment,
     POD,
     Product,
@@ -163,8 +164,13 @@ const findById = async (id: number, connection: PoolConnection) => {
     return booking;
 };
 
-const findByUserId = async (user_id: number, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ? ORDER BY ?? DESC";
+const findByUserId = async (
+    user_id: number,
+    pagination: Pagination,
+    connection: PoolConnection
+) => {
+    const queryParams: any[] = [];
+    let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "booking_id",
         "pod_id",
@@ -174,7 +180,16 @@ const findByUserId = async (user_id: number, connection: PoolConnection) => {
         "rating",
         "comment",
     ];
-    const values = [columns, "Booking", "user_id", user_id, "booking_date"];
+
+    sql += " ORDER BY ?? DESC";
+    queryParams.push("booking_date");
+
+    const { page, limit } = pagination;
+    const offset = (page! - 1) * limit!;
+    sql += " LIMIT ? OFFSET ?";
+    queryParams.push(limit, offset);
+
+    const values = [columns, "Booking", "user_id", user_id, ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
     return await Promise.all(

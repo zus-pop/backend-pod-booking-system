@@ -4,7 +4,13 @@ import BookingRepo from "../repositories/BookingRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
-import { Booking, BookingQueries, BookingSlot } from "../types/type.ts";
+import {
+    Booking,
+    BookingQueries,
+    BookingSlot,
+    Pagination,
+    Product,
+} from "../types/type.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
@@ -36,10 +42,14 @@ const findBookingById = async (id: number) => {
     }
 };
 
-const findByUserId = async (user_id: number) => {
+const findByUserId = async (user_id: number, pagination: Pagination) => {
     const connection = await pool.getConnection();
     try {
-        const bookings = await BookingRepo.findByUserId(user_id, connection);
+        const bookings = await BookingRepo.findByUserId(
+            user_id,
+            pagination,
+            connection
+        );
         return bookings;
     } catch (err) {
         console.log(err);
@@ -57,7 +67,6 @@ const createABooking = async (
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
-        console.log(moment().format(FORMAT_TYPE));
         booking = {
             ...booking,
             user_id,
@@ -78,8 +87,9 @@ const createABooking = async (
         const total_cost = await getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest(
+                user_id,
                 bookingResult.insertId,
-                bookingSlots,
+                bookingSlots as BookingSlot[],
                 total_cost
             );
         if (return_code === 1) {
@@ -95,8 +105,8 @@ const createABooking = async (
                 connection
             );
             await connection.commit();
-            trackBooking(bookingResult.insertId);
-            trackPayment(paymentResult.insertId);
+            const payment_job = trackPayment(paymentResult.insertId);
+            trackBooking(bookingResult.insertId, payment_job, app_trans_id);
             return {
                 booking_id: bookingResult.insertId,
                 payment_url: order_url,

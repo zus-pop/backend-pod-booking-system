@@ -54,7 +54,11 @@ const findUtilitiesByPodId = async (req: Request, res: Response) => {
 
 const findByStoreId = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const pods = await PODService.findByStoreId(+id);
+    const { page, limit } = req.query;
+    const pods = await PODService.findByStoreId(+id, {
+        page: page ? +page : 1,
+        limit: limit ? +limit : 3,
+    });
     if (!pods || !pods.length) {
         return res.status(404).json({ message: "No POD found" });
     }

@@ -139,6 +139,16 @@ StoreRouter.get("/:id", StoreController.findById);
  *              type: number
  *            required: true
  *            description: The Store id
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the POD list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the POD list
  *      responses:
  *        200:
  *          description: Success.

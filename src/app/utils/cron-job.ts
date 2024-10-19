@@ -7,9 +7,13 @@ import BookingSlotService from "../services/BookingSlotService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import { getPaymentStatus } from "./zalo.ts";
 
-export const trackBooking = (booking_id: number) => {
+export const trackBooking = (
+    booking_id: number,
+    paymentJob?: cron.ScheduledTask,
+    transaction_id?: string
+) => {
     let isExtend = false;
-    const job = cron.schedule("*/3 * * * * *", async () => {
+    const job = cron.schedule("*/30 * * * * *", async () => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
         const baseTime = 5;
         const bufferTime = 0.5;
@@ -42,7 +46,16 @@ export const trackBooking = (booking_id: number) => {
             console.log(
                 `Booking ${booking.booking_id} is canceled -> stop the job`
             );
+            if (transaction_id) {
+                await PaymentService.updatePayment({
+                    transaction_id,
+                    payment_status: "Failed",
+                });
+            }
             setTimeout(() => {
+                if (paymentJob) {
+                    paymentJob.stop();
+                }
                 job.stop();
             }, 0);
         } else {
@@ -77,10 +90,11 @@ export const trackBooking = (booking_id: number) => {
             }
         }
     });
+    return job;
 };
 
 export const trackPayment = (payment_id: number) => {
-    const job = cron.schedule("*/3 * * * * *", async () => {
+    const job = cron.schedule("*/45 * * * * *", async () => {
         const payment = await PaymentService.findPaymentById(payment_id);
         if (payment) {
             const { return_code } = await getPaymentStatus(
@@ -122,4 +136,5 @@ export const trackPayment = (payment_id: number) => {
             }
         }
     });
+    return job;
 };

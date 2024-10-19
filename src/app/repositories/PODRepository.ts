@@ -159,8 +159,13 @@ const findById = async (id: number, connection: PoolConnection) => {
     });
 };
 
-const findByStoreId = async (store_id: number, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+const findByStoreId = async (
+    store_id: number,
+    pagination: Pagination,
+    connection: PoolConnection
+) => {
+    const queryParams: any[] = [];
+    let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "pod_id",
         "pod_name",
@@ -170,9 +175,23 @@ const findByStoreId = async (store_id: number, connection: PoolConnection) => {
         "is_available",
         "store_id",
     ];
-    const values = [columns, "POD", "store_id", store_id];
-    const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-    return pods as POD[];
+
+    const { page, limit } = pagination;
+    const offset = (page! - 1) * limit!;
+    sql += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    const values = [columns, "POD", "store_id", store_id, ...queryParams];
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
+    const pods = rows as POD[];
+    return await Promise.all(
+        pods.map(
+            async (pod) =>
+                await podMapping(pod, connection, {
+                    type: true,
+                })
+        )
+    );
 };
 
 const createNewPod = async (pod: POD, connection: PoolConnection) => {

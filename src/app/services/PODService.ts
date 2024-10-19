@@ -47,10 +47,14 @@ const findPODById = async (id: number) => {
     }
 };
 
-const findByStoreId = async (store_id: number) => {
+const findByStoreId = async (store_id: number, pagination: Pagination) => {
     const connection = await pool.getConnection();
     try {
-        const pods = await PODRepo.findByStoreId(store_id, connection);
+        const pods = await PODRepo.findByStoreId(
+            store_id,
+            pagination,
+            connection
+        );
         return pods;
     } catch (err) {
         console.log(err);
