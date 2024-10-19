@@ -60,9 +60,23 @@ const updateUtility = async (req: Request, res: Response) => {
   return res.status(200).json(updatedUtility);
 };
 
+const deleteUtility = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const isDeleted = await UtilityService.deleteUtilityById(+id);
+
+  if (isDeleted) {
+    return res.status(200).json({ message: "Utility deleted successfully" });
+  } else {
+    return res
+      .status(404)
+      .json({ message: "Utility not found or deletion failed" });
+  }
+};
+
 export default {
   findAll,
   findById,
   createNewUtility,
   updateUtility,
+  deleteUtility,
 };

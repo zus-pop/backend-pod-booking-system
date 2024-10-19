@@ -67,9 +67,23 @@ const updateUtilityById = async (id: number, utilityData: Partial<Utility>) => {
   }
 };
 
+const deleteUtilityById = async (id: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const isDeleted = await UtilityRepository.deleteById(id, connection);
+    return isDeleted;
+  } catch (err) {
+    console.error(err);
+    return false;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   findAll,
   findUtilityById,
   createNewUtility,
   updateUtilityById,
+  deleteUtilityById,
 };
