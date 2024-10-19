@@ -19,6 +19,7 @@ export const pool = mysql2.createPool({
     },
     namedPlaceholders: true,
     dateStrings: true,
+    decimalNumbers: true,
 });
 
 pool.on("connection", (connection: PoolConnection) => {

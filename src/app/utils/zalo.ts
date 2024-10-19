@@ -15,11 +15,12 @@ const config = {
 };
 
 export const createOnlinePaymentRequest = async (
+    booking_id: number,
     bookingProducts: BookingProduct[],
     amount: number
 ) => {
     const embed_data = {
-        redirecturl: `${process.env.ZALO_REDIRECT_URL}/booking-history`,
+        redirecturl: `${process.env.ZALO_REDIRECT_URL}/booking-history/${booking_id}`,
     };
     const items = bookingProducts;
     const transID = Math.floor(Math.random() * 1000000);

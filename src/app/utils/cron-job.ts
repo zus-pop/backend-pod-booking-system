@@ -9,7 +9,7 @@ import { getPaymentStatus } from "./zalo.ts";
 
 export const trackBooking = (booking_id: number) => {
     let isExtend = false;
-    const job = cron.schedule("* * * * * *", async () => {
+    const job = cron.schedule("*/3 * * * * *", async () => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
         const baseTime = 5;
         const bufferTime = 0.5;
@@ -80,7 +80,7 @@ export const trackBooking = (booking_id: number) => {
 };
 
 export const trackPayment = (payment_id: number) => {
-    const job = cron.schedule("* * * * * *", async () => {
+    const job = cron.schedule("*/3 * * * * *", async () => {
         const payment = await PaymentService.findPaymentById(payment_id);
         if (payment) {
             const { return_code } = await getPaymentStatus(

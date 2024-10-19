@@ -121,7 +121,6 @@ const find = async (
         "store_id",
     ];
     const values = [columns, "POD", ...queryParams];
-    console.log(connection.format(sql, values));
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const [totalResult] = await connection.query<RowDataPacket[]>(
         countSql,
