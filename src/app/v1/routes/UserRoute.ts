@@ -275,12 +275,12 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
  *            name: limit
  *            schema:
  *              type: integer
- *            description: The size for each page of the POD list
+ *            description: The size for each page of the User's booking list
  *          - in: query
  *            name: page
  *            schema:
  *              type: integer
- *            description: The current page of the POD list
+ *            description: The current page of the User's booking list
  *      responses:
  *        200:
  *          description: Success.
