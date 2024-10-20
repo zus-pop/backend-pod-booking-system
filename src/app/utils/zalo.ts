@@ -25,7 +25,7 @@ export const createOnlinePaymentRequest = async (
     amount: number
 ) => {
     const embed_data = {
-        redirecturl: `${process.env.ZALO_REDIRECT_URL}/booking-history/${booking_id}`,
+        redirecturl: `${process.env.FRONTEND_SERVER}/booking-history/${booking_id}`,
     };
     const items = item;
     const transID = Math.floor(Math.random() * 1000000);
