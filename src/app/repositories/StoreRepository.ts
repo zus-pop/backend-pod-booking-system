@@ -43,8 +43,6 @@ const find = async (
 
     const columns = ["store_id", "store_name", "address", "hotline", "image"];
     const values = [columns, "Store", ...queryParams];
-    console.log(connection.format(sql, values));
-    console.log(connection.format(countSql, queryParams));
     const [stores] = await connection.query<RowDataPacket[]>(sql, values);
     const [countResult] = await connection.query<RowDataPacket[]>(
         countSql,

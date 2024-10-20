@@ -16,7 +16,7 @@ import BookingProductRepository from "./BookingProductRepository.ts";
 import UserRepository from "./UserRepository.ts";
 import PaymentRepository from "./PaymentRepository.ts";
 
-interface MappingOptions {
+export interface MappingOptions {
     slot?: boolean;
     product?: boolean;
     pod?: boolean;
@@ -24,7 +24,7 @@ interface MappingOptions {
     payment?: boolean;
 }
 
-interface MappingResponse {
+export interface MappingResponse {
     booking_id?: number;
     booking_date?: string;
     booking_status?: keyof typeof BookingStatus;
@@ -98,7 +98,8 @@ const bookingMapper = async (
 
 const find = async (
     filters: BookingQueries = {},
-    connection: PoolConnection
+    connection: PoolConnection,
+    mappingOptions?: MappingOptions
 ) => {
     const conditions: string[] = [];
     const queryParams: string[] = [];
@@ -136,12 +137,16 @@ const find = async (
     return await Promise.all(
         bookings.map(
             async (booking) =>
-                await bookingMapper(booking, connection, { user: true })
+                await bookingMapper(booking, connection, mappingOptions)
         )
     );
 };
 
-const findById = async (id: number, connection: PoolConnection) => {
+const findById = async (
+    id: number,
+    connection: PoolConnection,
+    mappingOptions: MappingOptions
+) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "booking_id",
@@ -154,20 +159,19 @@ const findById = async (id: number, connection: PoolConnection) => {
     ];
     const values = [columns, "Booking", "booking_id", id];
     const [bookings] = await connection.query<RowDataPacket[]>(sql, values);
-    const booking = await bookingMapper(bookings[0] as Booking, connection, {
-        pod: true,
-        slot: true,
-        product: true,
-        user: true,
-        payment: true,
-    });
+    const booking = await bookingMapper(
+        bookings[0] as Booking,
+        connection,
+        mappingOptions
+    );
     return booking;
 };
 
 const findByUserId = async (
     user_id: number,
-    pagination: Pagination,
-    connection: PoolConnection
+    connection: PoolConnection,
+    pagination?: Pagination,
+    mappingOptions?: MappingOptions
 ) => {
     const queryParams: any[] = [];
     let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
@@ -184,10 +188,12 @@ const findByUserId = async (
     sql += " ORDER BY ?? DESC";
     queryParams.push("booking_date");
 
-    const { page, limit } = pagination;
-    const offset = (page! - 1) * limit!;
-    sql += " LIMIT ? OFFSET ?";
-    queryParams.push(limit, offset);
+    if (pagination) {
+        const { page, limit } = pagination;
+        const offset = (page! - 1) * limit!;
+        sql += " LIMIT ? OFFSET ?";
+        queryParams.push(limit, offset);
+    }
 
     const values = [columns, "Booking", "user_id", user_id, ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
@@ -195,7 +201,7 @@ const findByUserId = async (
     return await Promise.all(
         bookings.map(
             async (booking) =>
-                await bookingMapper(booking, connection, { user: true })
+                await bookingMapper(booking, connection, mappingOptions)
         )
     );
 };

@@ -4,10 +4,15 @@ import { Booking, BookingSlot, BookingStatus } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
     const { booking_status, booking_date } = req.query;
-    const bookings = await BookingService.find({
-        booking_status: booking_status as keyof typeof BookingStatus,
-        booking_date: booking_date as string,
-    });
+    const bookings = await BookingService.find(
+        {
+            booking_status: booking_status as keyof typeof BookingStatus,
+            booking_date: booking_date as string,
+        },
+        {
+            user: true,
+        }
+    );
     if (!bookings || !bookings.length) {
         return res.status(404).json({ message: "No bookings found" });
     }
@@ -16,7 +21,13 @@ const find = async (req: Request, res: Response) => {
 
 const findById = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const booking = await BookingService.findBookingById(+id);
+    const booking = await BookingService.findBookingById(+id, {
+        pod: true,
+        slot: true,
+        product: true,
+        user: true,
+        payment: true,
+    });
     if (!booking) {
         return res.status(404).json({ message: "Booking not found" });
     }
@@ -26,10 +37,16 @@ const findById = async (req: Request, res: Response) => {
 const findByUserId = async (req: Request, res: Response) => {
     const { payload } = req;
     const { page, limit } = req.query;
-    const bookings = await BookingService.findByUserId(payload.user_id, {
-        page: page ? +page : 1,
-        limit: limit ? +limit : 8,
-    });
+    const bookings = await BookingService.findByUserId(
+        payload.user_id,
+        {
+            page: page ? +page : 1,
+            limit: limit ? +limit : 8,
+        },
+        {
+            user: true,
+        }
+    );
     if (!bookings || !bookings.length) {
         return res.status(404).json({ message: "No bookings found" });
     }

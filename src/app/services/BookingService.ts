@@ -1,6 +1,8 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
-import BookingRepo from "../repositories/BookingRepository.ts";
+import BookingRepo, {
+    MappingOptions,
+} from "../repositories/BookingRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
@@ -17,10 +19,17 @@ import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-const find = async (filters: BookingQueries) => {
+const find = async (
+    filters: BookingQueries,
+    mappingOptions: MappingOptions
+) => {
     const connection = await pool.getConnection();
     try {
-        const bookings = await BookingRepo.find(filters, connection);
+        const bookings = await BookingRepo.find(
+            filters,
+            connection,
+            mappingOptions
+        );
         return bookings;
     } catch (err) {
         console.log(err);
@@ -30,10 +39,14 @@ const find = async (filters: BookingQueries) => {
     }
 };
 
-const findBookingById = async (id: number) => {
+const findBookingById = async (id: number, mappingOptions: MappingOptions) => {
     const connection = await pool.getConnection();
     try {
-        const booking = await BookingRepo.findById(id, connection);
+        const booking = await BookingRepo.findById(
+            id,
+            connection,
+            mappingOptions
+        );
         return booking;
     } catch (err) {
         return null;
@@ -42,13 +55,18 @@ const findBookingById = async (id: number) => {
     }
 };
 
-const findByUserId = async (user_id: number, pagination: Pagination) => {
+const findByUserId = async (
+    user_id: number,
+    pagination?: Pagination,
+    mappingOptions?: MappingOptions
+) => {
     const connection = await pool.getConnection();
     try {
         const bookings = await BookingRepo.findByUserId(
             user_id,
+            connection,
             pagination,
-            connection
+            mappingOptions
         );
         return bookings;
     } catch (err) {

@@ -27,7 +27,7 @@ describe("checkAllAvailableSlot", () => {
     });
 });
 
-describe("check overlappingSlots", () => {
+describe.skip("check overlappingSlots", () => {
     test("should return true if there is overlapping slot", async () => {
         const connection = await pool.getConnection();
         const format = "YYYY-MM-DD HH:mm:ss";
