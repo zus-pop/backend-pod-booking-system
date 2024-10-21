@@ -39,7 +39,7 @@ const find = async (
     }
 };
 
-const findBookingById = async (id: number, mappingOptions: MappingOptions) => {
+const findBookingById = async (id: number, mappingOptions?: MappingOptions) => {
     const connection = await pool.getConnection();
     try {
         const booking = await BookingRepo.findById(
@@ -57,6 +57,7 @@ const findBookingById = async (id: number, mappingOptions: MappingOptions) => {
 
 const findByUserId = async (
     user_id: number,
+    filters: BookingQueries,
     pagination?: Pagination,
     mappingOptions?: MappingOptions
 ) => {
@@ -65,6 +66,7 @@ const findByUserId = async (
         const bookings = await BookingRepo.findByUserId(
             user_id,
             connection,
+            filters,
             pagination,
             mappingOptions
         );
