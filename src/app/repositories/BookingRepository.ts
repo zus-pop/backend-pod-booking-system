@@ -145,7 +145,7 @@ const find = async (
 const findById = async (
     id: number,
     connection: PoolConnection,
-    mappingOptions: MappingOptions
+    mappingOptions?: MappingOptions
 ) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
@@ -170,20 +170,41 @@ const findById = async (
 const findByUserId = async (
     user_id: number,
     connection: PoolConnection,
+    filters: BookingQueries,
     pagination?: Pagination,
     mappingOptions?: MappingOptions
 ) => {
+    const conditions: string[] = [];
     const queryParams: any[] = [];
-    let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = [
-        "booking_id",
-        "pod_id",
-        "user_id",
-        "booking_date",
-        "booking_status",
-        "rating",
-        "comment",
-    ];
+    let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM Booking";
+
+    conditions.push(`?? = ?`);
+    queryParams.push("user_id", user_id);
+
+    Object.keys(filters).forEach((filter) => {
+        const key = filter;
+        const value = filters[filter as keyof BookingQueries];
+        if (value !== null && value !== undefined) {
+            if (key === "booking_date") {
+                conditions.push(`DATE(${key}) = ?`);
+            } else {
+                conditions.push(`${key} = ?`);
+            }
+            queryParams.push(value);
+        }
+    });
+
+    if (conditions.length) {
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
+        countSql += where;
+    }
+
+    const [totalCount] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
 
     sql += " ORDER BY ?? DESC";
     queryParams.push("booking_date");
@@ -195,15 +216,27 @@ const findByUserId = async (
         queryParams.push(limit, offset);
     }
 
-    const values = [columns, "Booking", "user_id", user_id, ...queryParams];
+    const columns = [
+        "booking_id",
+        "pod_id",
+        "user_id",
+        "booking_date",
+        "booking_status",
+        "rating",
+        "comment",
+    ];
+    const values = [columns, "Booking", ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
-    return await Promise.all(
-        bookings.map(
-            async (booking) =>
-                await bookingMapper(booking, connection, mappingOptions)
-        )
-    );
+    return {
+        bookings: await Promise.all(
+            bookings.map(
+                async (booking) =>
+                    await bookingMapper(booking, connection, mappingOptions)
+            )
+        ),
+        total: totalCount[0].total as number,
+    };
 };
 
 const create = async (booking: Booking, connection: PoolConnection) => {

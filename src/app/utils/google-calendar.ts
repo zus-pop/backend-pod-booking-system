@@ -113,21 +113,27 @@ export const syncCalendar = async (req: Request, res: Response) => {
     );
     await deleteBeforeSyncAgain(userCalendarId as string);
 
-    const bookings = await BookingService.findByUserId(
+    const confirmedBookings = await BookingService.findByUserId(
         payload.user_id,
+        {
+            booking_status: "Confirmed",
+        },
         undefined,
         {
             pod: true,
             slot: true,
         }
     );
-    if (!bookings || !bookings.length) {
+
+    if (
+        !confirmedBookings ||
+        !confirmedBookings.bookings ||
+        !confirmedBookings.bookings.length
+    ) {
         return res.status(404).send("No bookings found");
     }
-    const confirmedBookings = bookings.filter(
-        (booking) => booking.booking_status === "Confirmed"
-    );
-    for (const booking of confirmedBookings) {
+
+    for (const booking of confirmedBookings.bookings) {
         if (!booking.slots || !booking.slots.length) {
             continue;
         }

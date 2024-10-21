@@ -23,7 +23,7 @@ export const BookingRouter = Router();
  *         name: booking_status
  *         schema:
  *           type: string
- *           enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *           enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
  *         description: Status of the booking
  *       - in: query
  *         name: booking_date
