@@ -9,8 +9,35 @@ export const PODRouter = Router();
  * @openapi
  * /api/v1/pods/sorted-by-rating:
  *   get:
- *     summary: Get PODs sorted by average rating
+ *     summary: Get PODs sorted by average rating with optional filters
  *     tags: [PODs]
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filter PODs by name (partial match)
+ *         example: "Pod A"
+ *       - in: query
+ *         name: type_id
+ *         schema:
+ *           type: integer
+ *         description: Filter PODs by type_id
+ *         example: 1
+ *       - in: query
+ *         name: column
+ *         schema:
+ *           type: string
+ *           enum: [pod_id, pod_name, avg_rating]
+ *         description: Column to sort by
+ *         example: avg_rating
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [ASC, DESC]
+ *         description: Sort order (ascending or descending)
+ *         example: DESC
  *     responses:
  *       200:
  *         description: List of PODs sorted by average rating
@@ -23,7 +50,7 @@ export const PODRouter = Router();
  *                 properties:
  *                   pod_id:
  *                     type: integer
- *                     description: The POD ID
+ *                     description: The ID of the POD
  *                     example: 1
  *                   pod_name:
  *                     type: string
@@ -31,10 +58,29 @@ export const PODRouter = Router();
  *                     example: "Pod A"
  *                   avg_rating:
  *                     type: number
+ *                     format: float
  *                     description: The average rating of the POD
  *                     example: 4.5
+ *       404:
+ *         description: No PODs found matching the criteria
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No PODs found"
  *       500:
- *         description: Failed to fetch PODs
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 PODRouter.get("/sorted-by-rating", PODController.sortPODByRating);
 
