@@ -59,7 +59,6 @@ const find = async (
     }
 
     const values = [columns, "Product", ...queryParams];
-    console.log(connection.format(sql, values));
     const [products] = await connection.query<RowDataPacket[]>(sql, values);
     return {
         products: products as Product[],
