@@ -81,8 +81,8 @@ const bookingMapper = async (
         );
         mappingResult.user = {
             user_id: user.user_id!,
-            user_name: user.user_name,
-            email: user.email,
+            user_name: user.user_name!,
+            email: user.email!,
         };
     }
 

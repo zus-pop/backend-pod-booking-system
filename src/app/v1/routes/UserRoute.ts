@@ -148,39 +148,56 @@ UserRouter.post("/register", UserController.register);
  *          schema:
  *              type: string
  *          description: The username/email of user
+ *        - in: query
+ *          name: limit
+ *          schema:
+ *            type: integer
+ *          description: The size for each page of the User's booking list
+ *        - in: query
+ *          name: page
+ *          schema:
+ *            type: integer
+ *          description: The current page of the User's booking list
  *      responses:
  *          200:
  *              description: Success
  *              content:
  *                  application/json:
  *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  user_id:
- *                                      type: integer
- *                                      description: id of user
- *                                      example: 1
- *                                  email:
- *                                      type: string
- *                                      format: email
- *                                      example: jane@gmail.com
- *                                  user_name:
- *                                      type: string
- *                                      description: name of user
- *                                      example: marry jane
- *                                  role:
+ *                          type: object
+ *                          properties:
+ *                              users:
+ *                                  type: array
+ *                                  items:
  *                                      type: object
  *                                      properties:
- *                                          role_id:
+ *                                          user_id:
  *                                              type: integer
- *                                              description: id of role
- *                                              example: 2
- *                                          role_name:
+ *                                              description: id of user
+ *                                              example: 1
+ *                                          email:
  *                                              type: string
- *                                              description: name of role
- *                                              example: Customer
+ *                                              format: email
+ *                                              example: jane@gmail.com
+ *                                          user_name:
+ *                                              type: string
+ *                                              description: name of user
+ *                                              example: marry jane
+ *                                          role:
+ *                                              type: object
+ *                                              properties:
+ *                                                  role_id:
+ *                                                      type: integer
+ *                                                      description: id of role
+ *                                                      example: 2
+ *                                                  role_name:
+ *                                                      type: string
+ *                                                      description: name of role
+ *                                                      example: Customer
+ *                              total:
+ *                                  type: integer
+ *                                  description: total number of rows from the query result
+ *                                  example: 8
  *          404:
  *              description: No users found
  *              content:
@@ -258,7 +275,7 @@ UserRouter.get("/users", UserController.find);
  *                              message:
  *                                  type: string
  *                                  description: message response
- */
+*/
 UserRouter.get("/profile", authenticateToken, UserController.getUser);
 
 // GET: api/v1/auth/bookings
