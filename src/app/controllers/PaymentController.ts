@@ -1,13 +1,21 @@
 import PaymentService from "../services/PaymentService.ts";
 import { Request, Response } from "express";
 import { callbackPayment } from "../utils/zalo.ts";
+import { PaymentStatus } from "../types/type.ts";
 
-const findAll = async (_: Request, res: Response) => {
-    const payments = await PaymentService.findAllPayment();
-    if (!payments || !payments.length) {
+const find = async (req: Request, res: Response) => {
+    const { payment_date, payment_status, page, limit } = req.query;
+    const result = await PaymentService.find({
+        payment_date: payment_date as string,
+        payment_status: payment_status as keyof typeof PaymentStatus,
+    }, {
+        page: page ? +page : 1,
+        limit: limit ? +limit : 10,
+    });
+    if (!result || !result.payments || !result.payments.length) {
         return res.status(404).json({ message: "No payments found" });
     }
-    res.status(200).json(payments);
+    res.status(200).json(result);
 };
 
 const findById = async (req: Request, res: Response) => {
@@ -26,7 +34,7 @@ const callback = async (req: Request, res: Response) => {
 };
 
 export default {
-    findAll,
+    find,
     findById,
     callback,
 };

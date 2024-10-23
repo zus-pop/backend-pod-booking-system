@@ -16,7 +16,7 @@ export const ProductRouter = Router();
  *     tags: [Products]
  *     parameters:
  *      - in: query
- *        name: name
+ *        name: product_name
  *        schema:
  *          type: string
  *        description: The name of the Product

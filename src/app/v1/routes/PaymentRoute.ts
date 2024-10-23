@@ -13,6 +13,29 @@ export const PaymentRouter = Router();
  *   get:
  *     summary: Get lists of Payments
  *     tags: [Payments]
+ *     parameters:
+ *          - in: query
+ *            name: payment_status
+ *            schema:
+ *              type: string
+ *              enum: [Unpaid, Paid, Failed]
+ *            description: Status of the payment
+ *          - in: query
+ *            name: payment_date
+ *            schema:
+ *              type: string
+ *              format: date
+ *            description: Date of the payment
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the Payment list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the Payment list
  *     responses:
  *       200:
  *         description: Success.
@@ -53,7 +76,7 @@ export const PaymentRouter = Router();
  *         description: No Payments found
  *
  */
-PaymentRouter.get("/", PaymentController.findAll);
+PaymentRouter.get("/", PaymentController.find);
 
 // GET: api/v1/payments/:id
 /**
