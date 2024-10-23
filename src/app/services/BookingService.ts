@@ -3,18 +3,17 @@ import { pool } from "../config/pool.ts";
 import BookingRepo, {
     MappingOptions,
 } from "../repositories/BookingRepository.ts";
+import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
-import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 import {
     Booking,
     BookingQueries,
     BookingSlot,
-    Pagination,
-    Product,
+    Pagination
 } from "../types/type.ts";
-import { getTotalCost } from "../utils/util.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
+import { getTotalCost } from "../utils/util.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";

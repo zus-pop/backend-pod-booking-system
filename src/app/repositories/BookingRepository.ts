@@ -131,7 +131,7 @@ const find = async (
         queryParams
     );
 
-    sql += ` ORDER BY ? DESC`;
+    sql += ` ORDER BY ?? DESC`;
     queryParams.push("booking_date");
 
     if (pagination) {

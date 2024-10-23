@@ -169,6 +169,11 @@ export interface StoreQueries {
     address?: string;
 }
 
+export interface PaymentQueries {
+    payment_date?: string;
+    payment_status?: keyof typeof PaymentStatus
+}
+
 export interface SortCriteria {
     orderBy?: string;
     direction?: "ASC" | "asc" | "DESC" | "desc";

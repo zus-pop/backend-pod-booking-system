@@ -3,15 +3,24 @@ import UserService from "../services/UserService.ts";
 import { Roles } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
-    const { search } = req.query;
-    const users = await UserService.find({
-        user_name: search as string,
-        email: search as string,
-    });
-    if (!users || !users.length) {
+    const { search, page, limit } = req.query;
+    const result = await UserService.find(
+        {
+            user_name: search as string,
+            email: search as string,
+        },
+        {
+            page: page ? +page : 1,
+            limit: limit ? +limit : 10,
+        },
+        {
+            role: true,
+        }
+    );
+    if (!result || !result.users || !result.users.length) {
         return res.status(404).json({ message: "No users found" });
     }
-    return res.status(200).json(users);
+    return res.status(200).json(result);
 };
 
 const login = async (req: Request, res: Response) => {
@@ -58,7 +67,7 @@ const register = async (req: Request, res: Response) => {
 
 const getUser = async (req: Request, res: Response) => {
     const { payload } = req;
-    const user = await UserService.findById(payload.user_id);
+    const user = await UserService.findById(payload.user_id, { role: true });
     res.status(200).json(user);
 };
 
