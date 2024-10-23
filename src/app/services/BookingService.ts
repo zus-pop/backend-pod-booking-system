@@ -21,6 +21,7 @@ const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
 const find = async (
     filters: BookingQueries,
+    pagination: Pagination,
     mappingOptions: MappingOptions
 ) => {
     const connection = await pool.getConnection();
@@ -28,6 +29,7 @@ const find = async (
         const bookings = await BookingRepo.find(
             filters,
             connection,
+            pagination,
             mappingOptions
         );
         return bookings;

@@ -99,11 +99,13 @@ const bookingMapper = async (
 const find = async (
     filters: BookingQueries = {},
     connection: PoolConnection,
+    pagination?: Pagination,
     mappingOptions?: MappingOptions
 ) => {
     const conditions: string[] = [];
-    const queryParams: string[] = [];
+    const queryParams: any[] = [];
     let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM Booking";
 
     Object.keys(filters).forEach((filter) => {
         const key = filter;
@@ -119,10 +121,25 @@ const find = async (
     });
 
     if (conditions.length) {
-        sql += ` WHERE ${conditions.join(" AND ")}`;
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
+        countSql += where;
     }
 
-    sql += ` ORDER BY ? DESC `;
+    const [totalCount] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
+
+    sql += ` ORDER BY ? DESC`;
+    queryParams.push("booking_date");
+
+    if (pagination) {
+        const { page, limit } = pagination;
+        const offset = (page! - 1) * limit!;
+        sql += ` LIMIT ? OFFSET ? `;
+        queryParams.push(limit, offset);
+    }
 
     const columns = [
         "booking_id",
@@ -131,15 +148,18 @@ const find = async (
         "booking_date",
         "booking_status",
     ];
-    const values = [columns, "Booking", ...queryParams, "booking_date"];
+    const values = [columns, "Booking", ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookings = rows as Booking[];
-    return await Promise.all(
-        bookings.map(
-            async (booking) =>
-                await bookingMapper(booking, connection, mappingOptions)
-        )
-    );
+    return {
+        bookings: await Promise.all(
+            bookings.map(
+                async (booking) =>
+                    await bookingMapper(booking, connection, mappingOptions)
+            )
+        ),
+        total: totalCount[0].total as number,
+    };
 };
 
 const findById = async (
