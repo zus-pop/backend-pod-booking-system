@@ -44,7 +44,7 @@ const login = async (req: Request, res: Response) => {
 };
 
 const register = async (req: Request, res: Response) => {
-    const { user_name, email, password } = req.body;
+    const { user_name, email, password, role_id } = req.body;
     const user = await UserService.findByEmail(email);
     if (user) {
         return res.status(400).json({ message: "Email already exists!" });
@@ -54,7 +54,7 @@ const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         user_name,
-        role_id: Roles.Customer,
+        role_id: role_id ? role_id : Roles.Customer,
     };
     const result = await UserService.persist(newUser);
     if (!result) {

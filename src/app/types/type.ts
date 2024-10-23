@@ -174,6 +174,11 @@ export interface PaymentQueries {
     payment_status?: keyof typeof PaymentStatus
 }
 
+export interface ProductQueries {
+    product_name?: string;
+    category_id?: number;
+}
+
 export interface SortCriteria {
     orderBy?: string;
     direction?: "ASC" | "asc" | "DESC" | "desc";
