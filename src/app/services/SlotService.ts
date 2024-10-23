@@ -1,14 +1,14 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
-import { Pagination, Slot, SlotOption, SlotQueries } from "../types/type.ts";
+import { Slot, SlotOption, SlotQueries } from "../types/type.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-const find = async (filters: SlotQueries, pagination?: Pagination) => {
+const find = async (filters: SlotQueries) => {
     const connection = await pool.getConnection();
     try {
-        const slots = await SlotRepo.find(filters, connection, pagination);
+        const slots = await SlotRepo.find(filters, connection);
         return slots;
     } catch (err) {
         console.log(err);
