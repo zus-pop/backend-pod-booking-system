@@ -2,26 +2,19 @@ import { Request, Response } from "express";
 import SlotService from "../services/SlotService.ts";
 
 const find = async (req: Request, res: Response) => {
-    const { pod_id, date, start_time, end_time, is_available, page, limit } =
-        req.query;
+    const { pod_id, date, start_time, end_time, is_available } = req.query;
 
-    const result = await SlotService.find(
-        {
-            pod_id: pod_id ? +pod_id : undefined,
-            date: date as string,
-            start_time: start_time as string,
-            end_time: end_time as string,
-            is_available: is_available ? is_available === "true" : undefined,
-        },
-        {
-            page: page ? +page : 1,
-            limit: limit ? +limit : 10,
-        }
-    );
-    if (!result || !result.slots || !result.slots.length) {
+    const slots = await SlotService.find({
+        pod_id: pod_id ? +pod_id : undefined,
+        date: date as string,
+        start_time: start_time as string,
+        end_time: end_time as string,
+        is_available: is_available ? is_available === "true" : undefined,
+    });
+    if (!slots || !slots.length) {
         return res.status(404).json({ message: "No slots found" });
     }
-    return res.status(200).json(result);
+    return res.status(200).json(slots);
 };
 
 const findById = async (req: Request, res: Response) => {

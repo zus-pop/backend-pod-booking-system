@@ -10,12 +10,12 @@ describe("Select multiple slot", () => {
         expect(slots).toHaveLength(slot_ids.length);
     });
     test("should return list of available slot by date and pod id", async () => {
-        const result = await SlotService.find({
+        const slots = await SlotService.find({
             pod_id: 3,
             date: "2024-10-01",
             is_available: true,
         });
-        expect(result?.slots?.length).toBeGreaterThan(0);
+        expect(slots?.length).toBeGreaterThan(0);
     });
 });
 
@@ -34,17 +34,17 @@ describe.skip("check overlappingSlots", () => {
         const start_time = moment("2024-08-30 07:00:00").format(format);
         const end_time = moment("2024-08-30 09:00:00").format(format);
         const pod_id = 1;
-        const result = await SlotRepository.checkOverlappingSlots(
+        const slots = await SlotRepository.checkOverlappingSlots(
             pod_id,
             start_time,
             end_time,
             connection
         );
-        expect(result.length).toBeGreaterThan(0);
+        expect(slots.length).toBeGreaterThan(0);
     });
 
     test("slot queries", async () => {
-        const result = await SlotService.find({
+        const slots = await SlotService.find({
             pod_id: 1,
             date: "2024-08-30",
             // start_time: "09:00:00",
@@ -52,7 +52,7 @@ describe.skip("check overlappingSlots", () => {
             // is_available: false,
         });
         // console.log(result);
-        expect(result?.slots.length).toBeGreaterThan(0);
+        expect(slots?.length).toBeGreaterThan(0);
     });
 });
 

@@ -1,16 +1,11 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { PoolConnection } from "mysql2/promise";
-import { Pagination, Slot, SlotQueries } from "../types/type.ts";
+import { Slot, SlotQueries } from "../types/type.ts";
 
-const find = async (
-    filters: SlotQueries,
-    connection: PoolConnection,
-    pagination?: Pagination
-) => {
+const find = async (filters: SlotQueries, connection: PoolConnection) => {
     const conditions: string[] = [];
     const queryParams: any[] = [];
     let sql = "SELECT ?? FROM ??";
-    let countSql = "SELECT COUNT(*) AS total FROM Slot";
 
     Object.keys(filters).forEach((filter) => {
         const key = filter;
@@ -46,19 +41,6 @@ const find = async (
     if (conditions.length) {
         const where = ` WHERE ${conditions.join(" AND ")}`;
         sql += where;
-        countSql += where;
-    }
-
-    const [totalCount] = await connection.query<RowDataPacket[]>(
-        countSql,
-        queryParams
-    );
-
-    if (pagination) {
-        const { page, limit } = pagination;
-        const offset = (page! - 1) * limit!;
-        sql += ` LIMIT ? OFFSET ?`;
-        queryParams.push(limit, offset);
     }
 
     const colums = [
@@ -71,7 +53,7 @@ const find = async (
     ];
     const values = [colums, "Slot", ...queryParams];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-    return { slots: slots as Slot[], total: totalCount[0].total as number };
+    return slots as Slot[];
 };
 
 const findById = async (id: number, connection: PoolConnection) => {
