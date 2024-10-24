@@ -105,7 +105,7 @@ const createABooking = async (
             bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
             connection
         );
-        const total_cost = await getTotalCost(bookingSlots);
+        const total_cost = getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest(
                 user_id,

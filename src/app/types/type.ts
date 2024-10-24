@@ -133,7 +133,7 @@ export interface StorePrice {
     price?: number;
     store_id?: number;
     type_id?: number;
-    days_of_week?: number;
+    days_of_week?: number | DaysOfWeek[];
 }
 
 export interface Role {

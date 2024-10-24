@@ -1,4 +1,4 @@
-import { PoolConnection, RowDataPacket } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Pagination, StorePrice, StorePriceQueries } from "../types/type.ts";
 
 const find = async (
@@ -55,6 +55,34 @@ const find = async (
     };
 };
 
+const create = async (store_price: StorePrice, connection: PoolConnection) => {
+    const sql = "INSERT INTO ?? SET ?";
+    const values = ["Store_Price", store_price];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.insertId;
+};
+
+const update = async (
+    store_price: StorePrice,
+    id: number,
+    connection: PoolConnection
+) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["Store_Price", store_price, "id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows;
+};
+
+const remove = async (id: number, connection: PoolConnection) => {
+    const sql = "DELETE FROM ?? WHERE ?? = ?";
+    const values = ["Store_Price", "id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows;
+};
+
 export default {
     find,
+    create,
+    update,
+    remove,
 };
