@@ -14,12 +14,16 @@ const find = async (req: Request, res: Response) => {
         {
             orderBy: orderBy ? (orderBy as string) : "pod_id",
             direction: direction
-                ? (direction as keyof SortCriteria["direction"])
+                ? (direction as SortCriteria["direction"])
                 : "ASC",
         },
         {
             limit: limit ? +limit : 4,
             page: page ? +page : 1,
+        },
+        {
+            type: true,
+            store: true,
         }
     );
     if (!result || !result.pods || !result.pods.length) {
@@ -34,7 +38,11 @@ const findById = async (req: Request, res: Response) => {
     if (isNaN(+id)) {
         return res.status(400).json({ message: "Invalid POD ID" });
     }
-    const pod = await PODService.findPODById(+id);
+    const pod = await PODService.findPODById(+id, {
+        type: true,
+        utility: true,
+        store: true,
+    });
     if (!pod) {
         return res.status(404).json({ message: "No POD found" });
     }
@@ -55,14 +63,20 @@ const findUtilitiesByPodId = async (req: Request, res: Response) => {
 const findByStoreId = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { page, limit } = req.query;
-    const pods = await PODService.findByStoreId(+id, {
-        page: page ? +page : 1,
-        limit: limit ? +limit : 3,
-    });
-    if (!pods || !pods.length) {
+    const result = await PODService.findByStoreId(
+        +id,
+        {
+            page: page ? +page : 1,
+            limit: limit ? +limit : 3,
+        },
+        {
+            type: true,
+        }
+    );
+    if (!result || !result.pods || !result.pods.length) {
         return res.status(404).json({ message: "No POD found" });
     }
-    return res.status(200).json(pods);
+    return res.status(200).json(result);
 };
 
 const createNewPod = async (req: Request, res: Response) => {

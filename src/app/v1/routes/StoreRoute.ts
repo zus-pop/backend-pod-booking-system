@@ -2,6 +2,7 @@ import PODController from "../../controllers/PODController.ts";
 import StoreController from "../../controllers/StoreController.ts";
 import { Router } from "express";
 import { upload } from "../../utils/google-cloud-storage.ts";
+import StorePriceController from "../../controllers/StorePriceController.ts";
 
 export const StoreRouter = Router();
 
@@ -179,6 +180,12 @@ StoreRouter.get("/:id", StoreController.findById);
  *          description: No PODs found
  */
 StoreRouter.get("/:id/pods", PODController.findByStoreId);
+
+// GET: api/v1/stores/:store_id/pod-type/:type_id/prices
+StoreRouter.get(
+    "/:store_id/pod-type/:type_id/prices",
+    StorePriceController.findByStoreIdAndTypeId
+);
 
 // POST: api/v1/stores
 /**

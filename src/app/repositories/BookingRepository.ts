@@ -136,7 +136,7 @@ const find = async (
 
     if (pagination) {
         const { page, limit } = pagination;
-        const offset = (page! - 1) * limit!;
+        const offset = (page - 1) * limit;
         sql += ` LIMIT ? OFFSET ? `;
         queryParams.push(limit, offset);
     }
@@ -231,7 +231,7 @@ const findByUserId = async (
 
     if (pagination) {
         const { page, limit } = pagination;
-        const offset = (page! - 1) * limit!;
+        const offset = (page - 1) * limit;
         sql += " LIMIT ? OFFSET ?";
         queryParams.push(limit, offset);
     }
