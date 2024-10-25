@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { pool } from "../config/pool.ts";
 import RoleRepo from "../repositories/RoleRepository.ts";
 import UserRepo, { MappingOptions } from "../repositories/UserRepository.ts";
-import { Pagination, UserQueries } from "../types/type.ts";
+import { Pagination, User, UserQueries } from "../types/type.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
@@ -99,6 +99,22 @@ const verifyToken = (token: string) => {
     }
 };
 
+const update = async (user: User, id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        const result = await UserRepo.update(user, id, connection);
+        await connection.commit();
+        return result.affectedRows;
+    } catch (err) {
+        await connection.rollback();
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 export default {
     find,
     findById,
@@ -108,4 +124,5 @@ export default {
     comparePassword,
     generateToken,
     verifyToken,
+    update,
 };

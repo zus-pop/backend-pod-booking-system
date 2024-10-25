@@ -1,5 +1,6 @@
 import SlotController from "../../controllers/SlotController.ts";
 import { Router } from "express";
+import { validateEmptyObject } from "../../middlewares/emptyObject.ts";
 
 export const SlotRouter = Router();
 
@@ -171,7 +172,7 @@ SlotRouter.get("/:id", SlotController.findById);
  *                              example: 80000
  *      responses:
  *          201:
- *              description: Slots created
+ *              description: Slot created
  *              content:
  *                  application/json:
  *                      schema:
@@ -192,3 +193,117 @@ SlotRouter.get("/:id", SlotController.findById);
  *                                  description: The overlapping slot and the overlap type
  */
 SlotRouter.post("/", SlotController.generateSlots);
+
+// PUT: api/v1/slots/:id
+/**
+ * @openapi
+ * /api/v1/slots/{id}:
+ *  put:
+ *      summary: Update slot
+ *      tags: [Slots]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *                type: number
+ *            required: true
+ *            description: The slot id
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          startDate:
+ *                              type: string
+ *                              format: date
+ *                              description: Start date for generating slots
+ *                              example: 2024-08-30
+ *                          endDate:
+ *                              type: string
+ *                              format: date
+ *                              description: End date for generating slots
+ *                              example: 2024-08-30
+ *                          startHour:
+ *                              type: integer
+ *                              description: Start hour for generating slots
+ *                              example: 7
+ *                          endHour:
+ *                              type: integer
+ *                              description: End hour for generating slots
+ *                              example: 10
+ *                          durationMinutes:
+ *                              type: integer
+ *                              description: Duration for each slot by minute
+ *                              example: 30
+ *                          pod_id:
+ *                              type: integer
+ *                              description: id of the target pod for generating slots
+ *                              example: 1
+ *                          price:
+ *                              type: integer
+ *                              format: double
+ *                              description: unit price for each slot
+ *                              example: 80000
+ *      responses:
+ *          201:
+ *              description: Slot updated
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *          400:
+ *              description: Update Failed
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: The overlapping slot and the overlap type
+ */
+SlotRouter.put("/:id", validateEmptyObject, SlotController.updateSlot);
+
+// DELETE: api/v1/slots/:id
+/**
+ * @openapi
+ * /api/v1/slots/{id}:
+ *  delete:
+ *      summary: Delete slot
+ *      tags: [Slots]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *                type: number
+ *            required: true
+ *            description: The slot id
+ *      responses:
+ *          201:
+ *              description: Slot deleted
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: the number of slots are generated
+ *          400:
+ *              description: Delete failed
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: The overlapping slot and the overlap type
+ */
+SlotRouter.delete("/:id", SlotController.removeSlot);

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/UserService.ts";
-import { Roles } from "../types/type.ts";
+import { Roles, User } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
     const { search, page, limit } = req.query;
@@ -71,9 +71,20 @@ const getUser = async (req: Request, res: Response) => {
     res.status(200).json(user);
 };
 
+const update = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user: User = req.body;
+    const result = await UserService.update(user, +id);
+    if (!result) {
+        return res.status(500).json({ message: "Failed to update user!" });
+    }
+    res.status(200).json({ message: "Updated user successfully!" });
+};
+
 export default {
     find,
     login,
     register,
     getUser,
+    update,
 };

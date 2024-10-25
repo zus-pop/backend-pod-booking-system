@@ -275,7 +275,7 @@ UserRouter.get("/users", UserController.find);
  *                              message:
  *                                  type: string
  *                                  description: message response
-*/
+ */
 UserRouter.get("/profile", authenticateToken, UserController.getUser);
 
 // GET: api/v1/auth/bookings
@@ -371,6 +371,61 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
  *
  */
 UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
+
+// PUT: api/v1/auth/users/:id
+/**
+ * @openapi
+ * /api/v1/auth/users/{id}:
+ *  put:
+ *      summary: Update
+ *      security:
+ *          - Authorization: []
+ *      tags: [Users]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The User id
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          user_name:
+ *                              type: string
+ *                              description: name of user
+ *                              example: Marry Jane
+ *                          role_id:
+ *                              type: integer
+ *                              description: role id of user
+ *                              example: 3
+ *      responses:
+ *          201:
+ *              description: Update successfully
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: response message
+ *                                  example: Update user successfully!
+ *          400:
+ *              description: Update failed
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ */
+UserRouter.put("/users/:id", authenticateToken, UserController.update);
 
 // POST: api/v1/auth/forgot-password
 // POST: api/v1/auth/reset-password
