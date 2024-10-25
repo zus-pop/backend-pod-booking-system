@@ -133,7 +133,7 @@ export interface StorePrice {
     price?: number;
     store_id?: number;
     type_id?: number;
-    days_of_week?: number;
+    days_of_week?: number | DaysOfWeek[];
 }
 
 export interface Role {
@@ -179,14 +179,19 @@ export interface ProductQueries {
     category_id?: number;
 }
 
+export interface StorePriceQueries {
+    store_id?: number;
+    type_id?: number;
+}
+
 export interface SortCriteria {
-    orderBy?: string;
-    direction?: "ASC" | "asc" | "DESC" | "desc";
+    orderBy: string;
+    direction: "ASC" | "asc" | "DESC" | "desc";
 }
 
 export interface Pagination {
-    page?: number;
-    limit?: number;
+    page: number;
+    limit: number;
 }
 
 export enum BookingStatus {

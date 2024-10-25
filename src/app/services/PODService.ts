@@ -1,5 +1,5 @@
 import { pool } from "../config/pool.ts";
-import PODRepo from "../repositories/PODRepository.ts";
+import PODRepo, { MappingOptions } from "../repositories/PODRepository.ts";
 import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
 import {
     POD,
@@ -12,7 +12,8 @@ import {
 const find = async (
     filters: PODQueries,
     comparator: SortCriteria,
-    pagination: Pagination
+    pagination: Pagination,
+    mappingOptions?: MappingOptions
 ) => {
     const connection = await pool.getConnection();
     try {
@@ -20,7 +21,8 @@ const find = async (
             filters,
             comparator,
             pagination,
-            connection
+            connection,
+            mappingOptions
         );
         return PODs;
     } catch (err) {
@@ -31,13 +33,13 @@ const find = async (
     }
 };
 
-const findPODById = async (id: number) => {
+const findPODById = async (id: number, mappingOptions: MappingOptions) => {
     if (isNaN(id)) {
         throw new Error("Invalid ID");
     }
     const connection = await pool.getConnection();
     try {
-        const POD = await PODRepo.findById(id, connection);
+        const POD = await PODRepo.findById(id, connection, mappingOptions);
         return POD;
     } catch (err) {
         console.log(err);
@@ -47,13 +49,18 @@ const findPODById = async (id: number) => {
     }
 };
 
-const findByStoreId = async (store_id: number, pagination: Pagination) => {
+const findByStoreId = async (
+    store_id: number,
+    pagination: Pagination,
+    mappingOptions?: MappingOptions
+) => {
     const connection = await pool.getConnection();
     try {
         const pods = await PODRepo.findByStoreId(
             store_id,
             pagination,
-            connection
+            connection,
+            mappingOptions
         );
         return pods;
     } catch (err) {

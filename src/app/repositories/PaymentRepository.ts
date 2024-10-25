@@ -15,7 +15,7 @@ const find = async (
     Object.keys(filters).forEach((filter) => {
         const key = filter;
         const value = filters[filter as keyof PaymentQueries];
-        if (value !== null && value !== undefined) {
+        if (value) {
             if (key === "payment_date") {
                 conditions.push(`DATE(${key}) = ?`);
             } else {

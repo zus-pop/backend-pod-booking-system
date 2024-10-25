@@ -1,8 +1,43 @@
-import { PoolConnection, RowDataPacket } from "mysql2/promise";
-import { StorePrice } from "../types/type.ts";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { Pagination, StorePrice, StorePriceQueries } from "../types/type.ts";
 
-const findAllStorePrice = async (connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ??";
+const find = async (
+    filters: StorePriceQueries,
+    connection: PoolConnection,
+    pagination?: Pagination
+) => {
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+    let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM Store_Price";
+
+    Object.keys(filters).forEach((filter) => {
+        const key = filter;
+        const value = filters[filter as keyof StorePriceQueries];
+        if (value !== null && value !== undefined) {
+            conditions.push(`${key} = ?`);
+            queryParams.push(value);
+        }
+    });
+
+    if (conditions.length) {
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
+        countSql += where;
+    }
+
+    const [totalCount] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
+
+    if (pagination) {
+        const { page, limit } = pagination;
+        const offset = (page - 1) * limit;
+        sql += ` LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
+    }
+
     const columns = [
         "id",
         "start_hour",
@@ -12,31 +47,42 @@ const findAllStorePrice = async (connection: PoolConnection) => {
         "type_id",
         "days_of_week",
     ];
-    const values = [columns, "Store_Price"];
-    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
-    return rows as StorePrice[];
+    const values = [columns, "Store_Price", ...queryParams];
+    const [prices] = await connection.query<RowDataPacket[]>(sql, values);
+    return {
+        storePrices: prices as StorePrice[],
+        total: totalCount[0].total as number,
+    };
 };
 
-const findAllStorePriceByPodType = async (
-    type_id: number,
+const create = async (store_price: StorePrice, connection: PoolConnection) => {
+    const sql = "INSERT INTO ?? SET ?";
+    const values = ["Store_Price", store_price];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.insertId;
+};
+
+const update = async (
+    store_price: StorePrice,
+    id: number,
     connection: PoolConnection
 ) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = [
-        "id",
-        "start_hour",
-        "end_hour",
-        "price",
-        "store_id",
-        "type_id",
-        "days_of_week",
-    ];
-    const values = [columns, "Store_Price", "type_id", type_id];
-    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
-    return rows as StorePrice[];
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["Store_Price", store_price, "id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows;
+};
+
+const remove = async (id: number, connection: PoolConnection) => {
+    const sql = "DELETE FROM ?? WHERE ?? = ?";
+    const values = ["Store_Price", "id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows;
 };
 
 export default {
-    findAllStorePrice,
-    findAllStorePriceByPodType,
+    find,
+    create,
+    update,
+    remove,
 };
