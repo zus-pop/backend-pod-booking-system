@@ -2,6 +2,7 @@ import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot, SlotOption, SlotQueries } from "../types/type.ts";
+import SlotRepository from "../repositories/SlotRepository.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -180,12 +181,15 @@ const generateSlots = async (options: SlotOption) => {
     return slots;
 };
 
-const updateSlot = async (slot: Slot) => {
+const update = async (slot: Slot, id: number) => {
     const connection = await pool.getConnection();
     try {
-        const result = await SlotRepo.update(slot, connection);
+        await connection.beginTransaction();
+        const result = await SlotRepo.update(slot, id, connection);
+        await connection.commit();
         return result;
     } catch (err) {
+        await connection.rollback();
         console.log(err);
         return null;
     } finally {
@@ -199,13 +203,32 @@ const updateMultipleSlot = async (
 ) => {
     const connection = await pool.getConnection();
     try {
+        await connection.beginTransaction();
         const result = await SlotRepo.updateStatusMultipleSlot(
             is_available,
             slot_ids,
             connection
         );
+        await connection.commit();
         return result;
     } catch (err) {
+        await connection.rollback();
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const remove = async (id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        const result = await SlotRepository.remove(id, connection);
+        await connection.commit();
+        return result.affectedRows;
+    } catch (err) {
+        await connection.rollback();
         console.log(err);
         return null;
     } finally {
@@ -219,6 +242,7 @@ export default {
     findSlotByRangeOfId,
     generateSlots,
     checkAllAvailableSlot,
-    updateSlot,
+    update,
     updateMultipleSlot,
+    remove,
 };

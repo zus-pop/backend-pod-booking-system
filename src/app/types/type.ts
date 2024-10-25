@@ -133,7 +133,7 @@ export interface StorePrice {
     price?: number;
     store_id?: number;
     type_id?: number;
-    days_of_week?: number | DaysOfWeek[];
+    days_of_week?: number | DaysOfWeek[] | string[];
 }
 
 export interface Role {
@@ -171,7 +171,7 @@ export interface StoreQueries {
 
 export interface PaymentQueries {
     payment_date?: string;
-    payment_status?: keyof typeof PaymentStatus
+    payment_status?: keyof typeof PaymentStatus;
 }
 
 export interface ProductQueries {

@@ -1,5 +1,6 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Pagination, StorePrice, StorePriceQueries } from "../types/type.ts";
+import { convertBitFieldToStringDays } from "../utils/days-and-bitfield.ts";
 
 const find = async (
     filters: StorePriceQueries,
@@ -48,9 +49,15 @@ const find = async (
         "days_of_week",
     ];
     const values = [columns, "Store_Price", ...queryParams];
-    const [prices] = await connection.query<RowDataPacket[]>(sql, values);
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
+    const prices = rows as StorePrice[];
     return {
-        storePrices: prices as StorePrice[],
+        storePrices: prices.map((price) => ({
+            ...price,
+            days_of_week: convertBitFieldToStringDays(
+                price.days_of_week as number
+            ),
+        })),
         total: totalCount[0].total as number,
     };
 };

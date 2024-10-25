@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import SlotService from "../services/SlotService.ts";
+import { Slot } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
     const { pod_id, date, start_time, end_time, is_available } = req.query;
@@ -56,8 +57,29 @@ const generateSlots = async (req: Request, res: Response) => {
     }
 };
 
+const updateSlot = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const slot: Slot = req.body;
+    const result = await SlotService.update(slot, +id);
+    if (!result) {
+        return res.status(400).json({ message: "Failed to update slot" });
+    }
+    return res.status(200).json({ message: "Slot updated successfully" });
+};
+
+const removeSlot = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await SlotService.remove(+id);
+    if (!result) {
+        return res.status(400).json({ message: "Delete failed" });
+    }
+    return res.status(201).json({ message: "Delete successfully" });
+};
+
 export default {
     find,
     findById,
     generateSlots,
+    updateSlot,
+    removeSlot,
 };
