@@ -184,6 +184,14 @@ export interface StorePriceQueries {
     type_id?: number;
 }
 
+export interface Notification {
+    notification_id?: number;
+    user_id?: number;
+    message?: string;
+    is_read?: boolean;
+    created_at?: string | Date;
+}
+
 export interface SortCriteria {
     orderBy: string;
     direction: "ASC" | "asc" | "DESC" | "desc";
