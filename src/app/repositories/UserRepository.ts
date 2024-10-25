@@ -123,9 +123,17 @@ const persist = async (
     return result;
 };
 
+const update = async (user: User, id: number, connection: PoolConnection) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["User", user, "user_id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
 export default {
     find,
     findById,
     findByEmail,
     persist,
+    update,
 };
