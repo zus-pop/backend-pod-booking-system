@@ -493,6 +493,66 @@ UserRouter.get(
     NotificationController.findByUserId
 );
 
+// PUT: api/v1/auth/notifications/:id/read
+/**
+ * @openapi
+ * /api/v1/auth/notifications/{id}/read:
+ *  put:
+ *      summary: Mark the notification as read
+ *      security:
+ *          - Authorization: []
+ *      tags: [Users]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            description: The id of notification
+ *      responses:
+ *          201:
+ *              description: Success.
+ *              content:
+ *              application/json:
+ *                  schema:
+ *                  type: object
+ *                  properties:
+ *                      message:
+ *                          type: string
+ *                          description: success message response
+ *          404:
+ *              description: Notifications not found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *
+ */
+UserRouter.put(
+    "/notifications/:id/read",
+    authenticateToken,
+    NotificationController.markAsRead
+);
+
 // PUT: api/v1/auth/users/:id
 /**
  * @openapi

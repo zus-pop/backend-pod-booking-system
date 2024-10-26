@@ -64,7 +64,25 @@ const create = async (
     return result.insertId;
 };
 
+const markAsRead = async (
+    notification: Notification,
+    connection: PoolConnection
+) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ? AND ?? = ?";
+    const values = [
+        "Notification",
+        notification,
+        "notification_id",
+        notification.notification_id,
+        "user_id",
+        notification.user_id,
+    ];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows;
+};
+
 export default {
     findByUserId,
     create,
+    markAsRead,
 };

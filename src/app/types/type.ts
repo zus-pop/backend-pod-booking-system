@@ -134,6 +134,7 @@ export interface StorePrice {
     store_id?: number;
     type_id?: number;
     days_of_week?: number | DaysOfWeek[] | string[];
+    priority?: number;
 }
 
 export interface Role {
