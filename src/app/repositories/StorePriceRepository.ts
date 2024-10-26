@@ -32,6 +32,9 @@ const find = async (
         queryParams
     );
 
+    sql += ` ORDER BY ?? DESC`;
+    queryParams.push(["priority", "start_hour", "end_hour", "price"]);
+
     if (pagination) {
         const { page, limit } = pagination;
         const offset = (page - 1) * limit;
@@ -47,6 +50,7 @@ const find = async (
         "store_id",
         "type_id",
         "days_of_week",
+        "priority",
     ];
     const values = [columns, "Store_Price", ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);

@@ -1,5 +1,5 @@
 import moment from "moment";
-import { BookingSlot, DaysOfWeek } from "../types/type.ts";
+import { BookingSlot } from "../types/type.ts";
 
 export const getTotalCost = (bookingSlots: BookingSlot[]): number => {
     let totalCost = 0;

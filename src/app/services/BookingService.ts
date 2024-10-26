@@ -132,6 +132,7 @@ const createABooking = async (
             const notification: Notification = {
                 user_id: user_id,
                 message: "Your booking has been created successfully!",
+                created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
             };
             const result = await NotificationRepository.create(
                 notification,
@@ -140,8 +141,13 @@ const createABooking = async (
             if (result) {
                 sendNotification(notification.user_id!, notification.message!);
             }
-            const payment_job = trackPayment(paymentResult.insertId);
-            trackBooking(bookingResult.insertId, payment_job, app_trans_id);
+            const payment_job = trackPayment(user_id, paymentResult.insertId);
+            trackBooking(
+                user_id,
+                bookingResult.insertId,
+                payment_job,
+                app_trans_id
+            );
             return {
                 booking_id: bookingResult.insertId,
                 payment_url: order_url,
@@ -150,6 +156,18 @@ const createABooking = async (
         } else throw new Error(sub_return_message);
     } catch (err) {
         console.log(err);
+        const notification: Notification = {
+            user_id: user_id,
+            message: "Your booking has been failed!",
+            created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+        };
+        const result = await NotificationRepository.create(
+            notification,
+            connection
+        );
+        if (result) {
+            sendNotification(notification.user_id!, notification.message!);
+        }
         await connection.rollback();
         return null;
     } finally {

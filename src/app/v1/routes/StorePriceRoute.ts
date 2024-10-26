@@ -52,6 +52,11 @@ export const StorePriceRouter = Router();
  *                                      type: integer
  *                                      description: the num of days that the time frame is applied for describe in 7 bits
  *                                      example: 127
+ *                                  priority:
+ *                                      type: integer
+ *                                      enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ *                                      description: days of the week
+ *                                      example: 8
  *          404:
  *              description: No store prices found
  *              content:
@@ -106,6 +111,11 @@ StorePriceRouter.get("/", StorePriceController.find);
  *                                  type: string
  *                                  description: days of the week
  *                                  example: Monday
+ *                          priority:
+ *                              type: integer
+ *                              enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ *                              description: days of the week
+ *                              example: 8
  *      responses:
  *          201:
  *              description: Store price updated
@@ -181,6 +191,11 @@ StorePriceRouter.post(
  *                                  type: string
  *                                  description: days of the week
  *                                  example: Monday
+ *                          priority:
+ *                              type: integer
+ *                              enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ *                              description: days of the week
+ *                              example: 8
  *      responses:
  *          201:
  *              description: Store price created

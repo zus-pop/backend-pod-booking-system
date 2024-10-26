@@ -211,7 +211,6 @@ export enum BookingStatus {
 }
 
 export enum PaymentStatus {
-    Processing = "Processing",
     Unpaid = "Unpaid",
     Paid = "Paid",
     Failed = "Failed",

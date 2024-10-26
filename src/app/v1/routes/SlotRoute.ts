@@ -215,37 +215,15 @@ SlotRouter.post("/", SlotController.generateSlots);
  *                  schema:
  *                      type: object
  *                      properties:
- *                          startDate:
- *                              type: string
- *                              format: date
- *                              description: Start date for generating slots
- *                              example: 2024-08-30
- *                          endDate:
- *                              type: string
- *                              format: date
- *                              description: End date for generating slots
- *                              example: 2024-08-30
- *                          startHour:
- *                              type: integer
- *                              description: Start hour for generating slots
- *                              example: 7
- *                          endHour:
- *                              type: integer
- *                              description: End hour for generating slots
- *                              example: 10
- *                          durationMinutes:
- *                              type: integer
- *                              description: Duration for each slot by minute
- *                              example: 30
- *                          pod_id:
- *                              type: integer
- *                              description: id of the target pod for generating slots
- *                              example: 1
  *                          price:
  *                              type: integer
  *                              format: double
  *                              description: unit price for each slot
  *                              example: 80000
+ *                          is_available:
+ *                              type: boolean
+ *                              description: available status of slot
+ *                              example: true
  *      responses:
  *          201:
  *              description: Slot updated
