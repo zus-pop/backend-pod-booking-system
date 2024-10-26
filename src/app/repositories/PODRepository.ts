@@ -1,18 +1,17 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { PoolConnection } from "mysql2/promise";
 import {
     POD,
-    SortCriteria,
     PODQueries,
-    Pagination,
-    Utility,
     PODType,
-    Store,
     PODUtility,
+    Pagination,
+    SortCriteria,
+    Store
 } from "../types/type.ts";
-import { PoolConnection } from "mysql2/promise";
 import PODTypeRepository from "./PODTypeRepository.ts";
-import StoreRepository from "./StoreRepository.ts";
 import PODUtilityRepository from "./PODUtilityRepository.ts";
+import StoreRepository from "./StoreRepository.ts";
 
 export interface MappingOptions {
     type?: boolean;

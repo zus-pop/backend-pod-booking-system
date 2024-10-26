@@ -369,6 +369,30 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
  *                      example: 8
  *          404:
  *              description: Booking found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
  *
  */
 UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
@@ -437,6 +461,30 @@ UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
  *                      example: 8
  *          404:
  *              description: Notifications not found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
  *
  */
 UserRouter.get(
@@ -497,6 +545,30 @@ UserRouter.get(
  *                          properties:
  *                              message:
  *                                  type: string
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
  */
 UserRouter.put("/users/:id", authenticateToken, UserController.update);
 
