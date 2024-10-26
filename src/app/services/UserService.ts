@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import UserRepo from "../repositories/UserRepository.ts";
-import RoleRepo from "../repositories/RoleRepository.ts";
 import { pool } from "../config/pool.ts";
+import RoleRepo from "../repositories/RoleRepository.ts";
+import UserRepo from "../repositories/UserRepository.ts";
 import { UserQueries } from "../types/type.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;

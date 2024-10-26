@@ -1,5 +1,4 @@
 import { pool } from "../app/config/pool";
-import { Roles, User } from "../app/types/type";
 import "../app/services/UserService";
 import UserService from "../app/services/UserService";
 

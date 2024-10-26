@@ -1,12 +1,27 @@
 import { pool } from "../config/pool.ts";
 import PODRepo from "../repositories/PODRepository.ts";
 import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
-import { POD, SortCriteria, PODQueries, PODUtility } from "../types/type.ts";
+import {
+  POD,
+  SortCriteria,
+  PODQueries,
+  PODUtility,
+  Pagination,
+} from "../types/type.ts";
 
-const find = async (filters: PODQueries, comparator: SortCriteria) => {
+const find = async (
+  filters: PODQueries,
+  comparator: SortCriteria,
+  pagination: Pagination
+) => {
   const connection = await pool.getConnection();
   try {
-    const PODs = await PODRepo.find(filters, comparator, connection);
+    const PODs = await PODRepo.find(
+      filters,
+      comparator,
+      pagination,
+      connection
+    );
     return PODs;
   } catch (err) {
     console.log(err);
@@ -32,36 +47,10 @@ const findPODById = async (id: number) => {
   }
 };
 
-const findPODByName = async (name: string) => {
+const findByStoreId = async (store_id: number, pagination: Pagination) => {
   const connection = await pool.getConnection();
   try {
-    const pods = await PODRepo.findByName(name, connection);
-    return pods;
-  } catch (err) {
-    console.log(err);
-    return null;
-  } finally {
-    connection.release();
-  }
-};
-
-const findPODByType = async (pod_type: number) => {
-  const connection = await pool.getConnection();
-  try {
-    const PODs = await PODRepo.findByType(pod_type, connection);
-    return PODs;
-  } catch (err) {
-    console.log(err);
-    return null;
-  } finally {
-    connection.release();
-  }
-};
-
-const findByStoreId = async (store_id: number) => {
-  const connection = await pool.getConnection();
-  try {
-    const pods = await PODRepo.findByStoreId(store_id, connection);
+    const pods = await PODRepo.findByStoreId(store_id, pagination, connection);
     return pods;
   } catch (err) {
     console.log(err);
@@ -146,8 +135,6 @@ const sortPODByRating = async (
 export default {
   find,
   findPODById,
-  findPODByName,
-  findPODByType,
   findByStoreId,
   createNewPOD,
   deletePODById,

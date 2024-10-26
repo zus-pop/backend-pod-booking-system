@@ -106,42 +106,60 @@ PODRouter.get("/sorted-by-rating", PODController.sortPODByRating);
  *          type: integer
  *        description: The id of the POD type
  *      - in: query
- *        name: column
+ *        name: orderBy
  *        schema:
  *          type: string
+ *          enum: [pod_id, pod_name]
  *        description: The list will be ordered by this column
  *      - in: query
- *        name: order
+ *        name: direction
  *        schema:
  *          type: string
  *          enum: [ASC, asc, DESC, desc]
  *        description: order type of the list
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *        description: The size for each page of the POD list
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *        description: The current page of the POD list
  *     responses:
  *       200:
  *         description: Success.
  *         content:
  *           application/json:
  *             schema:
- *              type: array
- *              items:
- *                  type: object
- *                  properties:
- *                      pod_id:
- *                          type: integer
- *                          description: id of pod
- *                          example: 1
- *                      pod_name:
- *                          type: string
- *                          description: name of pod
- *                          example: POD A
- *                      type_id:
- *                          type: integer
- *                          description: type of pod
- *                          example: 1
- *                      is_available:
- *                          type: integer
- *                          description: status of pod
- *                          example: 1
+ *              type: object
+ *              properties:
+ *                  pods:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              pod_id:
+ *                                  type: integer
+ *                                  description: id of pod
+ *                                  example: 1
+ *                              pod_name:
+ *                                  type: string
+ *                                  description: name of pod
+ *                                  example: POD A
+ *                              type_id:
+ *                                  type: integer
+ *                                  description: type of pod
+ *                                  example: 1
+ *                              is_available:
+ *                                  type: integer
+ *                                  description: status of pod
+ *                                  example: 1
+ *                  total:
+ *                      type: integer
+ *                      description: total number of rows from the query result
+ *                      example: 12
  *       404:
  *         description: No PODs found
  *

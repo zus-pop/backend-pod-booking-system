@@ -8,6 +8,58 @@ import BookingSlotController from "../../controllers/BookingSlotController.ts";
 
 export const BookingRouter = Router();
 
+//GET: api/v1/bookings-count-by-pod
+/**
+ * @openapi
+ * /api/v1/bookings/bookings-count-by-pod:
+ *   get:
+ *     summary: Get the count of completed bookings for each pod
+ *     tags: [Bookings]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the count of completed bookings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   pod_id:
+ *                     type: number
+ *                     description: The ID of the pod
+ *                   pod_name:
+ *                     type: string
+ *                     description: The name of the pod
+ *                   booking_count:
+ *                     type: number
+ *                     description: The count of completed bookings for the pod
+ *       404:
+ *         description: No bookings found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No bookings found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+BookingRouter.get(
+  "/bookings-count-by-pod",
+  BookingController.getBookingsCountByPod
+);
+
 // GET: api/v1/bookings
 /**
  * @openapi
@@ -421,11 +473,11 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  *                                   example: Booking failed
  */
 BookingRouter.post(
-    "/",
-    authenticateToken,
-    validateEmptyObject,
-    checkAllAvailableSlot,
-    BookingController.create
+  "/",
+  authenticateToken,
+  validateEmptyObject,
+  checkAllAvailableSlot,
+  BookingController.create
 );
 
 // PUT: api/v1/bookings

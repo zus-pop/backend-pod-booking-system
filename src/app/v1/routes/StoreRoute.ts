@@ -15,40 +15,68 @@ export const StoreRouter = Router();
  *  get:
  *      summary: Get list of Stores
  *      tags: [Stores]
+ *      parameters:
+ *        - in: query
+ *          name: store_name
+ *          schema:
+ *              type: string
+ *          description: The name of the Store
+ *        - in: query
+ *          name: address
+ *          schema:
+ *              type: string
+ *          description: The address of the Store
+ *        - in: query
+ *          name: page
+ *          schema:
+ *              type: number
+ *          description: The current page of the Store list
+ *        - in: query
+ *          name: limit
+ *          schema:
+ *              type: number
+ *          description: The size for each page of the Store list
  *      responses:
  *          200:
  *              description: Success
  *              content:
  *                  application/json:
  *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  store_id:
- *                                      type: integer
- *                                      description: id of store
- *                                      example: 1
- *                                  store_name:
- *                                      type: string
- *                                      description: name of store
- *                                      example: 2
- *                                  address:
- *                                      type: string
- *                                      description: address of store
- *                                      example: Quan 1, TP.Ho Chi Minh
- *                                  hotline:
- *                                      type: string
- *                                      description: hotline of store
- *                                      example: 0123456789
- *                                  image:
- *                                      type: string
- *                                      description: imageUrl of store
- *                                      example: https://googleapis/...
+ *                          type: object
+ *                          properties:
+ *                              stores:
+ *                                  type: array
+ *                                  items:
+ *                                      type: object
+ *                                      properties:
+ *                                          store_id:
+ *                                              type: integer
+ *                                              description: id of store
+ *                                              example: 1
+ *                                          store_name:
+ *                                              type: string
+ *                                              description: name of store
+ *                                              example: 2
+ *                                          address:
+ *                                              type: string
+ *                                              description: address of store
+ *                                              example: Quan 1, TP.Ho Chi Minh
+ *                                          hotline:
+ *                                              type: string
+ *                                              description: hotline of store
+ *                                              example: 0123456789
+ *                                          image:
+ *                                              type: string
+ *                                              description: imageUrl of store
+ *                                              example: https://googleapis/...
+ *                              total:
+ *                                  type: integer
+ *                                  description: total number of rows from the query (use this to set the pagination)
+ *                                  example: 8
  *          404:
  *              description: No stores found
  */
-StoreRouter.get("/", StoreController.findAll);
+StoreRouter.get("/", StoreController.find);
 
 // GET: api/v1/stores/:id
 /**
@@ -111,6 +139,16 @@ StoreRouter.get("/:id", StoreController.findById);
  *              type: number
  *            required: true
  *            description: The Store id
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the POD list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the POD list
  *      responses:
  *        200:
  *          description: Success.

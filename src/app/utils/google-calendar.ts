@@ -21,14 +21,6 @@ export const authenticateCalendar = (_: Request, res: Response) => {
         scope: scopes,
     });
     res.status(200).json({ redirect_url: url });
-    // res.send(`
-    //     <div id="foo">Click here</div>
-    //     <script>
-    //     document.getElementById('foo').addEventListener('click', function(){
-    //     console.log("foo")
-    //         window.open("${redirect_url}")
-    // })
-    //     </script>`);
 };
 
 export const getCalendar = async (summary: string, description: string) => {
@@ -103,7 +95,7 @@ export const calendarRedirect = async (req: Request, res: Response) => {
           <p>You have successfully authenticated with Google Calendar.</p>
           <p>This window will close automatically in 5 seconds...</p>
           <script>
-            window.opener.postMessage('oath-success', *);
+            window.opener.postMessage('oauth-success', "${process.env.FRONTEND_SERVER}");
             setTimeout(function() {
               window.close();
             }, 5000); // Close the window after 5 seconds
@@ -121,7 +113,14 @@ export const syncCalendar = async (req: Request, res: Response) => {
     );
     await deleteBeforeSyncAgain(userCalendarId as string);
 
-    const bookings = await BookingService.findByUserId(payload.user_id);
+    const bookings = await BookingService.findByUserId(
+        payload.user_id,
+        undefined,
+        {
+            pod: true,
+            slot: true,
+        }
+    );
     if (!bookings || !bookings.length) {
         return res.status(404).send("No bookings found");
     }
@@ -137,15 +136,15 @@ export const syncCalendar = async (req: Request, res: Response) => {
                 summary: `Event for - ${booking.pod?.pod_name}`,
                 description: `Event from booking of ${booking.pod?.pod_name}`,
                 start: {
-                    dateTime: moment
-                        .utc(slot.start_time)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
+                    dateTime: moment(slot.start_time).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    ),
                     timeZone: "Asia/Ho_Chi_Minh",
                 },
                 end: {
-                    dateTime: moment
-                        .utc(slot.end_time)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
+                    dateTime: moment(slot.end_time).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                    ),
                     timeZone: "Asia/Ho_Chi_Minh",
                 },
             };

@@ -1,15 +1,14 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
-import { Slot, SlotOption } from "../types/type.ts";
-import { ResultSetHeader } from "mysql2/promise";
+import { Slot, SlotOption, SlotQueries } from "../types/type.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
-const findAllSlot = async () => {
+const find = async (filters: SlotQueries) => {
     const connection = await pool.getConnection();
     try {
-        const slots = await SlotRepo.findAll(connection);
+        const slots = await SlotRepo.find(filters, connection);
         return slots;
     } catch (err) {
         console.log(err);
@@ -45,49 +44,6 @@ const findSlotByRangeOfId = async (slot_ids: number[]) => {
     }
 };
 
-const findByPodId = async (pod_id: number) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findByPodId(pod_id, connection);
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findAvailableSlotByDate = async (date: Date | string) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findAvailableSlotByDate(date, connection);
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
-const findSlotByDateAndPodId = async (pod_id: number, date: Date | string) => {
-    const connection = await pool.getConnection();
-    try {
-        const slots = await SlotRepo.findSlotByDateAndPodId(
-            pod_id,
-            date,
-            connection
-        );
-        return slots;
-    } catch (err) {
-        console.log(err);
-        return null;
-    } finally {
-        connection.release();
-    }
-};
-
 const checkAllAvailableSlot = async (slot_ids: number[]) => {
     const connection = await pool.getConnection();
     try {
@@ -104,13 +60,13 @@ const checkAllAvailableSlot = async (slot_ids: number[]) => {
             message: notAvailableSlots
                 .map(
                     (notAvailableSlot) =>
-                        `Slot from ( ${moment
-                            .utc(notAvailableSlot.start_time)
-                            .format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment
-                            .utc(notAvailableSlot.end_time)
-                            .format(
-                                "YYYY-MM-DD HH:mm:ss"
-                            )} ) is taken by other customer`
+                        `Slot from ( ${moment(
+                            notAvailableSlot.start_time
+                        ).format("YYYY-MM-DD HH:mm:ss")} ) to ( ${moment(
+                            notAvailableSlot.end_time
+                        ).format(
+                            "YYYY-MM-DD HH:mm:ss"
+                        )} ) is taken by other customer`
                 )
                 .join("\r\n"),
         };
@@ -148,7 +104,56 @@ const generateSlots = async (options: SlotOption) => {
                 price: options.price,
                 is_available: true,
             };
-         
+
+            const overlappingSlots = await SlotRepo.checkOverlappingSlots(
+                slot.pod_id,
+                slot.start_time,
+                slot.end_time,
+                connection
+            );
+
+            if (overlappingSlots.length) {
+                const overlappingSlot = overlappingSlots[0];
+                let overlapType: string;
+                if (
+                    moment(slot.start_time).isSameOrBefore(
+                        overlappingSlot.start_time
+                    ) &&
+                    moment(slot.end_time).isSameOrAfter(
+                        overlappingSlot.end_time
+                    )
+                ) {
+                    overlapType = `New slot completely encompasses the existing slot`;
+                } else if (
+                    moment(overlappingSlot.start_time).isSameOrBefore(
+                        slot.start_time
+                    ) &&
+                    moment(overlappingSlot.end_time).isSameOrAfter(
+                        slot.end_time
+                    )
+                ) {
+                    overlapType = `Existing slot completely encompasses the new slot`;
+                } else if (
+                    moment(slot.start_time).isBetween(
+                        overlappingSlot.start_time,
+                        overlappingSlot.end_time,
+                        null,
+                        "[)"
+                    )
+                ) {
+                    overlapType = `New slot starts inside the existing slot`;
+                } else {
+                    overlapType = `New slot ends inside the existing slot`;
+                }
+
+                const message =
+                    `Overlap detected:<br>` +
+                    `Conflicts with an existing slot (ID: ${overlappingSlot.slot_id}) from ${overlappingSlot.start_time} to ${overlappingSlot.end_time}.<br>` +
+                    `New slot details: from ${slot.start_time} to ${slot.end_time}.<br>` +
+                    `Overlap type: ${overlapType}. Please choose another time range.<br>`;
+                throw new Error(message);
+            }
+
             const result = await SlotRepo.create(slot, connection);
             slots.push(result.insertId);
 
@@ -166,8 +171,9 @@ const generateSlots = async (options: SlotOption) => {
         }
         await connection.commit();
     } catch (err) {
-        console.error("Error in generating slot: ", err);
         await connection.rollback();
+        console.log(err);
+        throw err;
     } finally {
         connection.release();
     }
@@ -208,12 +214,9 @@ const updateMultipleSlot = async (
 };
 
 export default {
-    findAllSlot,
+    find,
     findSlotById,
     findSlotByRangeOfId,
-    // findByPodId,
-    // findAvailableSlotByDate,
-    findSlotByDateAndPodId,
     generateSlots,
     checkAllAvailableSlot,
     updateSlot,

@@ -1,5 +1,9 @@
 import moment from "moment";
-import { BookingProduct, OnlinePaymentResponse } from "../types/type.ts";
+import {
+    BookingProduct,
+    BookingSlot,
+    OnlinePaymentResponse,
+} from "../types/type.ts";
 import crypto from "crypto";
 import qs from "qs";
 import { pool } from "../config/pool.ts";
@@ -15,24 +19,26 @@ const config = {
 };
 
 export const createOnlinePaymentRequest = async (
-    bookingProducts: BookingProduct[],
+    user_id: number,
+    booking_id: number,
+    item: BookingProduct[] | BookingSlot[],
     amount: number
 ) => {
     const embed_data = {
-        redirecturl: process.env.ZALO_REDIRECT_URL as string,
+        redirecturl: `${process.env.FRONTEND_SERVER}/booking-history/${booking_id}`,
     };
-    const items = bookingProducts;
+    const items = item;
     const transID = Math.floor(Math.random() * 1000000);
     const order: Record<string, any> = {
         app_id: config.APP_ID,
         app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-        app_user: "user123",
+        app_user: `user_id: ${user_id}`,
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
         embed_data: JSON.stringify(embed_data),
         amount,
         expire_duration_seconds: 300,
-        callback_url: process.env.ZALO_CALLBACK_URL as string,
+        callback_url: process.env.ZALO_CALLBACK_URL,
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };

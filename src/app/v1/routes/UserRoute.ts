@@ -142,6 +142,12 @@ UserRouter.post("/register", UserController.register);
  *  get:
  *      summary: Get list of Users
  *      tags: [Users]
+ *      parameters:
+ *        - in: query
+ *          name: search
+ *          schema:
+ *              type: string
+ *          description: The username/email of user
  *      responses:
  *          200:
  *              description: Success
@@ -264,6 +270,17 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
  *      security:
  *          - Authorization: []
  *      tags: [Users]
+ *      parameters:
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the User's booking list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the User's booking list
  *      responses:
  *        200:
  *          description: Success.

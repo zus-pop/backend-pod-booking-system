@@ -156,9 +156,27 @@ export interface PODQueries {
     type_id?: number;
 }
 
+export interface SlotQueries {
+    pod_id?: number;
+    date?: string;
+    start_time?: string;
+    end_time?: string;
+    is_available?: boolean;
+}
+
+export interface StoreQueries {
+    store_name?: string;
+    address?: string;
+}
+
 export interface SortCriteria {
-    column?: string;
-    order?: "ASC" | "asc" | "DESC" | "desc";
+    orderBy?: string;
+    direction?: "ASC" | "asc" | "DESC" | "desc";
+}
+
+export interface Pagination {
+    page?: number;
+    limit?: number;
 }
 
 export enum BookingStatus {
