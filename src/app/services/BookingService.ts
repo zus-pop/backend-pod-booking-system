@@ -10,11 +10,14 @@ import {
     Booking,
     BookingQueries,
     BookingSlot,
-    Pagination
+    Notification,
+    Pagination,
 } from "../types/type.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
+import NotificationRepository from "../repositories/NotificationRepository.ts";
+import { sendNotification } from "../utils/socket-stuffs.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -126,8 +129,25 @@ const createABooking = async (
                 connection
             );
             await connection.commit();
-            const payment_job = trackPayment(paymentResult.insertId);
-            trackBooking(bookingResult.insertId, payment_job, app_trans_id);
+            const notification: Notification = {
+                user_id: user_id,
+                message: "Your booking has been created successfully!",
+                created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+            };
+            const result = await NotificationRepository.create(
+                notification,
+                connection
+            );
+            if (result) {
+                sendNotification(notification.user_id!, notification.message!);
+            }
+            const payment_job = trackPayment(user_id, paymentResult.insertId);
+            trackBooking(
+                user_id,
+                bookingResult.insertId,
+                payment_job,
+                app_trans_id
+            );
             return {
                 booking_id: bookingResult.insertId,
                 payment_url: order_url,
@@ -136,6 +156,18 @@ const createABooking = async (
         } else throw new Error(sub_return_message);
     } catch (err) {
         console.log(err);
+        const notification: Notification = {
+            user_id: user_id,
+            message: "Your booking has been failed!",
+            created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+        };
+        const result = await NotificationRepository.create(
+            notification,
+            connection
+        );
+        if (result) {
+            sendNotification(notification.user_id!, notification.message!);
+        }
         await connection.rollback();
         return null;
     } finally {

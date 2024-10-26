@@ -6,8 +6,12 @@ import SlotService from "../services/SlotService.ts";
 import BookingSlotService from "../services/BookingSlotService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import { getPaymentStatus } from "./zalo.ts";
+import NotificationService from "../services/NotificationService.ts";
+import { Notification } from "../types/type.ts";
+import { sendNotification } from "./socket-stuffs.ts";
 
 export const trackBooking = (
+    user_id: number,
     booking_id: number,
     paymentJob?: cron.ScheduledTask,
     transaction_id?: string
@@ -34,6 +38,13 @@ export const trackBooking = (
                 console.log(
                     `Booking ${booking.booking_id} is confirmed -> stop the job`
                 );
+                const notification: Notification = {
+                    user_id,
+                    message: `Your booking with ID: ${booking.booking_id} has been confirmed!`,
+                    created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+                };
+                NotificationService.createNewMessage(notification);
+                sendNotification(notification.user_id!, notification.message!);
                 job.stop();
             }, 0);
         } else if (isCanceled) {
@@ -46,6 +57,13 @@ export const trackBooking = (
             console.log(
                 `Booking ${booking.booking_id} is canceled -> stop the job`
             );
+            const notification: Notification = {
+                user_id,
+                message: `Your booking with ID: ${booking.booking_id} has been canceled!`,
+                created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+            };
+            NotificationService.createNewMessage(notification);
+            sendNotification(notification.user_id!, notification.message!);
             if (transaction_id) {
                 await PaymentService.updatePayment({
                     transaction_id,
@@ -83,6 +101,18 @@ export const trackBooking = (
                             booking!.booking_id
                         } is expired -> stop the job`
                     );
+                    const notification: Notification = {
+                        user_id,
+                        message: `Your booking with ID: ${
+                            booking!.booking_id
+                        } has been expired!`,
+                        created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+                    };
+                    NotificationService.createNewMessage(notification);
+                    sendNotification(
+                        notification.user_id!,
+                        notification.message!
+                    );
                     setTimeout(() => {
                         job.stop();
                     }, 0);
@@ -93,8 +123,9 @@ export const trackBooking = (
     return job;
 };
 
-export const trackPayment = (payment_id: number) => {
+export const trackPayment = (user_id: number, payment_id: number) => {
     const job = cron.schedule("*/45 * * * * *", async () => {
+        const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
         const payment = await PaymentService.findPaymentById(payment_id);
         if (payment) {
             const { return_code } = await getPaymentStatus(
@@ -113,6 +144,13 @@ export const trackPayment = (payment_id: number) => {
                     booking_id: payment.booking_id,
                     booking_status: "Confirmed",
                 });
+                const notification: Notification = {
+                    user_id,
+                    message: `Your booking with ID: ${payment.booking_id} has been paid successfully!`,
+                    created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+                };
+                NotificationService.createNewMessage(notification);
+                sendNotification(notification.user_id!, notification.message!);
                 setTimeout(() => {
                     job.stop();
                 }, 0);
@@ -127,6 +165,13 @@ export const trackPayment = (payment_id: number) => {
                     booking_id: payment.booking_id,
                     booking_status: "Canceled",
                 });
+                const notification: Notification = {
+                    user_id,
+                    message: `Your booking with ID: ${payment.booking_id} has been paid failed!`,
+                    created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+                };
+                NotificationService.createNewMessage(notification);
+                sendNotification(notification.user_id!, notification.message!);
                 setTimeout(() => {
                     job.stop();
                 }, 0);

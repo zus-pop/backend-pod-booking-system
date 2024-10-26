@@ -2,6 +2,7 @@ import { Router } from "express";
 import UserController from "../../controllers/UserController.ts";
 import { authenticateToken } from "../../middlewares/authenticateToken.ts";
 import BookingController from "../../controllers/BookingController.ts";
+import NotificationController from "../../controllers/NotificationController.ts";
 
 export const UserRouter = Router();
 
@@ -368,9 +369,189 @@ UserRouter.get("/profile", authenticateToken, UserController.getUser);
  *                      example: 8
  *          404:
  *              description: Booking found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
  *
  */
 UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
+
+// GET: api/v1/auth/notifications
+/**
+ * @openapi
+ * /api/v1/auth/notifications:
+ *  get:
+ *      summary: Get notifications from user_id in token
+ *      security:
+ *          - Authorization: []
+ *      tags: [Users]
+ *      parameters:
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the User's booking list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the User's booking list
+ *      responses:
+ *        200:
+ *          description: Success.
+ *          content:
+ *            application/json:
+ *              schema:
+ *               type: object
+ *               properties:
+ *                  notifications:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              notification_id:
+ *                                  type: integer
+ *                                  description: id of notification
+ *                                  example: 1
+ *                              user_id:
+ *                                  type: integer
+ *                                  description: id of user
+ *                                  example: 2
+ *                              message:
+ *                                  type: string
+ *                                  description: content of notification
+ *                                  example: Your booking is confirmed!
+ *                              comment:
+ *                                  type: string
+ *                                  description: feedback of booking
+ *                                  example: đỉnh nóc, kịch trần, bay phấp phới
+ *                              is_read:
+ *                                  type: boolean
+ *                                  description: status of notification
+ *                                  example: false
+ *                              created_at:
+ *                                  type: string
+ *                                  format: date-time
+ *                                  description: created time of notification
+ *                                  example: 2024-10-20T12:38:08Z
+ *                  total:
+ *                      type: integer
+ *                      description: total number of rows from the query result
+ *                      example: 8
+ *          404:
+ *              description: Notifications not found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *
+ */
+UserRouter.get(
+    "/notifications",
+    authenticateToken,
+    NotificationController.findByUserId
+);
+
+// PUT: api/v1/auth/notifications/:id/read
+/**
+ * @openapi
+ * /api/v1/auth/notifications/{id}/read:
+ *  put:
+ *      summary: Mark the notification as read
+ *      security:
+ *          - Authorization: []
+ *      tags: [Users]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            description: The id of notification
+ *      responses:
+ *          201:
+ *              description: Success.
+ *              content:
+ *              application/json:
+ *                  schema:
+ *                  type: object
+ *                  properties:
+ *                      message:
+ *                          type: string
+ *                          description: success message response
+ *          404:
+ *              description: Notifications not found
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *
+ */
+UserRouter.put(
+    "/notifications/:id/read",
+    authenticateToken,
+    NotificationController.markAsRead
+);
 
 // PUT: api/v1/auth/users/:id
 /**
@@ -424,6 +605,30 @@ UserRouter.get("/bookings", authenticateToken, BookingController.findByUserId);
  *                          properties:
  *                              message:
  *                                  type: string
+ *          401:
+ *              description: Unauthorized
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
+ *                                  example: Access denied. No token provided.
+ *          403:
+ *              description: Forbidden
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  description: error name
+ *                              message:
+ *                                  type: string
+ *                                  description: message response
  */
 UserRouter.put("/users/:id", authenticateToken, UserController.update);
 

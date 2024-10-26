@@ -7,6 +7,7 @@ import {
     PODQueries,
     PODUtility,
     Pagination,
+    Utility,
 } from "../types/type.ts";
 
 const find = async (
@@ -76,13 +77,15 @@ const createNewPOD = async (newPod: POD, utilities: number[]) => {
     try {
         await connection.beginTransaction();
         const insertId = await PODRepo.createNewPod(newPod, connection);
-        await PODUtilityRepository.create(
-            utilities.map<PODUtility>((utility) => ({
-                pod_id: insertId,
-                utility_id: utility,
-            })),
-            connection
-        );
+        if (utilities.length) {
+            await PODUtilityRepository.create(
+                utilities.map<PODUtility>((utility) => ({
+                    pod_id: insertId,
+                    utility_id: utility,
+                })),
+                connection
+            );
+        }
         await connection.commit();
         return insertId;
     } catch (err) {
@@ -110,10 +113,20 @@ const deletePODById = async (id: number) => {
     }
 };
 
-const updatePOD = async (pod: POD) => {
+const updatePOD = async (pod: POD, utilities: number[]) => {
     const connection = await pool.getConnection();
     try {
         const updated = await PODRepo.updatePOD(pod, connection);
+        if (utilities.length) {
+            await PODUtilityRepository.remove(pod.pod_id!, connection);
+            await PODUtilityRepository.create(
+                utilities.map<PODUtility>((utility) => ({
+                    pod_id: pod.pod_id,
+                    utility_id: utility,
+                })),
+                connection
+            );
+        }
         return updated;
     } catch (err) {
         console.error(err);

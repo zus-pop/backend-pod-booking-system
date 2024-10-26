@@ -134,6 +134,7 @@ export interface StorePrice {
     store_id?: number;
     type_id?: number;
     days_of_week?: number | DaysOfWeek[] | string[];
+    priority?: number;
 }
 
 export interface Role {
@@ -184,6 +185,14 @@ export interface StorePriceQueries {
     type_id?: number;
 }
 
+export interface Notification {
+    notification_id?: number;
+    user_id?: number;
+    message?: string;
+    is_read?: boolean;
+    created_at?: string | Date;
+}
+
 export interface SortCriteria {
     orderBy: string;
     direction: "ASC" | "asc" | "DESC" | "desc";
@@ -203,7 +212,6 @@ export enum BookingStatus {
 }
 
 export enum PaymentStatus {
-    Processing = "Processing",
     Unpaid = "Unpaid",
     Paid = "Paid",
     Failed = "Failed",

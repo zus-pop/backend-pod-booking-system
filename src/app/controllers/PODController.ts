@@ -81,7 +81,9 @@ const findByStoreId = async (req: Request, res: Response) => {
 
 const createNewPod = async (req: Request, res: Response) => {
     const { pod_name, description, type_id, store_id } = req.body;
-    const utilities = JSON.parse(req.body.utilities) as number[];
+    const utilities = req.body.utilities
+        ? (JSON.parse(req.body.utilities) as number[])
+        : [];
 
     const newPod: POD = {
         pod_name,
@@ -102,6 +104,7 @@ const createNewPod = async (req: Request, res: Response) => {
                 .json({ message: "Error uploading image to cloud storage" });
         }
     }
+
     const insertId = await PODService.createNewPOD(newPod, utilities);
     if (!insertId) {
         return res.status(400).json({ message: "Failed to create new POD" });
@@ -124,10 +127,15 @@ const deleteOnePod = async (req: Request, res: Response) => {
 
 const updatePOD = async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { pod_name, description, type_id, store_id } = req.body;
     const pod: POD = {
-        ...(req.body as POD),
-        pod_id: +id, // Lấy ID từ URL
+        pod_id: +id, // Lấy ID từ URL,
+        pod_name,
+        description,
+        type_id,
+        store_id,
     };
+    const utilities = req.body.utilities ? JSON.parse(req.body.utilities) : [];
     const imageFile = req.file;
     if (imageFile) {
         try {
@@ -141,7 +149,7 @@ const updatePOD = async (req: Request, res: Response) => {
         }
     }
 
-    const updated = await PODService.updatePOD(pod);
+    const updated = await PODService.updatePOD(pod, utilities);
     if (updated) {
         return res.status(200).json({ message: "POD updated successfully" });
     } else {

@@ -7,6 +7,7 @@ import {
     Payment,
     POD,
     Product,
+    Role,
     Slot,
 } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
@@ -37,6 +38,7 @@ export interface MappingResponse {
         user_id: number;
         user_name: string;
         email: string;
+        role?: Role;
     };
     payment?: Payment;
 }
@@ -54,7 +56,11 @@ const bookingMapper = async (
         comment: booking.comment,
     };
     if (options?.pod) {
-        const pod = await PODRepository.findById(booking.pod_id!, connection);
+        const pod = await PODRepository.findById(booking.pod_id!, connection, {
+            type: true,
+            store: true,
+            utility: true,
+        });
         mappingResult.pod = pod;
     }
 
@@ -77,12 +83,16 @@ const bookingMapper = async (
     if (options?.user) {
         const user = await UserRepository.findById(
             booking.user_id!,
-            connection
+            connection,
+            {
+                role: true,
+            }
         );
         mappingResult.user = {
             user_id: user.user_id!,
             user_name: user.user_name!,
             email: user.email!,
+            role: user.role,
         };
     }
 

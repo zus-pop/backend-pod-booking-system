@@ -1,10 +1,21 @@
+import cors from "cors";
 import "dotenv/config";
 import express, { Express } from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { socketAuth } from "./middlewares/socketAuth.ts";
+import { initialize } from "./utils/socket-stuffs.ts";
 import { router } from "./v1/routes/route.ts";
-import cors from "cors";
 import { swaggerSpec, swaggerUI } from "./v1/swagger/swagger.ts";
 
 const app: Express = express();
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+    },
+    connectionStateRecovery: {},
+});
 const port = process.env.PORT || 3000;
 
 declare module "express-serve-static-core" {
@@ -28,6 +39,10 @@ app.use(
     swaggerUI.setup(swaggerSpec, { explorer: true })
 );
 
-app.listen(port, () => {
+io.use(socketAuth);
+
+initialize(io);
+
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
