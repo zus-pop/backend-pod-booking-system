@@ -3,25 +3,27 @@ import { pool } from "../config/pool.ts";
 import BookingRepo, {
   MappingOptions,
 } from "../repositories/BookingRepository.ts";
+import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
-import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
 import {
   Booking,
   BookingQueries,
   BookingSlot,
+  Notification,
   Pagination,
-  Product,
 } from "../types/type.ts";
-import { getTotalCost } from "../utils/util.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
+import { getTotalCost } from "../utils/util.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
-import { PoolConnection } from "mysql2";
+import NotificationRepository from "../repositories/NotificationRepository.ts";
+import { sendNotification } from "../utils/socket-stuffs.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
 const find = async (
   filters: BookingQueries,
+  pagination: Pagination,
   mappingOptions: MappingOptions
 ) => {
   const connection = await pool.getConnection();
@@ -29,6 +31,7 @@ const find = async (
     const bookings = await BookingRepo.find(
       filters,
       connection,
+      pagination,
       mappingOptions
     );
     return bookings;
@@ -40,7 +43,7 @@ const find = async (
   }
 };
 
-const findBookingById = async (id: number, mappingOptions: MappingOptions) => {
+const findBookingById = async (id: number, mappingOptions?: MappingOptions) => {
   const connection = await pool.getConnection();
   try {
     const booking = await BookingRepo.findById(id, connection, mappingOptions);
@@ -54,6 +57,7 @@ const findBookingById = async (id: number, mappingOptions: MappingOptions) => {
 
 const findByUserId = async (
   user_id: number,
+  filters: BookingQueries,
   pagination?: Pagination,
   mappingOptions?: MappingOptions
 ) => {
@@ -62,6 +66,7 @@ const findByUserId = async (
     const bookings = await BookingRepo.findByUserId(
       user_id,
       connection,
+      filters,
       pagination,
       mappingOptions
     );
@@ -99,7 +104,7 @@ const createABooking = async (
       bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
       connection
     );
-    const total_cost = await getTotalCost(bookingSlots);
+    const total_cost = getTotalCost(bookingSlots);
     const { return_code, order_url, sub_return_message, app_trans_id } =
       await createOnlinePaymentRequest(
         user_id,
@@ -120,8 +125,20 @@ const createABooking = async (
         connection
       );
       await connection.commit();
-      const payment_job = trackPayment(paymentResult.insertId);
-      trackBooking(bookingResult.insertId, payment_job, app_trans_id);
+      const notification: Notification = {
+        user_id: user_id,
+        message: "Your booking has been created successfully!",
+        created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+      };
+      const result = await NotificationRepository.create(
+        notification,
+        connection
+      );
+      if (result) {
+        sendNotification(notification.user_id!, notification.message!);
+      }
+      const payment_job = trackPayment(user_id, paymentResult.insertId);
+      trackBooking(user_id, bookingResult.insertId, payment_job, app_trans_id);
       return {
         booking_id: bookingResult.insertId,
         payment_url: order_url,
@@ -130,6 +147,18 @@ const createABooking = async (
     } else throw new Error(sub_return_message);
   } catch (err) {
     console.log(err);
+    const notification: Notification = {
+      user_id: user_id,
+      message: "Your booking has been failed!",
+      created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
+    };
+    const result = await NotificationRepository.create(
+      notification,
+      connection
+    );
+    if (result) {
+      sendNotification(notification.user_id!, notification.message!);
+    }
     await connection.rollback();
     return null;
   } finally {

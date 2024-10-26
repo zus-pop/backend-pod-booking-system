@@ -1,26 +1,25 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { PoolConnection } from "mysql2/promise";
 import {
   POD,
-  SortCriteria,
   PODQueries,
-  Pagination,
-  Utility,
   PODType,
-  Store,
   PODUtility,
+  Pagination,
+  SortCriteria,
+  Store,
 } from "../types/type.ts";
-import { PoolConnection } from "mysql2/promise";
 import PODTypeRepository from "./PODTypeRepository.ts";
-import StoreRepository from "./StoreRepository.ts";
 import PODUtilityRepository from "./PODUtilityRepository.ts";
+import StoreRepository from "./StoreRepository.ts";
 
-interface MappingOptions {
+export interface MappingOptions {
   type?: boolean;
   store?: boolean;
   utility?: boolean;
 }
 
-interface MappingResponse {
+export interface MappingResponse {
   pod_id?: number;
   pod_name?: string;
   description?: string;
@@ -70,7 +69,8 @@ const find = async (
   filters: PODQueries = {},
   comparator: SortCriteria,
   pagination: Pagination,
-  connection: PoolConnection
+  connection: PoolConnection,
+  mappingOptions?: MappingOptions
 ) => {
   const conditions: string[] = [];
   const queryParams: any[] = [];
@@ -123,17 +123,17 @@ const find = async (
   const pods = rows as POD[];
   return {
     pods: await Promise.all(
-      pods.map((pod) =>
-        podMapping(pod, connection, {
-          type: true,
-        })
-      )
+      pods.map((pod) => podMapping(pod, connection, mappingOptions))
     ),
     total: totalResult[0].total as number,
   };
 };
 
-const findById = async (id: number, connection: PoolConnection) => {
+const findById = async (
+  id: number,
+  connection: PoolConnection,
+  mappingOptions?: MappingOptions
+) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
   const columns = [
     "pod_id",
@@ -146,20 +146,39 @@ const findById = async (id: number, connection: PoolConnection) => {
   ];
   const values = [columns, "POD", "pod_id", id];
   const [pods] = await connection.query<RowDataPacket[]>(sql, values);
-  return podMapping(pods[0] as POD, connection, {
-    type: true,
-    utility: true,
-    store: true,
-  });
+  return podMapping(pods[0] as POD, connection, mappingOptions);
 };
 
 const findByStoreId = async (
   store_id: number,
   pagination: Pagination,
-  connection: PoolConnection
+  connection: PoolConnection,
+  mappingOptions?: MappingOptions
 ) => {
+  const conditions: string[] = [];
   const queryParams: any[] = [];
-  let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+  let sql = "SELECT ?? FROM ??";
+  let countSql = "SELECT COUNT(*) AS total FROM POD";
+
+  conditions.push(`?? = ?`);
+  queryParams.push("store_id", store_id);
+
+  if (conditions.length) {
+    const where = ` WHERE ${conditions.join(" AND ")}`;
+    sql += where;
+    countSql += where;
+  }
+
+  const [totalCount] = await connection.query<RowDataPacket[]>(
+    countSql,
+    queryParams
+  );
+
+  const { page, limit } = pagination;
+  const offset = (page! - 1) * limit!;
+  sql += ` LIMIT ? OFFSET ?`;
+  queryParams.push(limit, offset);
+
   const columns = [
     "pod_id",
     "pod_name",
@@ -169,23 +188,15 @@ const findByStoreId = async (
     "is_available",
     "store_id",
   ];
-
-  const { page, limit } = pagination;
-  const offset = (page! - 1) * limit!;
-  sql += ` LIMIT ? OFFSET ?`;
-  queryParams.push(limit, offset);
-
-  const values = [columns, "POD", "store_id", store_id, ...queryParams];
+  const values = [columns, "POD", ...queryParams];
   const [rows] = await connection.query<RowDataPacket[]>(sql, values);
   const pods = rows as POD[];
-  return await Promise.all(
-    pods.map(
-      async (pod) =>
-        await podMapping(pod, connection, {
-          type: true,
-        })
-    )
-  );
+  return {
+    pods: await Promise.all(
+      pods.map(async (pod) => await podMapping(pod, connection, mappingOptions))
+    ),
+    total: totalCount[0].total as number,
+  };
 };
 
 const createNewPod = async (pod: POD, connection: PoolConnection) => {

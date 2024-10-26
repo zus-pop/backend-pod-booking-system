@@ -16,7 +16,7 @@ export const ProductRouter = Router();
  *     tags: [Products]
  *     parameters:
  *      - in: query
- *        name: name
+ *        name: product_name
  *        schema:
  *          type: string
  *        description: The name of the Product
@@ -25,32 +25,45 @@ export const ProductRouter = Router();
  *        schema:
  *          type: number
  *        description: The id of the Product category
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *        description: The size for each page of the Product list
+ *      - in: query
+ *        name: page
+ *        schema:
+ *          type: integer
+ *        description: The current page of the Product list
  *     responses:
  *       200:
  *         description: Success.
  *         content:
  *           application/json:
  *             schema:
- *              type: array
- *              items:
- *                  type: object
- *                  properties:
- *                      product_id:
- *                          type: integer
- *                          description: id of product
- *                          example: 1
- *                      product_name:
- *                          type: string
- *                          description: name of product
- *                          example: Product A
- *                      category_id:
- *                          type: integer
- *                          description: id of category
- *                          example: 2
- *                      price:
- *                          type: number
- *                          description: price of product
- *                          example: 100.00
+ *              type: object
+ *              properties:
+ *                products:
+ *                  type: array
+ *                  items:
+ *                      type: object
+ *                      properties:
+ *                          product_id:
+ *                              type: integer
+ *                              description: id of product
+ *                              example: 1
+ *                          product_name:
+ *                              type: string
+ *                              description: name of product
+ *                              example: Product A
+ *                          category_id:
+ *                              type: integer
+ *                              description: id of category
+ *                              example: 2
+ *                          price:
+ *                              type: number
+ *                              description: price of product
+ *                              example: 100.00
  *       404:
  *         description: No products found
  */

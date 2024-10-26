@@ -44,9 +44,17 @@ const create = async (
     return result;
 };
 
+const remove = async (pod_id: number, connection: PoolConnection) => {
+    const sql = "DELETE FROM ?? WHERE ?? = ?";
+    const values = ["POD_Utility", "pod_id", pod_id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
 export default {
     findAll,
     findById,
     findByPodId,
     create,
+    remove,
 };

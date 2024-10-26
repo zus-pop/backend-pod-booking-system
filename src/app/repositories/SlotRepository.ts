@@ -39,7 +39,8 @@ const find = async (filters: SlotQueries, connection: PoolConnection) => {
     });
 
     if (conditions.length) {
-        sql += ` WHERE ${conditions.join(" AND ")}`;
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
     }
 
     const colums = [
@@ -96,9 +97,16 @@ const create = async (slot: Slot, connection: PoolConnection) => {
     return result;
 };
 
-const update = async (slot: Slot, connection: PoolConnection) => {
+const update = async (slot: Slot, id: number, connection: PoolConnection) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ?";
-    const values = ["Slot", slot, "slot_id", slot.slot_id];
+    const values = ["Slot", slot, "slot_id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
+const remove = async (id: number, connection: PoolConnection) => {
+    const sql = "DELETE FROM ?? WHERE ?? = ?";
+    const values = ["Slot", "slot_id", id];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
     return result;
 };
@@ -150,4 +158,5 @@ export default {
     create,
     update,
     updateStatusMultipleSlot,
+    remove,
 };

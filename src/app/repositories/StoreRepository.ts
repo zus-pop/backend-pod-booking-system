@@ -35,6 +35,11 @@ const find = async (
         sql += where;
         countSql += where;
     }
+    
+    const [countResult] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
 
     const { page, limit } = pagination;
     const offset = (page! - 1) * limit!;
@@ -44,10 +49,6 @@ const find = async (
     const columns = ["store_id", "store_name", "address", "hotline", "image"];
     const values = [columns, "Store", ...queryParams];
     const [stores] = await connection.query<RowDataPacket[]>(sql, values);
-    const [countResult] = await connection.query<RowDataPacket[]>(
-        countSql,
-        queryParams
-    );
     return {
         stores: stores as Store[],
         total: countResult[0].total as number,

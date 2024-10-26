@@ -350,6 +350,10 @@ PODRouter.delete("/:id", PODController.deleteOnePod);
  *                 store_id:
  *                   type: integer
  *                   description: id store's pod
+ *                 utilities:
+ *                   type: string
+ *                   description: list of id of utilities in a JSON format
+ *                   example: [1, 2, 3]
  *      responses:
  *          200:
  *              description: POD updated

@@ -1,11 +1,15 @@
 import { pool } from "../config/pool.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
-import { Payment } from "../types/type.ts";
+import { Pagination, Payment, PaymentQueries } from "../types/type.ts";
 
-const findAllPayment = async () => {
+const find = async (filters: PaymentQueries, pagination: Pagination) => {
     const connection = await pool.getConnection();
     try {
-        const payments = await PaymentRepo.findAll(connection);
+        const payments = await PaymentRepo.find(
+            filters,
+            connection,
+            pagination
+        );
         return payments;
     } catch (err) {
         console.error(err);
@@ -59,7 +63,10 @@ const createPayment = async (payment: Payment) => {
 const updatePayment = async (payment: Payment) => {
     const connection = await pool.getConnection();
     try {
-        const updatedPayment = await PaymentRepo.updateByTransactionId(payment, connection);
+        const updatedPayment = await PaymentRepo.updateByTransactionId(
+            payment,
+            connection
+        );
         return updatedPayment;
     } catch (err) {
         throw err;
@@ -69,7 +76,7 @@ const updatePayment = async (payment: Payment) => {
 };
 
 export default {
-    findAllPayment,
+    find,
     findPaymentById,
     findByTransactionId,
     createPayment,

@@ -7,6 +7,7 @@ import {
   Payment,
   POD,
   Product,
+  Role,
   Slot,
 } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
@@ -37,6 +38,7 @@ export interface MappingResponse {
     user_id: number;
     user_name: string;
     email: string;
+    role?: Role;
   };
   payment?: Payment;
 }
@@ -54,7 +56,11 @@ const bookingMapper = async (
     comment: booking.comment,
   };
   if (options?.pod) {
-    const pod = await PODRepository.findById(booking.pod_id!, connection);
+    const pod = await PODRepository.findById(booking.pod_id!, connection, {
+      type: true,
+      store: true,
+      utility: true,
+    });
     mappingResult.pod = pod;
   }
 
@@ -75,11 +81,14 @@ const bookingMapper = async (
   }
 
   if (options?.user) {
-    const user = await UserRepository.findById(booking.user_id!, connection);
+    const user = await UserRepository.findById(booking.user_id!, connection, {
+      role: true,
+    });
     mappingResult.user = {
       user_id: user.user_id!,
-      user_name: user.user_name,
-      email: user.email,
+      user_name: user.user_name!,
+      email: user.email!,
+      role: user.role,
     };
   }
 
@@ -96,11 +105,13 @@ const bookingMapper = async (
 const find = async (
   filters: BookingQueries = {},
   connection: PoolConnection,
+  pagination?: Pagination,
   mappingOptions?: MappingOptions
 ) => {
   const conditions: string[] = [];
-  const queryParams: string[] = [];
+  const queryParams: any[] = [];
   let sql = "SELECT ?? FROM ??";
+  let countSql = "SELECT COUNT(*) AS total FROM Booking";
 
   Object.keys(filters).forEach((filter) => {
     const key = filter;
@@ -116,10 +127,25 @@ const find = async (
   });
 
   if (conditions.length) {
-    sql += ` WHERE ${conditions.join(" AND ")}`;
+    const where = ` WHERE ${conditions.join(" AND ")}`;
+    sql += where;
+    countSql += where;
   }
 
-  sql += ` ORDER BY ? DESC `;
+  const [totalCount] = await connection.query<RowDataPacket[]>(
+    countSql,
+    queryParams
+  );
+
+  sql += ` ORDER BY ?? DESC`;
+  queryParams.push("booking_date");
+
+  if (pagination) {
+    const { page, limit } = pagination;
+    const offset = (page - 1) * limit;
+    sql += ` LIMIT ? OFFSET ? `;
+    queryParams.push(limit, offset);
+  }
 
   const columns = [
     "booking_id",
@@ -128,21 +154,24 @@ const find = async (
     "booking_date",
     "booking_status",
   ];
-  const values = [columns, "Booking", ...queryParams, "booking_date"];
+  const values = [columns, "Booking", ...queryParams];
   const [rows] = await connection.query<RowDataPacket[]>(sql, values);
   const bookings = rows as Booking[];
-  return await Promise.all(
-    bookings.map(
-      async (booking) =>
-        await bookingMapper(booking, connection, mappingOptions)
-    )
-  );
+  return {
+    bookings: await Promise.all(
+      bookings.map(
+        async (booking) =>
+          await bookingMapper(booking, connection, mappingOptions)
+      )
+    ),
+    total: totalCount[0].total as number,
+  };
 };
 
 const findById = async (
   id: number,
   connection: PoolConnection,
-  mappingOptions: MappingOptions
+  mappingOptions?: MappingOptions
 ) => {
   const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
   const columns = [
@@ -167,11 +196,52 @@ const findById = async (
 const findByUserId = async (
   user_id: number,
   connection: PoolConnection,
+  filters: BookingQueries,
   pagination?: Pagination,
   mappingOptions?: MappingOptions
 ) => {
+  const conditions: string[] = [];
   const queryParams: any[] = [];
-  let sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+  let sql = "SELECT ?? FROM ??";
+  let countSql = "SELECT COUNT(*) AS total FROM Booking";
+
+  conditions.push(`?? = ?`);
+  queryParams.push("user_id", user_id);
+
+  Object.keys(filters).forEach((filter) => {
+    const key = filter;
+    const value = filters[filter as keyof BookingQueries];
+    if (value !== null && value !== undefined) {
+      if (key === "booking_date") {
+        conditions.push(`DATE(${key}) = ?`);
+      } else {
+        conditions.push(`${key} = ?`);
+      }
+      queryParams.push(value);
+    }
+  });
+
+  if (conditions.length) {
+    const where = ` WHERE ${conditions.join(" AND ")}`;
+    sql += where;
+    countSql += where;
+  }
+
+  const [totalCount] = await connection.query<RowDataPacket[]>(
+    countSql,
+    queryParams
+  );
+
+  sql += " ORDER BY ?? DESC";
+  queryParams.push("booking_date");
+
+  if (pagination) {
+    const { page, limit } = pagination;
+    const offset = (page - 1) * limit;
+    sql += " LIMIT ? OFFSET ?";
+    queryParams.push(limit, offset);
+  }
+
   const columns = [
     "booking_id",
     "pod_id",
@@ -181,26 +251,18 @@ const findByUserId = async (
     "rating",
     "comment",
   ];
-
-  sql += " ORDER BY ?? DESC";
-  queryParams.push("booking_date");
-
-  if (pagination) {
-    const { page, limit } = pagination;
-    const offset = (page! - 1) * limit!;
-    sql += " LIMIT ? OFFSET ?";
-    queryParams.push(limit, offset);
-  }
-
-  const values = [columns, "Booking", "user_id", user_id, ...queryParams];
+  const values = [columns, "Booking", ...queryParams];
   const [rows] = await connection.query<RowDataPacket[]>(sql, values);
   const bookings = rows as Booking[];
-  return await Promise.all(
-    bookings.map(
-      async (booking) =>
-        await bookingMapper(booking, connection, mappingOptions)
-    )
-  );
+  return {
+    bookings: await Promise.all(
+      bookings.map(
+        async (booking) =>
+          await bookingMapper(booking, connection, mappingOptions)
+      )
+    ),
+    total: totalCount[0].total as number,
+  };
 };
 
 const create = async (booking: Booking, connection: PoolConnection) => {

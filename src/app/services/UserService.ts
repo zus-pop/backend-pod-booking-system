@@ -2,24 +2,26 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/pool.ts";
 import RoleRepo from "../repositories/RoleRepository.ts";
-import UserRepo from "../repositories/UserRepository.ts";
-import { UserQueries } from "../types/type.ts";
+import UserRepo, { MappingOptions } from "../repositories/UserRepository.ts";
+import { Pagination, User, UserQueries } from "../types/type.ts";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 const salt: number = 8;
 
-const find = async (filters: UserQueries) => {
+const find = async (
+    filters: UserQueries,
+    pagination?: Pagination,
+    options?: MappingOptions
+) => {
     const connection = await pool.getConnection();
     try {
-        const users = await UserRepo.find(filters, connection);
-        return await Promise.all(
-            users.map(async (user) => ({
-                user_id: user.user_id,
-                email: user.email,
-                user_name: user.user_name,
-                role: await RoleRepo.findById(user.role_id, connection),
-            }))
+        const users = await UserRepo.find(
+            filters,
+            connection,
+            pagination,
+            options
         );
+        return users;
     } catch (err) {
         console.error(err);
         return null;
@@ -27,16 +29,11 @@ const find = async (filters: UserQueries) => {
         connection.release();
     }
 };
-const findById = async (id: number) => {
+const findById = async (id: number, options?: MappingOptions) => {
     const connection = await pool.getConnection();
     try {
-        const user = await UserRepo.findById(id, connection);
-        return {
-            user_id: user.user_id,
-            email: user.email,
-            user_name: user.user_name,
-            role: await RoleRepo.findById(user.role_id, connection),
-        };
+        const user = await UserRepo.findById(id, connection, options);
+        return user;
     } catch (err) {
         console.error(err);
         return null;
@@ -102,6 +99,22 @@ const verifyToken = (token: string) => {
     }
 };
 
+const update = async (user: User, id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        const result = await UserRepo.update(user, id, connection);
+        await connection.commit();
+        return result.affectedRows;
+    } catch (err) {
+        await connection.rollback();
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 export default {
     find,
     findById,
@@ -111,4 +124,5 @@ export default {
     comparePassword,
     generateToken,
     verifyToken,
+    update,
 };

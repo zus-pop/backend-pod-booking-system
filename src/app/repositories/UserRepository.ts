@@ -1,10 +1,51 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { User, UserQueries } from "../types/type.ts";
+import { Pagination, Role, User, UserQueries } from "../types/type.ts";
+import RoleRepository from "./RoleRepository.ts";
 
-const find = async (filters: UserQueries = {}, connection: PoolConnection) => {
+export interface MappingOptions {
+    role?: boolean;
+}
+
+export interface MappingResponse {
+    user_id?: number;
+    email?: string;
+    user_name?: string;
+    role?: Role;
+}
+
+const userMapper = async (
+    user: User,
+    connection: PoolConnection,
+    options?: MappingOptions
+) => {
+    const mappingResult: MappingResponse = {
+        user_id: user.user_id,
+        email: user.email,
+        user_name: user.user_name,
+    };
+
+    if (options) {
+        if (options.role) {
+            const role = await RoleRepository.findById(
+                user.role_id,
+                connection
+            );
+            mappingResult.role = role;
+        }
+    }
+    return mappingResult;
+};
+
+const find = async (
+    filters: UserQueries = {},
+    connection: PoolConnection,
+    pagination?: Pagination,
+    options?: MappingOptions
+) => {
     const conditions: string[] = [];
-    const queryParams: string[] = [];
+    const queryParams: any[] = [];
     let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM User";
 
     Object.keys(filters).forEach((filter) => {
         const key = filter;
@@ -16,21 +57,45 @@ const find = async (filters: UserQueries = {}, connection: PoolConnection) => {
     });
 
     if (conditions.length) {
-        sql += ` WHERE ${conditions.join(" OR ")}`;
+        const where = ` WHERE ${conditions.join(" OR ")}`;
+        sql += where;
+        countSql += where;
+    }
+
+    const [totalCount] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
+
+    if (pagination) {
+        const { limit, page } = pagination;
+        const offset = (page! - 1) * limit!;
+        sql += ` LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
     }
 
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", ...queryParams];
-    const [users] = await connection.query<RowDataPacket[]>(sql, values);
-    return users as User[];
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
+    const users = rows as User[];
+    return {
+        users: await Promise.all(
+            users.map(async (user) => userMapper(user, connection, options))
+        ),
+        total: totalCount[0].total as number,
+    };
 };
 
-const findById = async (id: number, connection: PoolConnection) => {
+const findById = async (
+    id: number,
+    connection: PoolConnection,
+    options?: MappingOptions
+) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", "user_id", id];
     const [user] = await connection.query<RowDataPacket[]>(sql, values);
-    return user[0] as User;
+    return await userMapper(user[0] as User, connection, options);
 };
 
 const findByEmail = async (email: string, connection: PoolConnection) => {
@@ -58,9 +123,17 @@ const persist = async (
     return result;
 };
 
+const update = async (user: User, id: number, connection: PoolConnection) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ?";
+    const values = ["User", user, "user_id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
 export default {
     find,
     findById,
     findByEmail,
     persist,
+    update,
 };

@@ -1,5 +1,5 @@
 import { pool } from "../config/pool.ts";
-import PODRepo from "../repositories/PODRepository.ts";
+import PODRepo, { MappingOptions } from "../repositories/PODRepository.ts";
 import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
 import {
   POD,
@@ -7,12 +7,14 @@ import {
   PODQueries,
   PODUtility,
   Pagination,
+  Utility,
 } from "../types/type.ts";
 
 const find = async (
   filters: PODQueries,
   comparator: SortCriteria,
-  pagination: Pagination
+  pagination: Pagination,
+  mappingOptions?: MappingOptions
 ) => {
   const connection = await pool.getConnection();
   try {
@@ -20,7 +22,8 @@ const find = async (
       filters,
       comparator,
       pagination,
-      connection
+      connection,
+      mappingOptions
     );
     return PODs;
   } catch (err) {
@@ -31,13 +34,13 @@ const find = async (
   }
 };
 
-const findPODById = async (id: number) => {
+const findPODById = async (id: number, mappingOptions: MappingOptions) => {
   if (isNaN(id)) {
     throw new Error("Invalid ID");
   }
   const connection = await pool.getConnection();
   try {
-    const POD = await PODRepo.findById(id, connection);
+    const POD = await PODRepo.findById(id, connection, mappingOptions);
     return POD;
   } catch (err) {
     console.log(err);
@@ -47,10 +50,19 @@ const findPODById = async (id: number) => {
   }
 };
 
-const findByStoreId = async (store_id: number, pagination: Pagination) => {
+const findByStoreId = async (
+  store_id: number,
+  pagination: Pagination,
+  mappingOptions?: MappingOptions
+) => {
   const connection = await pool.getConnection();
   try {
-    const pods = await PODRepo.findByStoreId(store_id, pagination, connection);
+    const pods = await PODRepo.findByStoreId(
+      store_id,
+      pagination,
+      connection,
+      mappingOptions
+    );
     return pods;
   } catch (err) {
     console.log(err);
@@ -65,13 +77,15 @@ const createNewPOD = async (newPod: POD, utilities: number[]) => {
   try {
     await connection.beginTransaction();
     const insertId = await PODRepo.createNewPod(newPod, connection);
-    await PODUtilityRepository.create(
-      utilities.map<PODUtility>((utility) => ({
-        pod_id: insertId,
-        utility_id: utility,
-      })),
-      connection
-    );
+    if (utilities.length) {
+      await PODUtilityRepository.create(
+        utilities.map<PODUtility>((utility) => ({
+          pod_id: insertId,
+          utility_id: utility,
+        })),
+        connection
+      );
+    }
     await connection.commit();
     return insertId;
   } catch (err) {
@@ -99,10 +113,20 @@ const deletePODById = async (id: number) => {
   }
 };
 
-const updatePOD = async (pod: POD) => {
+const updatePOD = async (pod: POD, utilities: number[]) => {
   const connection = await pool.getConnection();
   try {
     const updated = await PODRepo.updatePOD(pod, connection);
+    if (utilities.length) {
+      await PODUtilityRepository.remove(pod.pod_id!, connection);
+      await PODUtilityRepository.create(
+        utilities.map<PODUtility>((utility) => ({
+          pod_id: pod.pod_id,
+          utility_id: utility,
+        })),
+        connection
+      );
+    }
     return updated;
   } catch (err) {
     console.error(err);

@@ -3,20 +3,24 @@ import { Request, Response } from "express";
 import { Booking, BookingSlot, BookingStatus } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
-  const { booking_status, booking_date } = req.query;
-  const bookings = await BookingService.find(
+  const { booking_status, booking_date, page, limit } = req.query;
+  const result = await BookingService.find(
     {
       booking_status: booking_status as keyof typeof BookingStatus,
       booking_date: booking_date as string,
     },
     {
+      page: page ? +page : 1,
+      limit: limit ? +limit : 10,
+    },
+    {
       user: true,
     }
   );
-  if (!bookings || !bookings.length) {
+  if (!result || !result.bookings || !result.bookings.length) {
     return res.status(404).json({ message: "No bookings found" });
   }
-  return res.status(200).json(bookings);
+  return res.status(200).json(result);
 };
 
 const findById = async (req: Request, res: Response) => {
@@ -36,9 +40,13 @@ const findById = async (req: Request, res: Response) => {
 
 const findByUserId = async (req: Request, res: Response) => {
   const { payload } = req;
-  const { page, limit } = req.query;
-  const bookings = await BookingService.findByUserId(
+  const { booking_status, booking_date, page, limit } = req.query;
+  const result = await BookingService.findByUserId(
     payload.user_id,
+    {
+      booking_status: booking_status as keyof typeof BookingStatus,
+      booking_date: booking_date as string,
+    },
     {
       page: page ? +page : 1,
       limit: limit ? +limit : 8,
@@ -47,10 +55,10 @@ const findByUserId = async (req: Request, res: Response) => {
       user: true,
     }
   );
-  if (!bookings || !bookings.length) {
+  if (!result || !result.bookings || !result.bookings.length) {
     return res.status(404).json({ message: "No bookings found" });
   }
-  return res.status(200).json(bookings);
+  return res.status(200).json(result);
 };
 
 const create = async (req: Request, res: Response) => {

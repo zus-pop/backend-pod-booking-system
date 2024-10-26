@@ -1,17 +1,26 @@
 import { Request, Response } from "express";
 import UserService from "../services/UserService.ts";
-import { Roles } from "../types/type.ts";
+import { Roles, User } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
-    const { search } = req.query;
-    const users = await UserService.find({
-        user_name: search as string,
-        email: search as string,
-    });
-    if (!users || !users.length) {
+    const { search, page, limit } = req.query;
+    const result = await UserService.find(
+        {
+            user_name: search as string,
+            email: search as string,
+        },
+        {
+            page: page ? +page : 1,
+            limit: limit ? +limit : 10,
+        },
+        {
+            role: true,
+        }
+    );
+    if (!result || !result.users || !result.users.length) {
         return res.status(404).json({ message: "No users found" });
     }
-    return res.status(200).json(users);
+    return res.status(200).json(result);
 };
 
 const login = async (req: Request, res: Response) => {
@@ -35,7 +44,7 @@ const login = async (req: Request, res: Response) => {
 };
 
 const register = async (req: Request, res: Response) => {
-    const { user_name, email, password } = req.body;
+    const { user_name, email, password, role_id } = req.body;
     const user = await UserService.findByEmail(email);
     if (user) {
         return res.status(400).json({ message: "Email already exists!" });
@@ -45,7 +54,7 @@ const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         user_name,
-        role_id: Roles.Customer,
+        role_id: role_id ? role_id : Roles.Customer,
     };
     const result = await UserService.persist(newUser);
     if (!result) {
@@ -58,8 +67,18 @@ const register = async (req: Request, res: Response) => {
 
 const getUser = async (req: Request, res: Response) => {
     const { payload } = req;
-    const user = await UserService.findById(payload.user_id);
+    const user = await UserService.findById(payload.user_id, { role: true });
     res.status(200).json(user);
+};
+
+const update = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user: User = req.body;
+    const result = await UserService.update(user, +id);
+    if (!result) {
+        return res.status(500).json({ message: "Failed to update user!" });
+    }
+    res.status(200).json({ message: "Updated user successfully!" });
 };
 
 export default {
@@ -67,4 +86,5 @@ export default {
     login,
     register,
     getUser,
+    update,
 };

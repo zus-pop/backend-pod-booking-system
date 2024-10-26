@@ -75,7 +75,7 @@ BookingRouter.get(
  *         name: booking_status
  *         schema:
  *           type: string
- *           enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *           enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
  *         description: Status of the booking
  *       - in: query
  *         name: booking_date
@@ -83,47 +83,76 @@ BookingRouter.get(
  *           type: string
  *           format: date
  *         description: Date of the booking
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The size for each page of the Booking list
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The current page of the Booking list
  *     responses:
  *       200:
  *         description: Success.
  *         content:
  *           application/json:
  *             schema:
- *              type: array
- *              items:
- *                  type: object
- *                  properties:
- *                      booking_id:
- *                          type: integer
- *                          description: id of booking
- *                          example: 1
- *                      pod_id:
- *                          type: integer
- *                          description: id of pod
- *                          example: 3
- *                      user_id:
- *                          type: integer
- *                          description: id of user
- *                          example: 4
- *                      rating:
- *                          type: integer
- *                          format: double
- *                          description: rating of booking
- *                          example: 5.0
- *                      comment:
- *                          type: string
- *                          description: feedback of booking
- *                          example: đỉnh nóc, kịch trần, bay phấp phới
- *                      booking_date:
- *                          type: string
- *                          format: date-time
- *                          description: date-time of booking
- *                          example: 2024-05-28T12:30:08Z
- *                      booking_status:
- *                          type: string
- *                          description: status of booking
- *                          enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
- *                          example: Pending
+ *              type: object
+ *              properties:
+ *                  bookings:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              booking_id:
+ *                                  type: integer
+ *                                  description: id of booking
+ *                                  example: 1
+ *                              pod_id:
+ *                                  type: integer
+ *                                  description: id of pod
+ *                                  example: 3
+ *                              user:
+ *                                  type: object
+ *                                  properties:
+ *                                      user_id:
+ *                                          type: integer
+ *                                          description: id of user
+ *                                          example: 4
+ *                                      user_name:
+ *                                          type: string
+ *                                          description: name of user
+ *                                          example: haha
+ *                                      email:
+ *                                          type: string
+ *                                          format: email
+ *                                          description: email of user
+ *                                          example: foo@gmail.com
+ *                              rating:
+ *                                  type: integer
+ *                                  format: double
+ *                                  description: rating of booking
+ *                                  example: 5.0
+ *                              comment:
+ *                                  type: string
+ *                                  description: feedback of booking
+ *                                  example: đỉnh nóc, kịch trần, bay phấp phới
+ *                              booking_date:
+ *                                  type: string
+ *                                  format: date-time
+ *                                  description: date-time of booking
+ *                                  example: 2024-05-28T12:30:08Z
+ *                              booking_status:
+ *                                  type: string
+ *                                  description: status of booking
+ *                                  enum: [Pending, Confirmed, Canceled, Completed, Ongoing]
+ *                                  example: Pending
+ *                  total:
+ *                      type: integer
+ *                      description: total row of the booking list
+ *                      example: 8
  *       404:
  *         description: No bookings found
  *
