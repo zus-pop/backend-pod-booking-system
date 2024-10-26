@@ -1,6 +1,7 @@
 import { pool } from "../config/pool.ts";
 import NotificationRepo from "../repositories/NotificationRepository.ts";
-import { Pagination } from "../types/type.ts";
+import { Notification, Pagination } from "../types/type.ts";
+import { sendNotification } from "../utils/socket-stuffs.ts";
 
 const findByUserId = async (user_id: number, pagination?: Pagination) => {
     const connection = await pool.getConnection();

@@ -10,11 +10,14 @@ import {
     Booking,
     BookingQueries,
     BookingSlot,
-    Pagination
+    Notification,
+    Pagination,
 } from "../types/type.ts";
 import { trackBooking, trackPayment } from "../utils/cron-job.ts";
 import { getTotalCost } from "../utils/util.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
+import NotificationRepository from "../repositories/NotificationRepository.ts";
+import { sendNotification } from "../utils/socket-stuffs.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -126,6 +129,17 @@ const createABooking = async (
                 connection
             );
             await connection.commit();
+            const notification: Notification = {
+                user_id: user_id,
+                message: "Your booking has been created successfully!",
+            };
+            const result = await NotificationRepository.create(
+                notification,
+                connection
+            );
+            if (result) {
+                sendNotification(notification.user_id!, notification.message!);
+            }
             const payment_job = trackPayment(paymentResult.insertId);
             trackBooking(bookingResult.insertId, payment_job, app_trans_id);
             return {

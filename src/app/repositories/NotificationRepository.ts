@@ -1,5 +1,5 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { Pagination } from "../types/type.ts";
+import { Notification, Pagination } from "../types/type.ts";
 
 const findByUserId = async (
     user_id: number,
