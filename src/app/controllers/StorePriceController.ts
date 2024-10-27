@@ -3,9 +3,12 @@ import StorePriceService from "../services/StorePriceService.ts";
 import { StorePrice } from "../types/type.ts";
 
 const find = async (req: Request, res: Response) => {
-    const { page, limit } = req.query;
+    const { store_id, type_id, page, limit } = req.query;
     const result = await StorePriceService.find(
-        {},
+        {
+            store_id: store_id ? +store_id : undefined,
+            type_id: type_id ? +type_id : undefined,
+        },
         {
             page: page ? +page : 1,
             limit: limit ? +limit : 10,

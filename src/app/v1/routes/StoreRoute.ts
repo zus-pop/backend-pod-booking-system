@@ -182,6 +182,101 @@ StoreRouter.get("/:id", StoreController.findById);
 StoreRouter.get("/:id/pods", PODController.findByStoreId);
 
 // GET: api/v1/stores/:store_id/pod-type/:type_id/prices
+/**
+ * @openapi
+ * /api/v1/stores/{store_id}/pod-type/{type_id}/prices:
+ *  get:
+ *      summary: Get list of Store Prices
+ *      tags: [Stores]
+ *      parameters:
+ *          - in: path
+ *            name: store_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Store id
+ *          - in: path
+ *            name: type_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The POD type id
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the list
+ *      responses:
+ *          200:
+ *              description: Success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  id:
+ *                                      type: integer
+ *                                      description: id of store price
+ *                                      example: 1
+ *                                  start_hour:
+ *                                      type: integer
+ *                                      description: start hour
+ *                                      example: 7
+ *                                  end_hour:
+ *                                      type: integer
+ *                                      description: end hour
+ *                                      example: 12
+ *                                  price:
+ *                                      type: integer
+ *                                      description: price for time slot
+ *                                      example: 80000
+ *                                  store_id:
+ *                                      type: integer
+ *                                      description: id of store
+ *                                      example: 4
+ *                                  type:
+ *                                      type: object
+ *                                      properties:
+ *                                          type_id:
+ *                                              type: integer
+ *                                              description: pod type id map to the time frame
+ *                                              example: 3
+ *                                          type_name:
+ *                                              type: string
+ *                                              description: pod type name
+ *                                              example: Single POD
+ *                                          capacity:
+ *                                              type: integer
+ *                                              description: pod type id map to the time frame
+ *                                              example: 1
+ *                                  days_of_week:
+ *                                      type: integer
+ *                                      description: the num of days that the time frame is applied for describe in 7 bits
+ *                                      example: 127
+ *                                  priority:
+ *                                      type: integer
+ *                                      enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ *                                      description: days of the week
+ *                                      example: 8
+ *          404:
+ *              description: No store prices found
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: error message response
+ *                                  example: No store prices found!
+ */
 StoreRouter.get(
     "/:store_id/pod-type/:type_id/prices",
     StorePriceController.findByStoreIdAndTypeId

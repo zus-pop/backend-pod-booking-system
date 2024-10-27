@@ -14,6 +14,27 @@ export const StorePriceRouter = Router();
  *  get:
  *      summary: Get list of Store Prices
  *      tags: [Store Prices]
+ *      parameters:
+ *          - in: query
+ *            name: store_id
+ *            schema:
+ *              type: number
+ *            description: id of store
+ *          - in: query
+ *            name: type_id
+ *            schema:
+ *              type: number
+ *            description: id of POD type
+ *          - in: query
+ *            name: limit
+ *            schema:
+ *              type: integer
+ *            description: The size for each page of the list
+ *          - in: query
+ *            name: page
+ *            schema:
+ *              type: integer
+ *            description: The current page of the list
  *      responses:
  *          200:
  *              description: Success
@@ -44,10 +65,21 @@ export const StorePriceRouter = Router();
  *                                      type: integer
  *                                      description: id of store
  *                                      example: 4
- *                                  type_id:
- *                                      type: integer
- *                                      description: pod type id map to the time frame
- *                                      example: 3
+ *                                  type:
+ *                                      type: object
+ *                                      properties:
+ *                                          type_id:
+ *                                              type: integer
+ *                                              description: pod type id map to the time frame
+ *                                              example: 3
+ *                                          type_name:
+ *                                              type: string
+ *                                              description: pod type name
+ *                                              example: Single POD
+ *                                          capacity:
+ *                                              type: integer
+ *                                              description: pod type id map to the time frame
+ *                                              example: 1
  *                                  days_of_week:
  *                                      type: integer
  *                                      description: the num of days that the time frame is applied for describe in 7 bits
