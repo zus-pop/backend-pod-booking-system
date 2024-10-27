@@ -180,6 +180,19 @@ const sortPODByRating = async (req: Request, res: Response) => {
   }
 };
 
+const getAveragePodUsageTime = async (req: Request, res: Response) => {
+  try {
+    const avgUsageTimes = await PODService.getAveragePodUsageTime();
+    if (!avgUsageTimes || !avgUsageTimes.length) {
+      return res.status(404).json({ message: "No POD usage times found" });
+    }
+    return res.status(200).json(avgUsageTimes);
+  } catch (error) {
+    console.error("Error fetching average POD usage times:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -189,4 +202,5 @@ export default {
   deleteOnePod,
   updatePOD,
   sortPODByRating,
+  getAveragePodUsageTime,
 };

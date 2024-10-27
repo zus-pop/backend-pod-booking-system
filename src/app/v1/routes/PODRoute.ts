@@ -4,6 +4,59 @@ import { upload } from "../../utils/google-cloud-storage.ts";
 
 export const PODRouter = Router();
 
+// GET: api/v1/pods/average-usage-time
+/**
+ * @openapi
+ * /api/v1/pods/average-usage-time:
+ *   get:
+ *     summary: Get average usage time for each POD
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved average usage times
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   pod_id:
+ *                     type: integer
+ *                     description: The ID of the POD
+ *                     example: 1
+ *                   pod_name:
+ *                     type: string
+ *                     description: The name of the POD
+ *                     example: "Pod A"
+ *                   avg_usage_time:
+ *                     type: number
+ *                     format: float
+ *                     description: The average usage time of the POD in minutes
+ *                     example: 45.5
+ *       404:
+ *         description: No POD usage times found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No POD usage times found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PODRouter.get("/average-usage-time", PODController.getAveragePodUsageTime);
+
 // GET: api/v1/pods/sorted-by-rating
 /**
  * @openapi

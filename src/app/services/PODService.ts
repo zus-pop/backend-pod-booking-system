@@ -156,6 +156,19 @@ const sortPODByRating = async (
   }
 };
 
+const getAveragePodUsageTime = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const avgUsageTimes = await PODRepo.getAveragePodUsageTime(connection);
+    return avgUsageTimes;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findPODById,
@@ -164,4 +177,5 @@ export default {
   deletePODById,
   updatePOD,
   sortPODByRating,
+  getAveragePodUsageTime,
 };

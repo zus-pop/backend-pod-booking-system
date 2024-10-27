@@ -274,6 +274,32 @@ const sortPODByRating = async (
   return rows as POD[];
 };
 
+const getAveragePodUsageTime = async (
+  connection: PoolConnection
+): Promise<{ pod: POD; avg_usage_time: number }[]> => {
+  const sql = `
+      SELECT 
+          p.*, 
+          AVG(TIMESTAMPDIFF(MINUTE, sl.start_time, sl.end_time)) AS avg_usage_time
+      FROM POD p
+      JOIN Slot sl ON p.pod_id = sl.pod_id
+      GROUP BY p.pod_id;
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows.map((row) => ({
+    pod: {
+      pod_id: row.pod_id,
+      pod_name: row.pod_name,
+      type_id: row.type_id,
+      description: row.description,
+      image: row.image,
+      is_available: row.is_available,
+      store_id: row.store_id,
+    },
+    avg_usage_time: row.avg_usage_time,
+  }));
+};
+
 export default {
   find,
   findById,
@@ -282,4 +308,5 @@ export default {
   deleteOnePod,
   updatePOD,
   sortPODByRating,
+  getAveragePodUsageTime,
 };
