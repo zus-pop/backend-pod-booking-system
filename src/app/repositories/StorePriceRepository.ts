@@ -59,7 +59,7 @@ const find = async (
     return {
         storePrices: await Promise.all(
             prices.map(async (price) => ({
-                id: price.store_id,
+                id: price.id,
                 start_hour: price.start_hour,
                 end_hour: price.end_hour,
                 price: price.price,
