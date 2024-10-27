@@ -107,6 +107,25 @@ const getBookingsCountByPod = async (req: Request, res: Response) => {
   }
 };
 
+export const getBookingsCountByPODType = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const bookingCounts = await BookingService.countBookingsByPODType();
+    console.log(bookingCounts);
+
+    if (!bookingCounts || bookingCounts.length === 0) {
+      return res.status(404).json({ message: "No bookings found" });
+    }
+
+    return res.status(200).json(bookingCounts);
+  } catch (error) {
+    console.error("Error fetching booking counts by POD type:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -114,4 +133,5 @@ export default {
   create,
   update,
   getBookingsCountByPod,
+  getBookingsCountByPODType,
 };

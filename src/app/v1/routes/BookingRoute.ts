@@ -8,6 +8,55 @@ import BookingSlotController from "../../controllers/BookingSlotController.ts";
 
 export const BookingRouter = Router();
 
+//GET: api/v1/bookings/count-by-pod-type
+/**
+ * @openapi
+ * /api/v1/bookings/count-by-pod-type:
+ *   get:
+ *     summary: Get the count of bookings for each POD type
+ *     tags: [Bookings]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the count of bookings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   type_name:
+ *                     type: string
+ *                     description: The name of the POD type
+ *                   booking_count:
+ *                     type: number
+ *                     description: The count of bookings for the POD type
+ *       404:
+ *         description: No bookings found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No bookings found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+BookingRouter.get(
+  "/count-by-pod-type",
+  BookingController.getBookingsCountByPODType
+);
+
 //GET: api/v1/bookings-count-by-pod
 /**
  * @openapi

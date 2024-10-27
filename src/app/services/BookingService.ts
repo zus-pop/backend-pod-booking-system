@@ -194,6 +194,20 @@ const countBookingsByPod = async () => {
   }
 };
 
+const countBookingsByPODType = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const bookingCounts = await BookingRepo.countBookingsByPODType(connection);
+    console.log(bookingCounts);
+    return bookingCounts;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findBookingById,
@@ -201,4 +215,5 @@ export default {
   createABooking,
   updateABooking,
   countBookingsByPod,
+  countBookingsByPODType,
 };

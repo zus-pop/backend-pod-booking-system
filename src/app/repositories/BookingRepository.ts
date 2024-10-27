@@ -307,6 +307,20 @@ const countBookingsByPod = async (
   return rows as { pod_id: number; booking_count: number }[];
 };
 
+const countBookingsByPODType = async (
+  connection: PoolConnection
+): Promise<{ type_name: string; booking_count: number }[]> => {
+  const sql = `
+      SELECT pt.type_name, COUNT(b.booking_id) AS booking_count
+      FROM Booking b
+      JOIN POD p ON b.pod_id = p.pod_id
+      JOIN POD_Type pt ON p.type_id = pt.type_id
+      GROUP BY pt.type_name;
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows as { type_name: string; booking_count: number }[];
+};
+
 export default {
   find,
   findById,
@@ -315,4 +329,5 @@ export default {
   update,
   // remove,
   countBookingsByPod,
+  countBookingsByPODType,
 };
