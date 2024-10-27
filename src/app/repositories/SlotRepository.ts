@@ -86,7 +86,7 @@ const findByMultipleId = async (
     ];
     const values = [colums, "Slot", "slot_id", slot_ids];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-    return slots as Slot[];
+        return slots as Slot[];
 };
 
 const create = async (slot: Slot, connection: PoolConnection) => {

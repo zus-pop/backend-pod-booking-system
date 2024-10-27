@@ -40,7 +40,7 @@ export interface MappingResponse {
         email: string;
         role?: Role;
     };
-    payment?: Payment;
+    payment?: Payment[];
 }
 
 const bookingMapper = async (

@@ -2,8 +2,12 @@ import BookingService from "../app/services/BookingService";
 import { pool } from "../app/config/pool";
 describe("booking id", () => {
     test("test book", async () => {
-        const booking = await BookingService.findBookingById(8);
-        expect(booking).not.toBeNull();
+        const result = await BookingService.find(
+            { booking_status: "Pending" },
+            { page: 1, limit: 3 },
+            {}
+        );
+        expect(result).not.toBeNull();
     });
 });
 
