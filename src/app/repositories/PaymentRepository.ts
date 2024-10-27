@@ -95,7 +95,7 @@ const findByBookingId = async (
     ];
     const values = [columns, "Payment", "booking_id", booking_id];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);
-    return payments[0] as Payment;
+    return payments as Payment[];
 };
 
 const findByTransactionId = async (

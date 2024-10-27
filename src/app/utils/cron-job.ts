@@ -38,13 +38,11 @@ export const trackBooking = (
                 console.log(
                     `Booking ${booking.booking_id} is confirmed -> stop the job`
                 );
-                const notification: Notification = {
+                NotificationService.createNewMessage({
                     user_id,
                     message: `Your booking with ID: ${booking.booking_id} has been confirmed!`,
                     created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
-                };
-                NotificationService.createNewMessage(notification);
-                sendNotification(notification.user_id!, notification.message!);
+                });
                 job.stop();
             }, 0);
         } else if (isCanceled) {
@@ -57,13 +55,11 @@ export const trackBooking = (
             console.log(
                 `Booking ${booking.booking_id} is canceled -> stop the job`
             );
-            const notification: Notification = {
+            NotificationService.createNewMessage({
                 user_id,
                 message: `Your booking with ID: ${booking.booking_id} has been canceled!`,
                 created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
-            };
-            NotificationService.createNewMessage(notification);
-            sendNotification(notification.user_id!, notification.message!);
+            });
             if (transaction_id) {
                 await PaymentService.updatePayment({
                     transaction_id,
@@ -101,18 +97,13 @@ export const trackBooking = (
                             booking!.booking_id
                         } is expired -> stop the job`
                     );
-                    const notification: Notification = {
+                    NotificationService.createNewMessage({
                         user_id,
                         message: `Your booking with ID: ${
                             booking!.booking_id
                         } has been expired!`,
                         created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
-                    };
-                    NotificationService.createNewMessage(notification);
-                    sendNotification(
-                        notification.user_id!,
-                        notification.message!
-                    );
+                    });
                     setTimeout(() => {
                         job.stop();
                     }, 0);
@@ -144,13 +135,11 @@ export const trackPayment = (user_id: number, payment_id: number) => {
                     booking_id: payment.booking_id,
                     booking_status: "Confirmed",
                 });
-                const notification: Notification = {
+                NotificationService.createNewMessage({
                     user_id,
                     message: `Your booking with ID: ${payment.booking_id} has been paid successfully!`,
                     created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
-                };
-                NotificationService.createNewMessage(notification);
-                sendNotification(notification.user_id!, notification.message!);
+                });
                 setTimeout(() => {
                     job.stop();
                 }, 0);
@@ -165,13 +154,11 @@ export const trackPayment = (user_id: number, payment_id: number) => {
                     booking_id: payment.booking_id,
                     booking_status: "Canceled",
                 });
-                const notification: Notification = {
+                NotificationService.createNewMessage({
                     user_id,
                     message: `Your booking with ID: ${payment.booking_id} has been paid failed!`,
                     created_at: moment().utcOffset(+7).format(FORMAT_TYPE),
-                };
-                NotificationService.createNewMessage(notification);
-                sendNotification(notification.user_id!, notification.message!);
+                });
                 setTimeout(() => {
                     job.stop();
                 }, 0);

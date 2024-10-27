@@ -53,6 +53,7 @@ const findBookingById = async (id: number, mappingOptions?: MappingOptions) => {
         );
         return booking;
     } catch (err) {
+        console.log(err);
         return null;
     } finally {
         connection.release();
