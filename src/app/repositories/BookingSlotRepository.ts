@@ -19,6 +19,9 @@ const findAllSlotByBookingId = async (
     const values = [columns, "Booking_Slot", "booking_id", booking_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookingSlots = rows as BookingSlot[];
+    if (!bookingSlots || !bookingSlots.length) {
+        return [];
+    }
     const slots = await SlotRepository.findByMultipleId(
         bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
         connection

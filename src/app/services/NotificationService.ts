@@ -1,6 +1,7 @@
 import { pool } from "../config/pool.ts";
 import NotificationRepo from "../repositories/NotificationRepository.ts";
 import { Notification, Pagination } from "../types/type.ts";
+import { sendNotification } from "../utils/socket-stuffs.ts";
 
 const findByUserId = async (user_id: number, pagination?: Pagination) => {
     const connection = await pool.getConnection();
@@ -24,6 +25,9 @@ const createNewMessage = async (notification: Notification) => {
     try {
         await connection.beginTransaction();
         const result = await NotificationRepo.create(notification, connection);
+        if (result) {
+            sendNotification(notification.user_id!, notification.message!);
+        }
         await connection.commit();
         return result;
     } catch (err) {

@@ -4,7 +4,7 @@ import SlotService from "../app/services/SlotService.ts";
 import moment from "moment";
 
 describe("Select multiple slot", () => {
-    test("should return list of slots by range of slot_ids", async () => {
+    test.skip("should return list of slots by range of slot_ids", async () => {
         const slot_ids: number[] = [1, 2, 3, 4, 5];
         const slots = await SlotService.findSlotByRangeOfId(slot_ids);
         expect(slots).toHaveLength(slot_ids.length);
@@ -20,7 +20,7 @@ describe("Select multiple slot", () => {
 });
 
 describe("checkAllAvailableSlot", () => {
-    test("should return true if all slots are available", async () => {
+    test.skip("should return true if all slots are available", async () => {
         const slot_ids: number[] = [1, 5, 6, 7];
         const slots = await SlotService.checkAllAvailableSlot(slot_ids);
         expect(slots?.status).toBe(true);

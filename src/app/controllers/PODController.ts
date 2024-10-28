@@ -32,7 +32,7 @@ const find = async (req: Request, res: Response) => {
 
 const findById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("Received ID: ", id);
+
   if (isNaN(+id)) {
     return res.status(400).json({ message: "Invalid POD ID" });
   }

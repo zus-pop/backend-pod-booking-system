@@ -41,10 +41,12 @@ const find = async (
     queryParams
   );
 
-  const { page, limit } = pagination;
-  const offset = (page! - 1) * limit!;
-  sql += ` LIMIT ? OFFSET ?`;
-  queryParams.push(limit, offset);
+  if (pagination) {
+    const { page, limit } = pagination;
+    const offset = (page! - 1) * limit!;
+    sql += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+  }
 
   const columns = ["store_id", "store_name", "address", "hotline", "image"];
   const values = [columns, "Store", ...queryParams];

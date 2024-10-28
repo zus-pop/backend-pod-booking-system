@@ -49,6 +49,7 @@ const findBookingById = async (id: number, mappingOptions?: MappingOptions) => {
     const booking = await BookingRepo.findById(id, connection, mappingOptions);
     return booking;
   } catch (err) {
+    console.log(err);
     return null;
   } finally {
     connection.release();

@@ -1,7 +1,7 @@
-import { calendar_v3, google } from "googleapis";
 import { Request, Response } from "express";
-import BookingService from "../services/BookingService.ts";
+import { calendar_v3, google } from "googleapis";
 import moment from "moment";
+import BookingService from "../services/BookingService.ts";
 
 const scopes = ["https://www.googleapis.com/auth/calendar"];
 const oauth2Client = new google.auth.OAuth2(
