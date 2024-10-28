@@ -39,9 +39,17 @@ const updateUtility = async (
   return result.affectedRows > 0;
 };
 
+const deleteById = async (id: number, connection: PoolConnection) => {
+  const sql = "DELETE FROM Utility WHERE utility_id = ?";
+  const values = [id];
+  const [result] = await connection.query<ResultSetHeader>(sql, values);
+  return result.affectedRows > 0;
+};
+
 export default {
   findAll,
   findById,
   createNewUtility,
   updateUtility,
+  deleteById,
 };

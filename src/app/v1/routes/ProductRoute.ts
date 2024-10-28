@@ -69,6 +69,59 @@ export const ProductRouter = Router();
  */
 ProductRouter.get("/", ProductController.find);
 
+// GET: api/v1/products/total-revenue
+/**
+ * @openapi
+ * /api/v1/products/total-revenue:
+ *   get:
+ *     summary: Get total revenue for each product
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   product_id:
+ *                     type: integer
+ *                     description: The ID of the product
+ *                     example: 1
+ *                   product_name:
+ *                     type: string
+ *                     description: The name of the product
+ *                     example: "Product A"
+ *                   product_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The total revenue of the product
+ *                     example: 100000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get("/total-revenue", ProductController.getTotalRevenueByProduct);
+
 //GET: api/v1/products/{id}
 /**
  * @openapi

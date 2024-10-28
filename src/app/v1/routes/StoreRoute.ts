@@ -79,6 +79,59 @@ export const StoreRouter = Router();
  */
 StoreRouter.get("/", StoreController.find);
 
+// GET: api/v1/stores/total-revenue
+/**
+ * @openapi
+ * /api/v1/stores/total-revenue:
+ *   get:
+ *     summary: Get total revenue for each store
+ *     tags: [Stores]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   store_id:
+ *                     type: integer
+ *                     description: The ID of the store
+ *                     example: 1
+ *                   store_name:
+ *                     type: string
+ *                     description: The name of the store
+ *                     example: "Store A"
+ *                   revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The total revenue of the store
+ *                     example: 100000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+StoreRouter.get("/total-revenue", StoreController.getTotalRevenueByStore);
+
 // GET: api/v1/stores/:id
 /**
  * @openapi
@@ -278,8 +331,8 @@ StoreRouter.get("/:id/pods", PODController.findByStoreId);
  *                                  example: No store prices found!
  */
 StoreRouter.get(
-    "/:store_id/pod-type/:type_id/prices",
-    StorePriceController.findByStoreIdAndTypeId
+  "/:store_id/pod-type/:type_id/prices",
+  StorePriceController.findByStoreIdAndTypeId
 );
 
 // POST: api/v1/stores

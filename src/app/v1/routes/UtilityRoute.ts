@@ -174,3 +174,25 @@ UtilityRouter.post("/", UtilityController.createNewUtility);
  *         description: Utility not found
  */
 UtilityRouter.put("/:id", UtilityController.updateUtility);
+
+// DELETE: api/v1/utilities/{id}
+/**
+ * @openapi
+ * /api/v1/utilities/{id}:
+ *   delete:
+ *     summary: Delete a utility by its id
+ *     tags: [Utilities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the utility to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Utility deleted successfully
+ *       404:
+ *         description: Utility not found or deletion failed
+ */
+UtilityRouter.delete("/:id", UtilityController.deleteUtility);
