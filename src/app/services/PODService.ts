@@ -3,11 +3,10 @@ import PODRepo, { MappingOptions } from "../repositories/PODRepository.ts";
 import PODUtilityRepository from "../repositories/PODUtilityRepository.ts";
 import {
   POD,
-  SortCriteria,
   PODQueries,
   PODUtility,
   Pagination,
-  Utility,
+  SortCriteria
 } from "../types/type.ts";
 
 const find = async (

@@ -1,6 +1,5 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Pagination, Payment, PaymentQueries } from "../types/type.ts";
-import { PoolConnection } from "mysql2/promise";
 
 const find = async (
   filters: PaymentQueries,

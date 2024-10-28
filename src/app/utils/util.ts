@@ -11,10 +11,10 @@ export const formatDate = (date: string | Date): string => {
     return moment(date).format("YYYY-MM-DD");
 };
 
-export const formatTime = (date: string | Date): string => {
+export const formatTime = (date: string): string => {
     return moment(date).format("HH:mm:ss");
 };
 
-export const formatDateTime = (date: string | Date): string => {
+export const formatDateTime = (date: string): string => {
     return moment(date).format("YYYY-MM-DD HH:mm:ss");
 };

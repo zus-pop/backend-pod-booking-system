@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import PODUtilityService from "../services/PODUtilityService.ts";
 const findAll = async (_: Request, res: Response) => {
   const podUtilities = await PODUtilityService.findAll();

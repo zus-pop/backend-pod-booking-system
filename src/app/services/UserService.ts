@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/pool.ts";
-import RoleRepo from "../repositories/RoleRepository.ts";
 import UserRepo, { MappingOptions } from "../repositories/UserRepository.ts";
 import { Pagination, User, UserQueries } from "../types/type.ts";
 
