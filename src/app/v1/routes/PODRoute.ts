@@ -57,6 +57,59 @@ export const PODRouter = Router();
  */
 PODRouter.get("/average-usage-time", PODController.getAveragePodUsageTime);
 
+// GET: api/v1/pods/total-revenue
+/**
+ * @openapi
+ * /api/v1/pods/total-revenue:
+ *   get:
+ *     summary: Get total revenue for each POD
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   pod_id:
+ *                     type: integer
+ *                     description: The ID of the POD
+ *                     example: 1
+ *                   pod_name:
+ *                     type: string
+ *                     description: The name of the POD
+ *                     example: "Pod A"
+ *                   revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The total revenue of the POD
+ *                     example: 100000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PODRouter.get("/total-revenue", PODController.getTotalRevenueByPod);
+
 // GET: api/v1/pods/sorted-by-rating
 /**
  * @openapi

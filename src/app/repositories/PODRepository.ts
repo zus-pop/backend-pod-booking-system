@@ -300,6 +300,32 @@ const getAveragePodUsageTime = async (
   }));
 };
 
+const getTotalRevenueByPod = async (
+  connection: PoolConnection
+): Promise<{ pod: POD; revenue: number }[]> => {
+  const sql = `
+    SELECT p.*, 
+           SUM(pay.total_cost) AS revenue
+    FROM POD p
+    LEFT JOIN Booking b ON p.pod_id = b.pod_id
+    LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
+    GROUP BY p.pod_id;
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows.map((row) => ({
+    pod: {
+      pod_id: row.pod_id,
+      pod_name: row.pod_name,
+      type_id: row.type_id,
+      description: row.description,
+      image: row.image,
+      is_available: row.is_available,
+      store_id: row.store_id,
+    },
+    revenue: row.revenue,
+  }));
+};
+
 export default {
   find,
   findById,
@@ -309,4 +335,5 @@ export default {
   updatePOD,
   sortPODByRating,
   getAveragePodUsageTime,
+  getTotalRevenueByPod,
 };

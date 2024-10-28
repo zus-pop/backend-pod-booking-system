@@ -169,6 +169,19 @@ const getAveragePodUsageTime = async () => {
   }
 };
 
+const getTotalRevenueByPod = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const totalRevenue = await PODRepo.getTotalRevenueByPod(connection);
+    return totalRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findPODById,
@@ -178,4 +191,5 @@ export default {
   updatePOD,
   sortPODByRating,
   getAveragePodUsageTime,
+  getTotalRevenueByPod,
 };
