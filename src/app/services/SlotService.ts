@@ -2,7 +2,6 @@ import moment from "moment";
 import { pool } from "../config/pool.ts";
 import SlotRepo from "../repositories/SlotRepository.ts";
 import { Slot, SlotOption, SlotQueries } from "../types/type.ts";
-import SlotRepository from "../repositories/SlotRepository.ts";
 
 const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
 
@@ -220,11 +219,30 @@ const updateMultipleSlot = async (
     }
 };
 
+const updateExpiredSlot = async () => {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        const result = await SlotRepo.updateExpiredSlot(connection);
+        console.log(
+            `--- Updated ${result.affectedRows} expired slots to unavailable status ---`
+        );
+        await connection.commit();
+        return result;
+    } catch (err) {
+        await connection.rollback();
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 const remove = async (id: number) => {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
-        const result = await SlotRepository.remove(id, connection);
+        const result = await SlotRepo.remove(id, connection);
         await connection.commit();
         return result.affectedRows;
     } catch (err) {
@@ -244,5 +262,6 @@ export default {
     checkAllAvailableSlot,
     update,
     updateMultipleSlot,
+    updateExpiredSlot,
     remove,
 };

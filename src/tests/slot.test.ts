@@ -9,11 +9,11 @@ describe("Select multiple slot", () => {
         const slots = await SlotService.findSlotByRangeOfId(slot_ids);
         expect(slots).toHaveLength(slot_ids.length);
     });
-    test("should return list of available slot by date and pod id", async () => {
+    test("should return list of unavailable slot by date and pod id", async () => {
         const slots = await SlotService.find({
             pod_id: 3,
             date: "2024-10-01",
-            is_available: true,
+            is_available: false,
         });
         expect(slots?.length).toBeGreaterThan(0);
     });

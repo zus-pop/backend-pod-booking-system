@@ -1,5 +1,5 @@
-import BookingSlotService from "../services/BookingSlotService.ts";
 import { Request, Response } from "express";
+import BookingSlotService from "../services/BookingSlotService.ts";
 
 const findAllSlot = async (_: Request, res: Response) => {
     const slots = await BookingSlotService.findAllSlot();

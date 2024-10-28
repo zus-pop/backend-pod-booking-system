@@ -1,5 +1,5 @@
-import PODTypeService from "../services/PODTypeService.ts";
 import { Request, Response } from "express";
+import PODTypeService from "../services/PODTypeService.ts";
 
 const findAll = async (_: Request, res: Response) => {
   const podTypes = await PODTypeService.findAllPODType();

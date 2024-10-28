@@ -1,5 +1,5 @@
-import BookingProductService from "../services/BookingProductService.ts";
 import { Request, Response } from "express";
+import BookingProductService from "../services/BookingProductService.ts";
 
 const findAll = async (_: Request, res: Response) => {
     const bookingProducts =

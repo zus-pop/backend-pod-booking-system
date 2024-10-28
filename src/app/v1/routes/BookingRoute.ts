@@ -62,11 +62,11 @@ BookingRouter.get(
  * @openapi
  * /api/v1/bookings/bookings-count-by-pod:
  *   get:
- *     summary: Get the count of completed bookings for each pod
+ *     summary: Get the count of bookings for each pod
  *     tags: [Bookings]
  *     responses:
  *       200:
- *         description: Successfully retrieved the count of completed bookings
+ *         description: Successfully retrieved the count of bookings
  *         content:
  *           application/json:
  *             schema:
@@ -80,6 +80,21 @@ BookingRouter.get(
  *                   pod_name:
  *                     type: string
  *                     description: The name of the pod
+ *                   type_id:
+ *                     type: integer
+ *                     description: The id of the pod type
+ *                   description:
+ *                     type: string
+ *                     description: The description of the pod
+ *                   image:
+ *                     type: string
+ *                     description: The image url of the pod
+ *                   is_available:
+ *                     type: boolean
+ *                     description: The available status of the pod
+ *                   store_id:
+ *                     type: integer
+ *                     description: The id of the store of the pod
  *                   booking_count:
  *                     type: number
  *                     description: The count of completed bookings for the pod

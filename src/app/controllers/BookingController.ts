@@ -94,12 +94,9 @@ const update = async (req: Request, res: Response) => {
 const getBookingsCountByPod = async (req: Request, res: Response) => {
   try {
     const bookingCounts = await BookingService.countBookingsByPod();
-    console.log(bookingCounts);
-
     if (!bookingCounts || bookingCounts.length === 0) {
       return res.status(404).json({ message: "No bookings found" });
     }
-
     return res.status(200).json(bookingCounts);
   } catch (error) {
     console.error("Error fetching booking counts by pod:", error);

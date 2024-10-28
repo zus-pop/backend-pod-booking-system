@@ -1,5 +1,5 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { PoolConnection } from "mysql2/promise";
+import moment from "moment";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Slot, SlotQueries } from "../types/type.ts";
 
 const find = async (filters: SlotQueries, connection: PoolConnection) => {
@@ -86,7 +86,7 @@ const findByMultipleId = async (
     ];
     const values = [colums, "Slot", "slot_id", slot_ids];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
-        return slots as Slot[];
+    return slots as Slot[];
 };
 
 const create = async (slot: Slot, connection: PoolConnection) => {
@@ -100,6 +100,20 @@ const create = async (slot: Slot, connection: PoolConnection) => {
 const update = async (slot: Slot, id: number, connection: PoolConnection) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ?";
     const values = ["Slot", slot, "slot_id", id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result;
+};
+
+const updateExpiredSlot = async (connection: PoolConnection) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? <= ? AND ?? = ?";
+    const values = [
+        "Slot",
+        { is_available: false },
+        "start_time",
+        moment().utcOffset(+7).format("YYYY-MM-DD HH:mm:ss"),
+        "is_available",
+        true,
+    ];
     const [result] = await connection.query<ResultSetHeader>(sql, values);
     return result;
 };
@@ -158,5 +172,6 @@ export default {
     create,
     update,
     updateStatusMultipleSlot,
+    updateExpiredSlot,
     remove,
 };
