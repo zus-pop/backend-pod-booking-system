@@ -26,6 +26,11 @@ export const ProductRouter = Router();
  *          type: number
  *        description: The id of the Product category
  *      - in: query
+ *        name: store_id
+ *        schema:
+ *          type: number
+ *        description: The id of the Product's store
+ *      - in: query
  *        name: limit
  *        schema:
  *          type: integer
@@ -56,6 +61,14 @@ export const ProductRouter = Router();
  *                              type: string
  *                              description: name of product
  *                              example: Product A
+ *                          image:
+ *                              type: string
+ *                              description: image of product
+ *                              example: https://googleapis/...
+ *                          description:
+ *                              type: string
+ *                              description: description of product
+ *                              example: delicous food
  *                          category_id:
  *                              type: integer
  *                              description: id of category
@@ -64,6 +77,14 @@ export const ProductRouter = Router();
  *                              type: number
  *                              description: price of product
  *                              example: 100.00
+ *                          store_id:
+ *                              type: number
+ *                              description: id of store
+ *                              example: 100.00
+ *                          stock:
+ *                              type: integer
+ *                              description: stock of product
+ *                              example: 120
  *       404:
  *         description: No products found
  */
@@ -146,18 +167,64 @@ ProductRouter.get("/total-revenue", ProductController.getTotalRevenueByProduct);
  *                      schema:
  *                          type: object
  *                          properties:
- *                              id:
+ *                              product_id:
  *                                  type: integer
- *                                  description: ID of the product
+ *                                  description: id of product
  *                                  example: 1
- *                              name:
+ *                              product_name:
  *                                  type: string
- *                                  description: Name of the product
- *                                  example: "Product A"
+ *                                  description: name of product
+ *                                  example: Product A
+ *                              image:
+ *                                  type: string
+ *                                  description: image of product
+ *                                  example: https://googleapis/...
+ *                              description:
+ *                                  type: string
+ *                                  description: description of product
+ *                                  example: delicous food
+ *                              category:
+ *                                  type: object
+ *                                  properties:
+ *                                    category_id:
+ *                                        type: integer
+ *                                        description: id of category
+ *                                        example: 2
+ *                                    category_name:
+ *                                        type: string
+ *                                        description: name of category
+ *                                        example: Food
  *                              price:
  *                                  type: number
- *                                  description: Price of the product
- *                                  example: 100.50
+ *                                  description: price of product
+ *                                  example: 100.00
+ *                              store:
+ *                                  type: object
+ *                                  properties:
+ *                                    store_id:
+ *                                        type: integer
+ *                                        description: id of store
+ *                                        example: 100.00
+ *                                    store_name:
+ *                                        type: string
+ *                                        description: name of store
+ *                                        example: PhucLong
+ *                                    address:
+ *                                        type: string
+ *                                        description: address of store
+ *                                        example: Binh Tan
+ *                                    hotline:
+ *                                        type: string
+ *                                        description: hotline of store
+ *                                        example: 0123654789
+ *                                    image:
+ *                                        type: string
+ *                                        description: image of store
+ *                                        example: https://googleapis/...
+ *                              stock:
+ *                                  type: integer
+ *                                  description: stock of product
+ *                                  example: 120
  *          404:
  *              description: Product not found
  *          500:
@@ -208,9 +275,9 @@ ProductRouter.get("/:id", ProductController.findById);
  *           description: Failed to create new Product
  */
 ProductRouter.post(
-  "/",
-  upload.single("image"),
-  ProductController.createNewProduct
+    "/",
+    upload.single("image"),
+    ProductController.createNewProduct
 );
 
 // PUT: api/v1/products/{id}
@@ -276,9 +343,9 @@ ProductRouter.post(
  *              description: Product not found
  */
 ProductRouter.put(
-  "/:id",
-  upload.single("image"),
-  ProductController.updateProduct
+    "/:id",
+    upload.single("image"),
+    ProductController.updateProduct
 );
 
 // DELETE: api/v1/products/{id}

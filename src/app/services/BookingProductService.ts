@@ -30,14 +30,18 @@ const findByBookingId = async (booking_id: number) => {
             bookingProducts.map(async (bookingProduct) => {
                 const product = await ProductRepository.findById(
                     bookingProduct.product_id!,
-                    connection
+                    connection,
+                    {
+                        category: true,
+                        store: true,
+                    }
                 );
                 const category = await CategoryRepository.findById(
-                    product.category_id!,
+                    product.category?.category_id!,
                     connection
                 );
                 const store = await StoreRepository.findById(
-                    product.store_id!,
+                    product.store?.store_id!,
                     connection
                 );
                 return {

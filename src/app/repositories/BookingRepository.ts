@@ -54,53 +54,60 @@ const bookingMapper = async (
         rating: booking.rating,
         comment: booking.comment,
     };
-    if (options?.pod) {
-        const pod = await PODRepository.findById(booking.pod_id!, connection, {
-            type: true,
-            store: true,
-            utility: true,
-        });
-        mappingResult.pod = pod;
-    }
 
-    if (options?.slot) {
-        const slots = await BookingSlotRepository.findAllSlotByBookingId(
-            booking.booking_id!,
-            connection
-        );
-        mappingResult.slots = slots;
-    }
+    if (options) {
+        if (options.pod) {
+            const pod = await PODRepository.findById(
+                booking.pod_id!,
+                connection,
+                {
+                    type: true,
+                    store: true,
+                    utility: true,
+                }
+            );
+            mappingResult.pod = pod;
+        }
 
-    if (options?.product) {
-        const products = await BookingProductRepository.findByBookingId(
-            booking.booking_id!,
-            connection
-        );
-        mappingResult.products = products;
-    }
+        if (options.slot) {
+            const slots = await BookingSlotRepository.findAllSlotByBookingId(
+                booking.booking_id!,
+                connection
+            );
+            mappingResult.slots = slots;
+        }
 
-    if (options?.user) {
-        const user = await UserRepository.findById(
-            booking.user_id!,
-            connection,
-            {
-                role: true,
-            }
-        );
-        mappingResult.user = {
-            user_id: user.user_id!,
-            user_name: user.user_name!,
-            email: user.email!,
-            role: user.role,
-        };
-    }
+        if (options.product) {
+            const products = await BookingProductRepository.findByBookingId(
+                booking.booking_id!,
+                connection
+            );
+            mappingResult.products = products;
+        }
 
-    if (options?.payment) {
-        const payment = await PaymentRepository.findByBookingId(
-            booking.booking_id!,
-            connection
-        );
-        mappingResult.payment = payment;
+        if (options.user) {
+            const user = await UserRepository.findById(
+                booking.user_id!,
+                connection,
+                {
+                    role: true,
+                }
+            );
+            mappingResult.user = {
+                user_id: user.user_id!,
+                user_name: user.user_name!,
+                email: user.email!,
+                role: user.role,
+            };
+        }
+
+        if (options.payment) {
+            const payment = await PaymentRepository.findByBookingId(
+                booking.booking_id!,
+                connection
+            );
+            mappingResult.payment = payment;
+        }
     }
     return mappingResult;
 };
