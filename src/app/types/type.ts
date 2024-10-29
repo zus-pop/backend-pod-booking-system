@@ -178,6 +178,7 @@ export interface PaymentQueries {
 export interface ProductQueries {
     product_name?: string;
     category_id?: number;
+    store_id?: number;
 }
 
 export interface StorePriceQueries {

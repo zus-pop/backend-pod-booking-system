@@ -1,199 +1,235 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { Pagination, Product, ProductQueries } from "../types/type.ts";
+import {
+    Category,
+    Pagination,
+    Product,
+    ProductQueries,
+    Store,
+} from "../types/type.ts";
+import CategoryRepository from "./CategoryRepository.ts";
+import StoreRepository from "./StoreRepository.ts";
 
-const find = async (
-  filters: ProductQueries,
-  connection: PoolConnection,
-  pagination?: Pagination
+export interface MappingOptions {
+    category?: boolean;
+    store?: boolean;
+}
+
+export interface MappingResponse {
+    product_id?: number;
+    product_name?: string;
+    category?: Category;
+    image?: string;
+    description?: string;
+    price?: number;
+    store_id?: Store;
+    stock?: number;
+}
+
+const productMapper = async (
+    product: Product,
+    connection: PoolConnection,
+    options?: MappingOptions
 ) => {
-  const conditions: string[] = [];
-  const queryParams: any[] = [];
+    const mappingResult: MappingResponse = {
+        product_id: product.product_id,
+        product_name: product.product_name,
+        image: product.image,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+    };
 
-  let sql = "SELECT ?? FROM ??";
-  let countSql = "SELECT COUNT(*) AS total FROM Product";
-  const columns = [
-    "product_id",
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "stock",
-  ];
-
-  Object.keys(filters).forEach((filter) => {
-    const key = filter;
-    const value = filters[filter as keyof ProductQueries];
-    if (value !== null && value !== undefined) {
-      switch (key) {
-        case "product_name":
-          conditions.push(`${key} LIKE ?`);
-          queryParams.push(`%${value}%`);
-          break;
-        case "category_id":
-          conditions.push(`${key} = ?`);
-          queryParams.push(value);
-          break;
-        default:
-          throw new Error(`${key} option is not supported`);
-      }
+    if (options) {
+        if (options.category) {
+            const category = await CategoryRepository.findById(
+                product.category_id!,
+                connection
+            );
+            mappingResult.category = category;
+        }
+        if (options.store) {
+            const store = await StoreRepository.findById(
+                product.store_id!,
+                connection
+            );
+            mappingResult.store_id = store;
+        }
     }
-  });
 
-  if (conditions.length) {
-    const where = ` WHERE ${conditions.join(" AND ")}`;
-    sql += where;
-    countSql += where;
-  }
-
-  const [totalCount] = await connection.query<RowDataPacket[]>(
-    countSql,
-    queryParams
-  );
-
-  if (pagination) {
-    const { page, limit } = pagination;
-    const offset = (page! - 1) * limit!;
-    sql += " LIMIT ? OFFSET ?";
-    queryParams.push(limit, offset);
-  }
-
-  const values = [columns, "Product", ...queryParams];
-  const [products] = await connection.query<RowDataPacket[]>(sql, values);
-  return {
-    products: products as Product[],
-    total: totalCount[0].total as number,
-  };
+    return mappingResult;
 };
 
-const findById = async (id: number, connection: PoolConnection) => {
-  const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-  const columns = [
-    "product_id",
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "stock",
-  ];
-  const values = [columns, "Product", "product_id", id];
-  const [product] = await connection.query<RowDataPacket[]>(sql, values);
-  return product[0] as Product;
+const find = async (
+    filters: ProductQueries,
+    connection: PoolConnection,
+    pagination?: Pagination
+) => {
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+
+    let sql = "SELECT ?? FROM ??";
+    let countSql = "SELECT COUNT(*) AS total FROM Product";
+    const columns = [
+        "product_id",
+        "product_name",
+        "category_id",
+        "image",
+        "description",
+        "price",
+        "store_id",
+        "stock",
+    ];
+
+    Object.keys(filters).forEach((filter) => {
+        const key = filter;
+        const value = filters[filter as keyof ProductQueries];
+        if (value !== null && value !== undefined) {
+            switch (key) {
+                case "product_name":
+                    conditions.push(`${key} LIKE ?`);
+                    queryParams.push(`%${value}%`);
+                    break;
+                case "category_id":
+                    conditions.push(`${key} = ?`);
+                    queryParams.push(value);
+                    break;
+                case "store_id":
+                    conditions.push(`${key} = ?`);
+                    queryParams.push(value);
+                    break;
+                default:
+                    throw new Error(`${key} option is not supported`);
+            }
+        }
+    });
+
+    if (conditions.length) {
+        const where = ` WHERE ${conditions.join(" AND ")}`;
+        sql += where;
+        countSql += where;
+    }
+
+    const [totalCount] = await connection.query<RowDataPacket[]>(
+        countSql,
+        queryParams
+    );
+
+    if (pagination) {
+        const { page, limit } = pagination;
+        const offset = (page! - 1) * limit!;
+        sql += " LIMIT ? OFFSET ?";
+        queryParams.push(limit, offset);
+    }
+
+    const values = [columns, "Product", ...queryParams];
+    const [products] = await connection.query<RowDataPacket[]>(sql, values);
+    return {
+        products: products as Product[],
+        total: totalCount[0].total as number,
+    };
+};
+
+const findById = async (
+    id: number,
+    connection: PoolConnection,
+    mappingOptions?: MappingOptions
+) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = [
+        "product_id",
+        "product_name",
+        "category_id",
+        "image",
+        "description",
+        "price",
+        "store_id",
+        "stock",
+    ];
+    const values = [columns, "Product", "product_id", id];
+    const [product] = await connection.query<RowDataPacket[]>(sql, values);
+    return await productMapper(
+        product[0] as Product,
+        connection,
+        mappingOptions
+    );
 };
 
 const findByMultipleId = async (
-  product_ids: number[],
-  connection: PoolConnection
+    product_ids: number[],
+    connection: PoolConnection
 ) => {
-  const sql = "SELECT ?? FROM ?? WHERE ?? IN ( ? )";
-  const columns = [
-    "product_id",
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "stock",
-  ];
-  const values = [columns, "Product", "product_id", product_ids];
-  const [products] = await connection.query<RowDataPacket[]>(sql, values);
-  return products as Product[];
-};
-
-const findByName = async (name: string, connection: PoolConnection) => {
-  const sql = "SELECT ?? FROM ?? WHERE ?? LIKE ?";
-  const columns = [
-    "product_id",
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "stock",
-  ];
-  const values = [columns, "Product", "product_name", `%${name}%`];
-  const [products] = await connection.query<RowDataPacket[]>(sql, values);
-  return products as Product[];
-};
-
-const findByCategory = async (
-  category_id: number,
-  connection: PoolConnection
-) => {
-  const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-  const columns = [
-    "product_id",
-    "product_name",
-    "category_id",
-    "image",
-    "description",
-    "price",
-    "stock",
-  ];
-  const values = [columns, "Product", "category_id", category_id];
-  const [products] = await connection.query<RowDataPacket[]>(sql, values);
-  return products as Product[];
+    const sql = "SELECT ?? FROM ?? WHERE ?? IN ( ? )";
+    const columns = [
+        "product_id",
+        "product_name",
+        "category_id",
+        "image",
+        "description",
+        "price",
+        "store_id",
+        "stock",
+    ];
+    const values = [columns, "Product", "product_id", product_ids];
+    const [products] = await connection.query<RowDataPacket[]>(sql, values);
+    return products as Product[];
 };
 
 const createNewProduct = async (
-  product: Product,
-  connection: PoolConnection
+    product: Product,
+    connection: PoolConnection
 ) => {
-  const sql = "INSERT INTO Product SET ?";
-  const [result] = await connection.query<ResultSetHeader>(sql, [product]);
-  return result.insertId;
+    const sql = "INSERT INTO Product SET ?";
+    const [result] = await connection.query<ResultSetHeader>(sql, [product]);
+    return result.insertId;
 };
 
 const updateProduct = async (product: Product, connection: PoolConnection) => {
-  const sql = `UPDATE Product SET ? WHERE product_id = ?`;
-  const [result] = await connection.query<ResultSetHeader>(sql, [
-    product,
-    product.product_id,
-  ]);
-  return result.affectedRows > 0;
+    const sql = `UPDATE Product SET ? WHERE product_id = ?`;
+    const [result] = await connection.query<ResultSetHeader>(sql, [
+        product,
+        product.product_id,
+    ]);
+    return result.affectedRows > 0;
 };
 
 const deleteById = async (id: number, connection: PoolConnection) => {
-  const sql = "DELETE FROM Product WHERE product_id = ?";
-  const values = [id];
-  const [result] = await connection.query<ResultSetHeader>(sql, values);
-  return result.affectedRows > 0;
+    const sql = "DELETE FROM Product WHERE product_id = ?";
+    const values = [id];
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows > 0;
 };
 
 const getTotalRevenueByProduct = async (
-  connection: PoolConnection
+    connection: PoolConnection
 ): Promise<{ product: Product; product_revenue: number }[]> => {
-  const sql = `
+    const sql = `
       SELECT prod.*, 
              COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS product_revenue
       FROM Product prod
       LEFT JOIN Booking_Product bp ON prod.product_id = bp.product_id
       GROUP BY prod.product_id;
     `;
-  const [rows] = await connection.query<RowDataPacket[]>(sql);
-  return rows.map((row) => ({
-    product: {
-      product_id: row.product_id,
-      product_name: row.product_name,
-      category_id: row.category_id,
-      image: row.image,
-      description: row.description,
-      price: row.price,
-      stock: row.stock,
-    },
-    product_revenue: row.product_revenue,
-  }));
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows.map((row) => ({
+        product: {
+            product_id: row.product_id,
+            product_name: row.product_name,
+            category_id: row.category_id,
+            image: row.image,
+            description: row.description,
+            price: row.price,
+            stock: row.stock,
+        },
+        product_revenue: row.product_revenue,
+    }));
 };
 
 export default {
-  find,
-  findById,
-  findByMultipleId,
-  findByName,
-  findByCategory,
-  createNewProduct,
-  updateProduct,
-  deleteById,
-  getTotalRevenueByProduct,
+    find,
+    findById,
+    findByMultipleId,
+    createNewProduct,
+    updateProduct,
+    deleteById,
+    getTotalRevenueByProduct,
 };
