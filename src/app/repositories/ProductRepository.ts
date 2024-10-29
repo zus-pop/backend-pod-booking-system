@@ -21,7 +21,7 @@ export interface MappingResponse {
     image?: string;
     description?: string;
     price?: number;
-    store_id?: Store;
+    store?: Store;
     stock?: number;
 }
 
@@ -52,7 +52,7 @@ const productMapper = async (
                 product.store_id!,
                 connection
             );
-            mappingResult.store_id = store;
+            mappingResult.store = store;
         }
     }
 
