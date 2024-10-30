@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import PaymentService from "../services/PaymentService.ts";
 import { PaymentStatus } from "../types/type.ts";
-import { callbackPayment } from "../utils/zalo.ts";
+import { callbackPaymentProduct, callbackPaymentSlot } from "../utils/zalo.ts";
 
 const find = async (req: Request, res: Response) => {
   const { payment_date, payment_status, page, limit } = req.query;
@@ -30,9 +30,15 @@ const findById = async (req: Request, res: Response) => {
   return res.status(200).json(payment);
 };
 
-const callback = async (req: Request, res: Response) => {
+const callbackSlot = async (req: Request, res: Response) => {
   const { data: dataStr, mac: reqMac } = req.body;
-  const result = await callbackPayment(dataStr, reqMac);
+  const result = await callbackPaymentSlot(dataStr, reqMac);
+  res.json(result);
+};
+
+const callbackProduct = async (req: Request, res: Response) => {
+  const { data: dataStr, mac: reqMac } = req.body;
+  const result = await callbackPaymentProduct(dataStr, reqMac);
   res.json(result);
 };
 
@@ -65,7 +71,8 @@ const getMonthlyRevenue = async (req: Request, res: Response) => {
 export default {
   find,
   findById,
-  callback,
+  callbackSlot,
+  callbackProduct,
   getDailyRevenue,
   getMonthlyRevenue,
 };

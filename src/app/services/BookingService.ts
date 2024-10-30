@@ -111,12 +111,14 @@ const createABooking = async (
         );
         const total_cost = getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
-            await createOnlinePaymentRequest(
+            await createOnlinePaymentRequest({
                 user_id,
-                bookingResult.insertId,
-                bookingSlots as BookingSlot[],
-                total_cost
-            );
+                item: bookingSlots as BookingSlot[],
+                amount: total_cost,
+                callback_url: "callback-slot",
+                redirect_url: `${process.env.CUSTOMER_FRONTEND_SERVER}/booking-history/${bookingResult.insertId}`,
+                expire_duration_seconds: 300,
+            });
         if (return_code === 1) {
             const paymentResult = await PaymentRepo.create(
                 {
@@ -208,7 +210,6 @@ const countBookingsByPODType = async () => {
         const bookingCounts = await BookingRepo.countBookingsByPODType(
             connection
         );
-        console.log(bookingCounts);
         return bookingCounts;
     } catch (err) {
         console.error(err);
