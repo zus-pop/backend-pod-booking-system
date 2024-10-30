@@ -6,7 +6,7 @@ import {
   PODQueries,
   PODUtility,
   Pagination,
-  SortCriteria
+  SortCriteria,
 } from "../types/type.ts";
 
 const find = async (
@@ -181,6 +181,19 @@ const getTotalRevenueByPod = async () => {
   }
 };
 
+const getDailyRevenueByPOD = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const dailyRevenue = await PODRepo.getDailyRevenueByPOD(connection);
+    return dailyRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findPODById,
@@ -191,4 +204,5 @@ export default {
   sortPODByRating,
   getAveragePodUsageTime,
   getTotalRevenueByPod,
+  getDailyRevenueByPOD,
 };
