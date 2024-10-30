@@ -206,6 +206,19 @@ const getTotalRevenueByPod = async (req: Request, res: Response) => {
   }
 };
 
+const getDailyRevenueByPOD = async (req: Request, res: Response) => {
+  try {
+    const dailyRevenue = await PODService.getDailyRevenueByPOD();
+    if (!dailyRevenue || !dailyRevenue.length) {
+      return res.status(404).json({ message: "No revenue data found" });
+    }
+    return res.status(200).json(dailyRevenue);
+  } catch (error) {
+    console.error("Error fetching daily revenue by POD:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -217,4 +230,5 @@ export default {
   sortPODByRating,
   getAveragePodUsageTime,
   getTotalRevenueByPod,
+  getDailyRevenueByPOD,
 };

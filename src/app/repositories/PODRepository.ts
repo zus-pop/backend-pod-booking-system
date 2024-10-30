@@ -326,6 +326,26 @@ const getTotalRevenueByPod = async (
   }));
 };
 
+const getDailyRevenueByPOD = async (
+  connection: PoolConnection
+): Promise<{ date: string; daily_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE(b.booking_date) AS date,
+        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+    FROM 
+        Booking b
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    GROUP BY 
+        DATE(b.booking_date)
+    ORDER BY 
+        DATE(b.booking_date);
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows as { date: string; daily_revenue: number }[];
+};
+
 export default {
   find,
   findById,
@@ -336,4 +356,5 @@ export default {
   sortPODByRating,
   getAveragePodUsageTime,
   getTotalRevenueByPod,
+  getDailyRevenueByPOD,
 };
