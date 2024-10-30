@@ -305,7 +305,7 @@ const getTotalRevenueByPod = async (
 ): Promise<{ pod: POD; revenue: number }[]> => {
   const sql = `
     SELECT p.*, 
-           SUM(pay.total_cost) AS revenue
+           COALESCE(SUM(pay.total_cost), 0) AS revenue
     FROM POD p
     LEFT JOIN Booking b ON p.pod_id = b.pod_id
     LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
