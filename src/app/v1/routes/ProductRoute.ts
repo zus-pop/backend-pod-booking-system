@@ -143,6 +143,117 @@ ProductRouter.get("/", ProductController.find);
  */
 ProductRouter.get("/total-revenue", ProductController.getTotalRevenueByProduct);
 
+// GET: api/v1/products/daily-revenue
+/**
+ * @openapi
+ * /api/v1/products/daily-revenue:
+ *   get:
+ *     summary: Get daily revenue for each product
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   product_id:
+ *                     type: integer
+ *                     description: The ID of the product
+ *                     example: 1
+ *                   product_name:
+ *                     type: string
+ *                     description: The name of the product
+ *                     example: "Product A"
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the revenue
+ *                     example: "2023-10-01"
+ *                   daily_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The daily revenue of the product
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get("/daily-revenue", ProductController.getDailyRevenueByProduct);
+
+// GET: api/v1/products/daily-total-revenue
+/**
+ * @openapi
+ * /api/v1/products/daily-total-revenue:
+ *   get:
+ *     summary: Get daily total revenue for all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the revenue
+ *                     example: "2023-10-01"
+ *                   daily_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The daily total revenue of all products
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get(
+  "/daily-total-revenue",
+  ProductController.getDailyTotalRevenue
+);
+
 //GET: api/v1/products/{id}
 /**
  * @openapi
@@ -275,9 +386,9 @@ ProductRouter.get("/:id", ProductController.findById);
  *           description: Failed to create new Product
  */
 ProductRouter.post(
-    "/",
-    upload.single("image"),
-    ProductController.createNewProduct
+  "/",
+  upload.single("image"),
+  ProductController.createNewProduct
 );
 
 // PUT: api/v1/products/{id}
@@ -343,9 +454,9 @@ ProductRouter.post(
  *              description: Product not found
  */
 ProductRouter.put(
-    "/:id",
-    upload.single("image"),
-    ProductController.updateProduct
+  "/:id",
+  upload.single("image"),
+  ProductController.updateProduct
 );
 
 // DELETE: api/v1/products/{id}

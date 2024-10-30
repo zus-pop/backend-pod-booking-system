@@ -110,6 +110,56 @@ PODRouter.get("/average-usage-time", PODController.getAveragePodUsageTime);
  */
 PODRouter.get("/total-revenue", PODController.getTotalRevenueByPod);
 
+// GET: api/v1/pods/daily-revenue
+/**
+ * @openapi
+ * /api/v1/pods/daily-revenue:
+ *   get:
+ *     summary: Get daily revenue for all PODs
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the revenue
+ *                     example: "2023-10-01"
+ *                   daily_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The daily total revenue of all PODs
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PODRouter.get("/daily-revenue", PODController.getDailyRevenueByPOD);
+
 // GET: api/v1/pods/sorted-by-rating
 /**
  * @openapi
