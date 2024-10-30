@@ -9,6 +9,9 @@ import {
     BookingSlot,
     OnlinePaymentResponse,
 } from "../types/type.ts";
+import BookingProductService from "../services/BookingProductService.ts";
+import PaymentService from "../services/PaymentService.ts";
+import NotificationService from "../services/NotificationService.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
@@ -18,27 +21,31 @@ const config = {
     QUERY_STATUS: process.env.QUERY_STATUS as string,
 };
 
-export const createOnlinePaymentRequest = async (
-    user_id: number,
-    booking_id: number,
-    item: BookingProduct[] | BookingSlot[],
-    amount: number
-) => {
+interface PaymentOptions {
+    item: BookingProduct[] | BookingSlot[];
+    amount: number;
+    user_id: number;
+    callback_url: string;
+    redirect_url: string;
+    expire_duration_seconds: number;
+}
+
+export const createOnlinePaymentRequest = async (options: PaymentOptions) => {
     const embed_data = {
-        redirecturl: `${process.env.FRONTEND_SERVER}/booking-history/${booking_id}`,
+        redirecturl: options.redirect_url,
     };
-    const items = item;
+    const items = options.item;
     const transID = Math.floor(Math.random() * 1000000);
     const order: Record<string, any> = {
         app_id: config.APP_ID,
         app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-        app_user: `user_id: ${user_id}`,
+        app_user: `user_id: ${options.user_id}`,
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
         embed_data: JSON.stringify(embed_data),
-        amount,
-        expire_duration_seconds: 300,
-        callback_url: process.env.ZALO_CALLBACK_URL,
+        amount: options.amount,
+        expire_duration_seconds: options.expire_duration_seconds,
+        callback_url: `${process.env.ZALO_CALLBACK_URL}/${options.callback_url}`,
         description: `POD Booking - Payment for the order #${transID}`,
         bank_code: "",
     };
@@ -64,7 +71,7 @@ export const createOnlinePaymentRequest = async (
     }
 };
 
-export const callbackPayment = async (dataStr: any, reqMac: any) => {
+export const callbackPaymentSlot = async (dataStr: any, reqMac: any) => {
     const result: Record<string, any> = {};
     const connection = await pool.getConnection();
     try {
@@ -105,6 +112,73 @@ export const callbackPayment = async (dataStr: any, reqMac: any) => {
                 },
                 connection
             );
+
+            result.return_code = 1;
+            result.return_message = "success";
+        }
+    } catch (ex: any) {
+        result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
+        result.return_message = ex.message;
+    } finally {
+        connection.release();
+    }
+    // thông báo kết quả cho ZaloPay server
+    return result;
+};
+
+export const callbackPaymentProduct = async (dataStr: any, reqMac: any) => {
+    const result: Record<string, any> = {};
+    const connection = await pool.getConnection();
+    try {
+        let mac = crypto
+            .createHmac("sha256", config.KEY2)
+            .update(dataStr)
+            .digest("hex");
+        console.log("mac =", mac);
+        // kiểm tra callback hợp lệ (đến từ ZaloPay server)
+        if (reqMac !== mac) {
+            // callback không hợp lệ
+            result.return_code = -1;
+            result.return_message = "mac not equal";
+        } else {
+            // thanh toán thành công
+            // merchant cập nhật trạng thái cho đơn hàng
+            let dataJson = JSON.parse(dataStr);
+            console.log(dataJson);
+            console.log(
+                "update order's status = success where app_trans_id =",
+                dataJson["app_trans_id"]
+            );
+            const bookingProduct = JSON.parse(
+                dataJson.item
+            ) as BookingProduct[];
+
+            const productResult =
+                await BookingProductService.addProductForBooking(
+                    bookingProduct
+                );
+
+            if (productResult) {
+                PaymentService.createPayment({
+                    transaction_id: dataJson["app_trans_id"],
+                    booking_id: bookingProduct[0].booking_id,
+                    total_cost: dataJson.amount,
+                    payment_date: moment()
+                        .utcOffset(+7)
+                        .format("YYYY-MM-DD HH:mm:ss"),
+                    payment_status: "Paid",
+                });
+            }
+
+            const notiResult = await NotificationService.createNewMessage({
+                user_id: +dataJson.app_user.split(' ')[1],
+                message:
+                    "The customer's product order has been paid successfully",
+                created_at: moment()
+                    .utcOffset(+7)
+                    .format("YYYY-MM-DD HH:mm:ss"),
+            });
+            console.log(`Noti has been send: ${notiResult}`)
 
             result.return_code = 1;
             result.return_message = "success";

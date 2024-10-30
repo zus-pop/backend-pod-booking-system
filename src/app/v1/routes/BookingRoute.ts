@@ -53,8 +53,8 @@ export const BookingRouter = Router();
  *                   example: Internal server error
  */
 BookingRouter.get(
-  "/count-by-pod-type",
-  BookingController.getBookingsCountByPODType
+    "/count-by-pod-type",
+    BookingController.getBookingsCountByPODType
 );
 
 //GET: api/v1/bookings-count-by-pod
@@ -120,8 +120,8 @@ BookingRouter.get(
  *                   example: Internal server error
  */
 BookingRouter.get(
-  "/bookings-count-by-pod",
-  BookingController.getBookingsCountByPod
+    "/bookings-count-by-pod",
+    BookingController.getBookingsCountByPod
 );
 
 // GET: api/v1/bookings
@@ -430,6 +430,75 @@ BookingRouter.get("/:id", BookingController.findById);
  */
 BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
 
+/**
+ * @openapi
+ * /api/v1/bookings/{id}/products:
+ *  post:
+ *      summary: Add product for booking
+ *      tags: [Bookings]
+ *      security:
+ *          - Authorization: []
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              booking_id:
+ *                                  type: integer
+ *                                  description: id of selected booking
+ *                                  example: 1
+ *                              product_id:
+ *                                  type: integer
+ *                                  description: id of selected product
+ *                                  example: 1
+ *                              unit_price:
+ *                                  type: integer
+ *                                  format: double
+ *                                  description: unit price of selected product
+ *                                  example: 50000
+ *                              quantity:
+ *                                  type: integer
+ *                                  description: quanity of selected product
+ *                                  example: 2
+ *      responses:
+ *           200:
+ *              description: Added products
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              payment_url:
+ *                                  type: string
+ *                                  description: payment link for from online payment API
+ *                                  example: https://example.com/pay
+ *                              message:
+ *                                  type: string
+ *                                  description: message about the response status
+ *                                  example: Booking created successfully
+ *           400:
+ *               description: Add products failed
+ *               content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                               message:
+ *                                   type: string
+ *                                   description: message about the response status failed
+ *                                   example: Add product failed
+ */
+BookingRouter.post(
+    "/:id/products",
+    authenticateToken,
+    validateEmptyObject,
+    BookingProductController.createProductPayment
+);
+
 // GET: api/v1/bookings/:id/slots
 /**
  * @openapi
@@ -500,6 +569,68 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  */
 BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
 
+// PUT: api/v1/bookings/:booking_id/slots/:id
+/**
+ * @openapi
+ * /api/v1/bookings/{booking_id}/slots/{id}:
+ *  put:
+ *      summary: Update slot checkin status
+ *      tags: [Bookings]
+ *      parameters:
+ *          - in: path
+ *            name: booking_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The booking id
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The id of booking slot
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          is_checked_in:
+ *                              type: boolean
+ *                              required: true
+ *      responses:
+ *          200:
+ *              description: Update successfully!
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              result:
+ *                                  type: object
+ *                                  description: result meta data
+ *                              message:
+ *                                  type: string
+ *                                  description: update message response
+ *                                  example: Update successfully
+ *          404:
+ *              description: Update Failed
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: update message response
+ *                                  example: Not found any slot!
+ */
+BookingRouter.put(
+    "/:booking_id/slots/:id",
+    BookingSlotController.updateCheckin
+);
+
 // POST: api/v1/bookings
 /**
  * @openapi
@@ -566,11 +697,11 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  *                                   example: Booking failed
  */
 BookingRouter.post(
-  "/",
-  authenticateToken,
-  validateEmptyObject,
-  checkAllAvailableSlot,
-  BookingController.create
+    "/",
+    authenticateToken,
+    validateEmptyObject,
+    checkAllAvailableSlot,
+    BookingController.create
 );
 
 // PUT: api/v1/bookings

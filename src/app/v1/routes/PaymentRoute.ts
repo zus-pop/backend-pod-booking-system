@@ -235,5 +235,8 @@ PaymentRouter.get("/", PaymentController.find);
  */
 PaymentRouter.get("/:id", PaymentController.findById);
 
-// POST: api/v1/payments/callback
-PaymentRouter.post("/callback", PaymentController.callback);
+// POST: api/v1/payments/callback-slot
+PaymentRouter.post("/callback-slot", PaymentController.callbackSlot);
+
+// POST: api/c1/payments/callback-product
+PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
