@@ -21,9 +21,11 @@ const findByBookingId = async (req: Request, res: Response) => {
 };
 
 const createProductPayment = async (req: Request, res: Response) => {
+    const { payload } = req;
     const bookingProduct = req.body as BookingProduct[];
     const result = await BookingProductService.createProductPayment(
-        bookingProduct
+        bookingProduct,
+        payload.user_id
     );
     return res.status(201).json(result);
 };

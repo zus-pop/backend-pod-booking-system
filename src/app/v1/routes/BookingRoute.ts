@@ -436,6 +436,8 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  *  post:
  *      summary: Add product for booking
  *      tags: [Bookings]
+ *      security:
+ *          - Authorization: []
  *      requestBody:
  *          required: true
  *          content:
@@ -492,6 +494,7 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  */
 BookingRouter.post(
     "/:id/products",
+    authenticateToken,
     validateEmptyObject,
     BookingProductController.createProductPayment
 );
