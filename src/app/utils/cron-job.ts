@@ -1,14 +1,25 @@
-import moment from "moment";
 import "dotenv/config";
+import moment from "moment";
 import cron from "node-cron";
 import BookingService from "../services/BookingService.ts";
-import SlotService from "../services/SlotService.ts";
 import BookingSlotService from "../services/BookingSlotService.ts";
-import PaymentService from "../services/PaymentService.ts";
-import { getPaymentStatus } from "./zalo.ts";
 import NotificationService from "../services/NotificationService.ts";
-import { Notification } from "../types/type.ts";
-import { sendNotification } from "./socket-stuffs.ts";
+import PaymentService from "../services/PaymentService.ts";
+import SlotService from "../services/SlotService.ts";
+import { getPaymentStatus } from "./zalo.ts";
+
+if (process.env.NODE_ENV !== "test") {
+    cron.schedule("*/10 * * * *", async () => {
+        console.log(
+            `--- Running scheduled task to update expired slot status at ${moment()
+                .utcOffset(+7)
+                .format("YYYY-MM-DD HH:mm:ss")} ---`
+        );
+        await SlotService.updateExpiredSlot();
+    });
+} else {
+    console.log("Running in test mode! Could not start this job");
+}
 
 export const trackBooking = (
     user_id: number,
@@ -36,7 +47,7 @@ export const trackBooking = (
         if (isConfirmed) {
             setTimeout(() => {
                 console.log(
-                    `Booking ${booking.booking_id} is confirmed -> stop the job`
+                    `--- Booking ${booking.booking_id} is confirmed -> stop the job ---`
                 );
                 NotificationService.createNewMessage({
                     user_id,
@@ -53,7 +64,7 @@ export const trackBooking = (
             );
             await BookingService.updateABooking({ booking_status: "Canceled" });
             console.log(
-                `Booking ${booking.booking_id} is canceled -> stop the job`
+                `--- Booking ${booking.booking_id} is canceled -> stop the job ---`
             );
             NotificationService.createNewMessage({
                 user_id,
@@ -80,7 +91,7 @@ export const trackBooking = (
                 if (!isExtend) {
                     // extend the job
                     console.log(
-                        `Threshold reached. Extending time by ${bufferTime} minutes.`
+                        `--- Threshold reached. Extending time by ${bufferTime} minutes. ---`
                     );
                     isExtend = true;
                 } else {
@@ -125,7 +136,7 @@ export const trackPayment = (user_id: number, payment_id: number) => {
             if (return_code === 1) {
                 // payment is successful
                 console.log(
-                    `Payment ${payment_id} is successful -> stop the job`
+                    `--- Payment ${payment_id} is successful -> stop the job ---`
                 );
                 await PaymentService.updatePayment({
                     transaction_id: payment.transaction_id,
@@ -145,7 +156,9 @@ export const trackPayment = (user_id: number, payment_id: number) => {
                 }, 0);
             } else if (return_code === 2) {
                 // payment is failed
-                console.log(`Payment ${payment_id} is failed -> stop the job`);
+                console.log(
+                    `--- Payment ${payment_id} is failed -> stop the job ---`
+                );
                 await PaymentService.updatePayment({
                     transaction_id: payment.transaction_id,
                     payment_status: "Failed",
@@ -164,7 +177,7 @@ export const trackPayment = (user_id: number, payment_id: number) => {
                 }, 0);
             } else {
                 // payment is pending
-                console.log(`Payment ${payment_id} is processing`);
+                console.log(`--- Payment ${payment_id} is processing ---`);
             }
         }
     });

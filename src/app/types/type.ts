@@ -31,8 +31,8 @@ export interface User {
     avatar?: string;
     role_id: number;
     phone_number?: string;
-    created_at?: Date | string;
-    updated_at?: Date | string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface Product {
@@ -104,8 +104,8 @@ export interface Store {
 export interface Slot {
     slot_id?: number;
     pod_id?: number;
-    start_time?: Date | string;
-    end_time?: Date | string;
+    start_time?: string;
+    end_time?: string;
     price?: number;
     is_available?: boolean;
 }
@@ -178,6 +178,7 @@ export interface PaymentQueries {
 export interface ProductQueries {
     product_name?: string;
     category_id?: number;
+    store_id?: number;
 }
 
 export interface StorePriceQueries {
@@ -190,7 +191,7 @@ export interface Notification {
     user_id?: number;
     message?: string;
     is_read?: boolean;
-    created_at?: string | Date;
+    created_at?: string;
 }
 
 export interface SortCriteria {

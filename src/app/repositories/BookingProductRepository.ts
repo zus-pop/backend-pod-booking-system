@@ -1,5 +1,5 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { BookingProduct, Product } from "../types/type.ts";
+import { BookingProduct } from "../types/type.ts";
 import ProductRepository from "./ProductRepository.ts";
 
 const findAll = async (connection: PoolConnection) => {

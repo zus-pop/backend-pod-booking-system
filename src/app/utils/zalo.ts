@@ -1,14 +1,14 @@
+import crypto from "crypto";
 import moment from "moment";
+import qs from "qs";
+import { pool } from "../config/pool.ts";
+import BookingRepo from "../repositories/BookingRepository.ts";
+import PaymentRepo from "../repositories/PaymentRepository.ts";
 import {
     BookingProduct,
     BookingSlot,
     OnlinePaymentResponse,
 } from "../types/type.ts";
-import crypto from "crypto";
-import qs from "qs";
-import { pool } from "../config/pool.ts";
-import PaymentRepo from "../repositories/PaymentRepository.ts";
-import BookingRepo from "../repositories/BookingRepository.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
