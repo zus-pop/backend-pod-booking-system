@@ -51,6 +51,7 @@ export interface BookingProduct {
     product_id?: number;
     unit_price?: number;
     quantity?: number;
+    bought_date?: string;
 }
 
 export interface BookingSlot {
@@ -58,6 +59,7 @@ export interface BookingSlot {
     booking_id?: number;
     slot_id?: number;
     unit_price?: number;
+    is_checked_in?: boolean;
 }
 
 export interface Category {

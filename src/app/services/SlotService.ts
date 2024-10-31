@@ -68,7 +68,7 @@ const checkAllAvailableSlot = async (slot_ids: number[]) => {
                             "YYYY-MM-DD HH:mm:ss"
                         )} ) is taken by other customer`
                 )
-                .join("\r\n"),
+                .join(" <-> "),
         };
     } catch (err) {
         console.log(err);

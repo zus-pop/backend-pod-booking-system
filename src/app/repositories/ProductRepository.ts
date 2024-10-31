@@ -181,10 +181,8 @@ const createNewProduct = async (
 
 const updateProduct = async (product: Product, connection: PoolConnection) => {
   const sql = `UPDATE Product SET ? WHERE product_id = ?`;
-  const [result] = await connection.query<ResultSetHeader>(sql, [
-    product,
-    product.product_id,
-  ]);
+  const values = [product, [product.product_id]];
+  const [result] = await connection.query<ResultSetHeader>(sql, values);
   return result.affectedRows > 0;
 };
 

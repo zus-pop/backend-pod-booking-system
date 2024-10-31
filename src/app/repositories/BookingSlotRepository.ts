@@ -4,7 +4,13 @@ import SlotRepository from "./SlotRepository.ts";
 
 const findAllSlot = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const columns = ["id", "booking_id", "slot_id", "unit_price"];
+    const columns = [
+        "id",
+        "booking_id",
+        "slot_id",
+        "unit_price",
+        "is_checked_in",
+    ];
     const values = [columns, "Booking_Slot"];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     return rows as BookingSlot[];
@@ -15,7 +21,13 @@ const findAllSlotByBookingId = async (
     connection: PoolConnection
 ) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["id", "booking_id", "slot_id", "unit_price"];
+    const columns = [
+        "id",
+        "booking_id",
+        "slot_id",
+        "unit_price",
+        "is_checked_in",
+    ];
     const values = [columns, "Booking_Slot", "booking_id", booking_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const bookingSlots = rows as BookingSlot[];
@@ -50,8 +62,28 @@ const createMany = async (
     return rows;
 };
 
+const updateCheckin = async (
+    id: number,
+    booking_id: number,
+    is_checked_in: boolean,
+    connection: PoolConnection
+) => {
+    const sql = "UPDATE ?? SET ? WHERE ?? = ? AND ?? = ?";
+    const values = [
+        "Booking_Slot",
+        { is_checked_in },
+        "id",
+        id,
+        "booking_id",
+        booking_id,
+    ];
+    const [rows] = await connection.query<ResultSetHeader>(sql, values);
+    return rows;
+};
+
 export default {
     findAllSlot,
     findAllSlotByBookingId,
     createMany,
+    updateCheckin,
 };
