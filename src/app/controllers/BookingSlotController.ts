@@ -19,10 +19,10 @@ const findAllSlotByBookingId = async (req: Request, res: Response) => {
 };
 
 const updateCheckin = async (req: Request, res: Response) => {
-    const { id, booking_id } = req.params;
+    const { slot_id, booking_id } = req.params;
     const { is_checked_in } = req.body;
     const result = await BookingSlotService.updateCheckin(
-        +id,
+        +slot_id,
         +booking_id,
         is_checked_in
     );

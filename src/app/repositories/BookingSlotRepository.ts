@@ -63,7 +63,7 @@ const createMany = async (
 };
 
 const updateCheckin = async (
-    id: number,
+    slot_id: number,
     booking_id: number,
     is_checked_in: boolean,
     connection: PoolConnection
@@ -72,8 +72,8 @@ const updateCheckin = async (
     const values = [
         "Booking_Slot",
         { is_checked_in },
-        "id",
-        id,
+        "slot_id",
+        slot_id,
         "booking_id",
         booking_id,
     ];

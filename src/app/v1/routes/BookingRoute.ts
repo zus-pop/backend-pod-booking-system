@@ -578,7 +578,7 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  * @openapi
  * /api/v1/bookings/{booking_id}/slots/{slot_id}/products:
  *  get:
- *    summary: Get list of booking products by booking id
+ *    summary: Get list of booking products by booking id and slot id
  *    tags: [Bookings]
  *    parameters:
  *          - in: path
@@ -637,10 +637,10 @@ BookingRouter.get(
     BookingProductController.findByBookingIdAndSlotId
 );
 
-// PUT: api/v1/bookings/:booking_id/slots/:id
+// PUT: api/v1/bookings/:booking_id/slots/:slot_id
 /**
  * @openapi
- * /api/v1/bookings/{booking_id}/slots/{id}:
+ * /api/v1/bookings/{booking_id}/slots/{slot_id}:
  *  put:
  *      summary: Update slot checkin status
  *      tags: [Bookings]
@@ -652,11 +652,11 @@ BookingRouter.get(
  *            required: true
  *            description: The booking id
  *          - in: path
- *            name: id
+ *            name: slot_id
  *            schema:
  *              type: number
  *            required: true
- *            description: The id of booking slot
+ *            description: The id of slot
  *      requestBody:
  *          required: true
  *          content:
@@ -695,7 +695,7 @@ BookingRouter.get(
  *                                  example: Not found any slot!
  */
 BookingRouter.put(
-    "/:booking_id/slots/:id",
+    "/:booking_id/slots/:slot_id",
     BookingSlotController.updateCheckin
 );
 
