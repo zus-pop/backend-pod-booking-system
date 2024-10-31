@@ -346,6 +346,26 @@ const getDailyRevenueByPOD = async (
   return rows as { date: string; daily_revenue: number }[];
 };
 
+const getMonthlyRevenueByPOD = async (
+  connection: PoolConnection
+): Promise<{ month: string; monthly_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE_FORMAT(b.booking_date, '%Y-%m') AS month,
+        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+    FROM 
+        Booking b
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    GROUP BY 
+        DATE_FORMAT(b.booking_date, '%Y-%m')
+    ORDER BY 
+        DATE_FORMAT(b.booking_date, '%Y-%m');
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows as { month: string; monthly_revenue: number }[];
+};
+
 export default {
   find,
   findById,
@@ -357,4 +377,5 @@ export default {
   getAveragePodUsageTime,
   getTotalRevenueByPod,
   getDailyRevenueByPOD,
+  getMonthlyRevenueByPOD,
 };

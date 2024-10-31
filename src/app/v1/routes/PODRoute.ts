@@ -160,6 +160,55 @@ PODRouter.get("/total-revenue", PODController.getTotalRevenueByPod);
  */
 PODRouter.get("/daily-revenue", PODController.getDailyRevenueByPOD);
 
+// GET: api/v1/pods/monthly-revenue
+/**
+ * @openapi
+ * /api/v1/pods/monthly-revenue:
+ *   get:
+ *     summary: Get monthly revenue for all PODs
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved monthly revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: string
+ *                     description: The month of the revenue
+ *                     example: "2023-10"
+ *                   monthly_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The monthly revenue of the POD
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PODRouter.get("/monthly-revenue", PODController.getMonthlyRevenueByPOD);
+
 // GET: api/v1/pods/sorted-by-rating
 /**
  * @openapi

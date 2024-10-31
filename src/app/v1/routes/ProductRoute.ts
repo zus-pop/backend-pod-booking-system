@@ -201,6 +201,58 @@ ProductRouter.get("/total-revenue", ProductController.getTotalRevenueByProduct);
  */
 ProductRouter.get("/daily-revenue", ProductController.getDailyRevenueByProduct);
 
+// GET: api/v1/products/monthly-revenue
+/**
+ * @openapi
+ * /api/v1/products/monthly-revenue:
+ *   get:
+ *     summary: Get monthly revenue for products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved monthly revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: string
+ *                     description: The month of the revenue
+ *                     example: "2023-10"
+ *                   monthly_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The monthly revenue of the product
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get(
+  "/monthly-revenue",
+  ProductController.getMonthlyRevenueByProduct
+);
+
 // GET: api/v1/products/daily-total-revenue
 /**
  * @openapi
