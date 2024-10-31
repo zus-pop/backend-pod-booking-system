@@ -455,6 +455,10 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  *                                  type: integer
  *                                  description: id of selected product
  *                                  example: 1
+ *                              slot_id:
+ *                                  type: integer
+ *                                  description: id of selected slot
+ *                                  example: 1
  *                              unit_price:
  *                                  type: integer
  *                                  format: double
@@ -568,6 +572,70 @@ BookingRouter.post(
  *
  */
 BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
+
+// GET: api/v1/bookings/:booking_id/slots/:slot_id/products
+/**
+ * @openapi
+ * /api/v1/bookings/{booking_id}/slots/{slot_id}/products:
+ *  get:
+ *    summary: Get list of booking products by booking id
+ *    tags: [Bookings]
+ *    parameters:
+ *          - in: path
+ *            name: booking_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Booking id
+ *          - in: path
+ *            name: slot_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Slot id
+ *    responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: arrays
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  product_id:
+ *                                      type: integer
+ *                                      description: id of product
+ *                                      example: 3
+ *                                  product_name:
+ *                                      type: string
+ *                                      description: name of product
+ *                                      example: Expresso
+ *                                  price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: price price of product
+ *                                      example: 30000
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of product
+ *                                      example: 30000
+ *                                  quantity:
+ *                                      type: integer
+ *                                      description: quantity of product
+ *                                      example: 2
+ *                                  stock:
+ *                                      type: integer
+ *                                      description: remaining amount of product
+ *                                      example: 100
+ *          404:
+ *              description: No booking products found
+ */
+BookingRouter.get(
+    "/:booking_id/slots/:slot_id/products",
+    BookingProductController.findByBookingIdAndSlotId
+);
 
 // PUT: api/v1/bookings/:booking_id/slots/:id
 /**

@@ -1,11 +1,6 @@
-import moment from "moment";
 import { pool } from "../config/pool.ts";
 import BookingProductRepository from "../repositories/BookingProductRepository.ts";
-import BookingRepository from "../repositories/BookingRepository.ts";
-import CategoryRepository from "../repositories/CategoryRepository.ts";
-import PaymentRepository from "../repositories/PaymentRepository.ts";
 import ProductRepository from "../repositories/ProductRepository.ts";
-import StoreRepository from "../repositories/StoreRepository.ts";
 import { BookingProduct } from "../types/type.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
@@ -31,36 +26,28 @@ const findByBookingId = async (booking_id: number) => {
             booking_id,
             connection
         );
-        return await Promise.all(
-            bookingProducts.map(async (bookingProduct) => {
-                const product = await ProductRepository.findById(
-                    bookingProduct.product_id!,
-                    connection,
-                    {
-                        category: true,
-                        store: true,
-                    }
-                );
-                const category = await CategoryRepository.findById(
-                    product.category?.category_id!,
-                    connection
-                );
-                const store = await StoreRepository.findById(
-                    product.store?.store_id!,
-                    connection
-                );
-                return {
-                    product_id: product.product_id,
-                    product_name: product.product_name,
-                    price: product.price,
-                    unit_price: bookingProduct.unit_price,
-                    quantity: bookingProduct.quantity,
-                    stock: product.stock,
-                    category,
-                    store,
-                };
-            })
-        );
+        return bookingProducts;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const findByBookingIdAndSlotId = async (
+    booking_id: number,
+    slot_id: number
+) => {
+    const connection = await pool.getConnection();
+    try {
+        const bookingProducts =
+            await BookingProductRepository.findByBookingIdAndSlotId(
+                booking_id,
+                slot_id,
+                connection
+            );
+        return bookingProducts;
     } catch (err) {
         console.error(err);
         return null;
@@ -115,6 +102,7 @@ const addProductForBooking = async (bookingProduct: BookingProduct[]) => {
 export default {
     findAllBookingProducts,
     findByBookingId,
+    findByBookingIdAndSlotId,
     addProductForBooking,
     createProductPayment,
 };
