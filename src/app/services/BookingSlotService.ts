@@ -30,22 +30,24 @@ const findAllSlotByBookingId = async (booking_id: number) => {
     }
 };
 
-
 const updateCheckin = async (
-    id: number,
+    slot_id: number,
     booking_id: number,
     is_checked_in: boolean
 ) => {
     const connection = await pool.getConnection();
     try {
+        await connection.beginTransaction();
         const result = await BookingSlotRepo.updateCheckin(
-            id,
+            slot_id,
             booking_id,
             is_checked_in,
             connection
         );
+        await connection.commit();
         return result;
     } catch (err) {
+        await connection.rollback();
         console.error(err);
         return null;
     } finally {
