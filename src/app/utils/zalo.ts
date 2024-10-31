@@ -12,6 +12,8 @@ import {
 import BookingProductService from "../services/BookingProductService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import NotificationService from "../services/NotificationService.ts";
+import ProductRepository from "../repositories/ProductRepository.ts";
+import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
@@ -149,48 +151,67 @@ export const callbackPaymentProduct = async (dataStr: any, reqMac: any) => {
                 "update order's status = success where app_trans_id =",
                 dataJson["app_trans_id"]
             );
-            const bookingProduct = JSON.parse(
+            const bookingProducts = JSON.parse(
                 dataJson.item
             ) as BookingProduct[];
+            await connection.beginTransaction();
 
-            const productResult =
-                await BookingProductService.addProductForBooking(
-                    bookingProduct
+            const productResult = await BookingProductRepository.create(
+                bookingProducts,
+                connection
+            );
+            if (productResult.affectedRows) {
+                for (const bookingProduct of bookingProducts) {
+                    const product = await ProductRepository.findById(
+                        bookingProduct.product_id!,
+                        connection
+                    );
+                    const newStock = product.stock! - bookingProduct.quantity!;
+                    await ProductRepository.updateProduct(
+                        {
+                            product_id: product.product_id,
+                            stock: newStock,
+                        },
+                        connection
+                    );
+                }
+                PaymentRepo.create(
+                    {
+                        transaction_id: dataJson["app_trans_id"],
+                        booking_id: bookingProducts[0].booking_id,
+                        total_cost: dataJson.amount,
+                        payment_date: moment()
+                            .utcOffset(+7)
+                            .format("YYYY-MM-DD HH:mm:ss"),
+                        payment_status: "Paid",
+                    },
+                    connection
                 );
-
-            if (productResult) {
-                PaymentService.createPayment({
-                    transaction_id: dataJson["app_trans_id"],
-                    booking_id: bookingProduct[0].booking_id,
-                    total_cost: dataJson.amount,
-                    payment_date: moment()
-                        .utcOffset(+7)
-                        .format("YYYY-MM-DD HH:mm:ss"),
-                    payment_status: "Paid",
-                });
             }
 
             const notiResult = await NotificationService.createNewMessage({
-                user_id: +dataJson.app_user.split(' ')[1],
+                user_id: +dataJson.app_user.split(" ")[1],
                 message:
                     "The customer's product order has been paid successfully",
                 created_at: moment()
                     .utcOffset(+7)
                     .format("YYYY-MM-DD HH:mm:ss"),
             });
-            console.log(`Noti has been send: ${notiResult}`)
-
+            console.log(`Noti has been send: ${notiResult}`);
+            await connection.commit();
             result.return_code = 1;
             result.return_message = "success";
         }
     } catch (ex: any) {
+        console.log(ex);
+        await connection.rollback();
         result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
         result.return_message = ex.message;
     } finally {
         connection.release();
+        // thông báo kết quả cho ZaloPay server
+        return result;
     }
-    // thông báo kết quả cho ZaloPay server
-    return result;
 };
 
 export const getPaymentStatus = async (app_trans_id: string) => {
