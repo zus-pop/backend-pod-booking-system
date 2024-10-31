@@ -49,6 +49,7 @@ export interface Product {
 export interface BookingProduct {
     booking_id?: number;
     product_id?: number;
+    slot_id?: number;
     unit_price?: number;
     quantity?: number;
     bought_date?: string;
