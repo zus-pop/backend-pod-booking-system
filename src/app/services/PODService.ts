@@ -194,6 +194,19 @@ const getDailyRevenueByPOD = async () => {
   }
 };
 
+const getMonthlyRevenueByPOD = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const monthlyRevenue = await PODRepo.getMonthlyRevenueByPOD(connection);
+    return monthlyRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findPODById,
@@ -205,4 +218,5 @@ export default {
   getAveragePodUsageTime,
   getTotalRevenueByPod,
   getDailyRevenueByPOD,
+  getMonthlyRevenueByPOD,
 };
