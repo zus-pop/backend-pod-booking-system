@@ -554,6 +554,10 @@ BookingRouter.post(
  *                                      type: boolean
  *                                      description: available status of slot
  *                                      example: false
+ *                                  is_checked_in:
+ *                                      type: boolean
+ *                                      description: available checkin status of slot
+ *                                      example: false
  *                                  price:
  *                                      type: integer
  *                                      description: price of slot
