@@ -99,6 +99,22 @@ const getDailyRevenueByStore = async (storeId: number) => {
   }
 };
 
+const getMonthlyRevenueByStore = async (storeId: number) => {
+  const connection = await pool.getConnection();
+  try {
+    const monthlyRevenue = await StoreRepo.getMonthlyRevenueByStore(
+      storeId,
+      connection
+    );
+    return monthlyRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findStoreById,
@@ -107,4 +123,5 @@ export default {
   deleteStoreById,
   getTotalRevenueByStore,
   getDailyRevenueByStore,
+  getMonthlyRevenueByStore,
 };

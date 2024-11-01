@@ -142,6 +142,36 @@ const getDailyRevenueByStore = async (
   }));
 };
 
+const getMonthlyRevenueByStore = async (
+  storeId: number,
+  connection: PoolConnection
+): Promise<{ month: string; monthly_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
+        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        s.store_id = ?
+    GROUP BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m')
+    ORDER BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m');
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql, [storeId]);
+  return rows.map((row) => ({
+    month: row.month,
+    monthly_revenue: row.monthly_revenue,
+  }));
+};
+
 export default {
   find,
   findById,
@@ -150,4 +180,5 @@ export default {
   deleteById,
   getTotalRevenueByStore,
   getDailyRevenueByStore,
+  getMonthlyRevenueByStore,
 };
