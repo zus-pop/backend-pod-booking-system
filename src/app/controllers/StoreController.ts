@@ -145,6 +145,32 @@ const getMonthlyRevenueByStore = async (req: Request, res: Response) => {
   }
 };
 
+const getDailyRevenueForAllStores = async (req: Request, res: Response) => {
+  try {
+    const dailyRevenue = await StoreService.getDailyRevenueForAllStores();
+    if (!dailyRevenue || !dailyRevenue.length) {
+      return res.status(404).json({ message: "No revenue data found" });
+    }
+    return res.status(200).json(dailyRevenue);
+  } catch (error) {
+    console.error("Error fetching daily revenue for all stores:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getMonthlyRevenueForAllStores = async (req: Request, res: Response) => {
+  try {
+    const monthlyRevenue = await StoreService.getMonthlyRevenueForAllStores();
+    if (!monthlyRevenue || !monthlyRevenue.length) {
+      return res.status(404).json({ message: "No revenue data found" });
+    }
+    return res.status(200).json(monthlyRevenue);
+  } catch (error) {
+    console.error("Error fetching monthly revenue for all stores:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -154,4 +180,6 @@ export default {
   getTotalRevenueByStore,
   getDailyRevenueByStore,
   getMonthlyRevenueByStore,
+  getDailyRevenueForAllStores,
+  getMonthlyRevenueForAllStores,
 };

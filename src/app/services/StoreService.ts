@@ -115,6 +115,36 @@ const getMonthlyRevenueByStore = async (storeId: number) => {
   }
 };
 
+const getDailyRevenueForAllStores = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const dailyRevenue = await StoreRepo.getDailyRevenueForAllStores(
+      connection
+    );
+    return dailyRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
+const getMonthlyRevenueForAllStores = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const monthlyRevenue = await StoreRepo.getMonthlyRevenueForAllStores(
+      connection
+    );
+    return monthlyRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findStoreById,
@@ -124,4 +154,6 @@ export default {
   getTotalRevenueByStore,
   getDailyRevenueByStore,
   getMonthlyRevenueByStore,
+  getDailyRevenueForAllStores,
+  getMonthlyRevenueForAllStores,
 };
