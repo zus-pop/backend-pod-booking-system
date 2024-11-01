@@ -99,16 +99,6 @@ const createABooking = async (
             booking_status: "Pending",
         };
         const bookingResult = await BookingRepo.create(booking, connection);
-        bookingSlots = bookingSlots.map((bookingSlot) => ({
-            ...bookingSlot,
-            booking_id: bookingResult.insertId,
-        }));
-        await BookingSlotRepo.createMany(bookingSlots, connection);
-        await SlotRepo.updateStatusMultipleSlot(
-            false,
-            bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
-            connection
-        );
         const total_cost = getTotalCost(bookingSlots);
         const { return_code, order_url, sub_return_message, app_trans_id } =
             await createOnlinePaymentRequest({
@@ -128,7 +118,19 @@ const createABooking = async (
                     payment_url: order_url,
                     payment_date: moment().utcOffset(+7).format(FORMAT_TYPE),
                     payment_status: "Unpaid",
+                    payment_for: "Slot",
                 },
+                connection
+            );
+            bookingSlots = bookingSlots.map((bookingSlot) => ({
+                ...bookingSlot,
+                booking_id: bookingResult.insertId,
+                payment_id: paymentResult.insertId,
+            }));
+            await BookingSlotRepo.createMany(bookingSlots, connection);
+            await SlotRepo.updateStatusMultipleSlot(
+                false,
+                bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
                 connection
             );
             await connection.commit();

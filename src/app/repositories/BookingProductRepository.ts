@@ -72,6 +72,7 @@ const findByBookingIdAndSlotId = async (
     const sql = "SELECT ?? FROM ?? WHERE ?? = ? AND ?? = ?";
     const columns = [
         "booking_id",
+        "payment_id",
         "product_id",
         "slot_id",
         "unit_price",
@@ -106,6 +107,49 @@ const findByBookingIdAndSlotId = async (
     );
 };
 
+const findAllSlotByBookingIdAndPaymentId = async (
+    booking_id: number,
+    payment_id: number,
+    connection: PoolConnection
+) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ? AND ?? = ?";
+    const columns = [
+        "booking_id",
+        "payment_id",
+        "product_id",
+        "payment_id",
+        "unit_price",
+        "quantity",
+    ];
+    const values = [
+        columns,
+        "Booking_Product",
+        "booking_id",
+        booking_id,
+        "payment_id",
+        payment_id,
+    ];
+    const [rows] = await connection.query<RowDataPacket[]>(sql, values);
+    const bookingProducts = rows as BookingProduct[];
+    if (!bookingProducts || !bookingProducts.length) {
+        return [];
+    }
+    return await Promise.all(
+        bookingProducts.map(async (bookingProduct) => {
+            const product = await ProductRepository.findById(
+                bookingProduct.product_id!,
+                connection,
+                { category: true, store: true }
+            );
+            return {
+                ...product,
+                quantity: bookingProduct.quantity,
+                unit_price: bookingProduct.unit_price,
+            };
+        })
+    );
+};
+
 const create = async (
     bookingProducts: BookingProduct[],
     connection: PoolConnection
@@ -113,6 +157,7 @@ const create = async (
     const sql = "INSERT INTO ?? (??) VALUES ?";
     const columns = [
         "booking_id",
+        "payment_id",
         "product_id",
         "slot_id",
         "unit_price",
@@ -125,6 +170,7 @@ const create = async (
         columns,
         bookingProducts.map((item) => [
             item.booking_id,
+            item.payment_id,
             item.product_id,
             item.slot_id,
             item.unit_price,
@@ -141,5 +187,6 @@ export default {
     findAll,
     findByBookingId,
     findByBookingIdAndSlotId,
+    findAllSlotByBookingIdAndPaymentId,
     create,
 };

@@ -577,6 +577,89 @@ BookingRouter.post(
  */
 BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
 
+// GET: api/v1/bookings/:booking_id/payments/:payment_id/slots
+/**
+ * @openapi
+ * /api/v1/bookings/{booking_id}/payments/{payment_id}/slots:
+ *     get:
+ *      summary: Get a list of booking slots by booking id and payment id
+ *      tags: [Bookings]
+ *      parameters:
+ *          - in: path
+ *            name: booking_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The booking id
+ *          - in: path
+ *            name: payment_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The payment id
+ *      responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  slot_id:
+ *                                      type: integer
+ *                                      description: id of slot
+ *                                      example: 1
+ *                                  pod_id:
+ *                                      type: integer
+ *                                      description: id of POD
+ *                                      example: 1
+ *                                  start_time:
+ *                                      type: string
+ *                                      format: date-time
+ *                                      description: start time of slot
+ *                                      example: 2024-10-01T08:00:00.000Z
+ *                                  end_time:
+ *                                      type: string
+ *                                      format: date-time
+ *                                      description: end time of slot
+ *                                      example: 2024-10-01T12:00:00.000Z
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of slot
+ *                                      example: 100000
+ *                                  is_available:
+ *                                      type: boolean
+ *                                      description: available status of slot
+ *                                      example: false
+ *                                  is_checked_in:
+ *                                      type: boolean
+ *                                      description: available checkin status of slot
+ *                                      example: false
+ *                                  price:
+ *                                      type: integer
+ *                                      description: price of slot
+ *                                      example: 100000
+ *          404:
+ *              description: No POD found
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: response error message
+ *                                  example: Not found any slot!
+ *
+ */
+BookingRouter.get(
+    "/:booking_id/payments/:payment_id/slots",
+    BookingSlotController.findAllSlotByBookingIdAndPaymentId
+);
+
 // GET: api/v1/bookings/:booking_id/slots/:slot_id/products
 /**
  * @openapi
@@ -639,6 +722,70 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
 BookingRouter.get(
     "/:booking_id/slots/:slot_id/products",
     BookingProductController.findByBookingIdAndSlotId
+);
+
+// GET: api/v1/bookings/:booking_id/payments/:payment_id/products
+/**
+ * @openapi
+ * /api/v1/bookings/{booking_id}/payments/{payment_id}/products:
+ *  get:
+ *    summary: Get list of booking products by booking id and payment id
+ *    tags: [Bookings]
+ *    parameters:
+ *          - in: path
+ *            name: booking_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Booking id
+ *          - in: path
+ *            name: payment_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Payment id
+ *    responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: arrays
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  product_id:
+ *                                      type: integer
+ *                                      description: id of product
+ *                                      example: 3
+ *                                  product_name:
+ *                                      type: string
+ *                                      description: name of product
+ *                                      example: Expresso
+ *                                  price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: price price of product
+ *                                      example: 30000
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of product
+ *                                      example: 30000
+ *                                  quantity:
+ *                                      type: integer
+ *                                      description: quantity of product
+ *                                      example: 2
+ *                                  stock:
+ *                                      type: integer
+ *                                      description: remaining amount of product
+ *                                      example: 100
+ *          404:
+ *              description: No booking products found
+ */
+BookingRouter.get(
+    "/:booking_id/payments/:payment_id/products",
+    BookingProductController.findAllSlotByBookingIdAndPaymentId
 );
 
 // PUT: api/v1/bookings/:booking_id/slots/:slot_id
