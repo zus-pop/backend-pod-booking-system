@@ -143,10 +143,10 @@ const getMonthlyRevenueByProduct = async () => {
   }
 };
 
-const getTotalProductRevenue = async () => {
+const getTotalProductRevenueSaled = async () => {
   const connection = await pool.getConnection();
   try {
-    const totalRevenue = await ProductRepository.getTotalProductRevenue(
+    const totalRevenue = await ProductRepository.getTotalProductRevenueSaled(
       connection
     );
     return totalRevenue;
@@ -168,5 +168,5 @@ export default {
   getDailyRevenueByProduct,
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
-  getTotalProductRevenue,
+  getTotalProductRevenueSaled,
 };

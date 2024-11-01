@@ -288,7 +288,7 @@ const getMonthlyRevenueByProduct = async (
   return rows as { month: string; monthly_revenue: number }[];
 };
 
-const getTotalProductRevenue = async (
+const getTotalProductRevenueSaled = async (
   connection: PoolConnection
 ): Promise<{ totalAllProductSaled: number }> => {
   const sql = `
@@ -312,5 +312,5 @@ export default {
   getDailyRevenueByProduct,
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
-  getTotalProductRevenue,
+  getTotalProductRevenueSaled,
 };

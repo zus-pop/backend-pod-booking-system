@@ -314,7 +314,7 @@ ProductRouter.get(
  * @openapi
  * /api/v1/products/total-revenue:
  *   get:
- *     summary: Get total revenue for all products saled
+ *     summary: Get total revenue all products saled
  *     tags: [Products]
  *     responses:
  *       200:
@@ -350,7 +350,10 @@ ProductRouter.get(
  *                   type: string
  *                   example: "Internal server error"
  */
-ProductRouter.get("/total-revenue", ProductController.getTotalProductRevenue);
+ProductRouter.get(
+  "/total-revenue",
+  ProductController.getTotalProductRevenueSaled
+);
 
 //GET: api/v1/products/{id}
 /**

@@ -168,9 +168,9 @@ const getMonthlyRevenueByProduct = async (req: Request, res: Response) => {
   }
 };
 
-const getTotalProductRevenue = async (req: Request, res: Response) => {
+const getTotalProductRevenueSaled = async (req: Request, res: Response) => {
   try {
-    const totalRevenue = await ProductService.getTotalProductRevenue();
+    const totalRevenue = await ProductService.getTotalProductRevenueSaled();
     if (!totalRevenue) {
       return res.status(404).json({ message: "No revenue data found" });
     }
@@ -191,5 +191,5 @@ export default {
   getDailyRevenueByProduct,
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
-  getTotalProductRevenue,
+  getTotalProductRevenueSaled,
 };
