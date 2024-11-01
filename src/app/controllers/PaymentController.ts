@@ -68,6 +68,19 @@ const getMonthlyRevenue = async (req: Request, res: Response) => {
   }
 };
 
+const getTotalRevenue = async (req: Request, res: Response) => {
+  try {
+    const totalRevenue = await PaymentService.getTotalRevenue();
+    if (!totalRevenue) {
+      return res.status(404).json({ message: "No revenue data found" });
+    }
+    return res.status(200).json(totalRevenue);
+  } catch (error) {
+    console.error("Error fetching total revenue:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -75,4 +88,5 @@ export default {
   callbackProduct,
   getDailyRevenue,
   getMonthlyRevenue,
+  getTotalRevenue,
 };

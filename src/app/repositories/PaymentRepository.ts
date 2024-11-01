@@ -159,6 +159,21 @@ const getMonthlyRevenue = async (
   return rows as { year: number; month: number; monthly_revenue: number }[];
 };
 
+const getTotalRevenue = async (
+  connection: PoolConnection
+): Promise<{ totalRevenue: number }> => {
+  const sql = `
+    SELECT 
+        COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+    FROM 
+        Payment p
+    WHERE 
+        p.payment_status = 'Paid';
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows[0] as { totalRevenue: number };
+};
+
 export default {
   find,
   findById,
@@ -168,4 +183,5 @@ export default {
   updateByTransactionId,
   getDailyRevenue,
   getMonthlyRevenue,
+  getTotalRevenue,
 };
