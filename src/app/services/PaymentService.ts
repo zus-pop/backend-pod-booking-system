@@ -97,6 +97,19 @@ const getMonthlyRevenue = async () => {
   }
 };
 
+const getTotalRevenue = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const totalRevenue = await PaymentRepo.getTotalRevenue(connection);
+    return totalRevenue;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findPaymentById,
@@ -105,4 +118,5 @@ export default {
   updatePayment,
   getDailyRevenue,
   getMonthlyRevenue,
+  getTotalRevenue,
 };

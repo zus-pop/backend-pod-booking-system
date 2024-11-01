@@ -89,26 +89,34 @@ const deleteById = async (id: number, connection: PoolConnection) => {
 
 const getTotalRevenueByStore = async (
   connection: PoolConnection
-): Promise<{ store: Store; revenue: number }[]> => {
+): Promise<
+  { store_id: number; store_name: string; totalRevenue: number }[]
+> => {
   const sql = `
-      SELECT s.*, 
-             COALESCE(SUM(p.total_cost), 0) AS revenue
-      FROM Store s
-      LEFT JOIN POD pod ON s.store_id = pod.store_id
-      LEFT JOIN Booking b ON pod.pod_id = b.pod_id
-      LEFT JOIN Payment p ON b.booking_id = p.booking_id
-      GROUP BY s.store_id;
-    `;
+    SELECT 
+        s.store_id,
+        s.store_name,
+        COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        p.payment_status = 'Paid'
+    GROUP BY 
+        s.store_id, s.store_name
+    ORDER BY 
+        s.store_id;
+  `;
   const [rows] = await connection.query<RowDataPacket[]>(sql);
   return rows.map((row) => ({
-    store: {
-      store_id: row.store_id,
-      store_name: row.store_name,
-      address: row.address,
-      hotline: row.hotline,
-      image: row.image,
-    },
-    revenue: row.revenue,
+    store_id: row.store_id,
+    store_name: row.store_name,
+    totalRevenue: row.totalRevenue,
   }));
 };
 

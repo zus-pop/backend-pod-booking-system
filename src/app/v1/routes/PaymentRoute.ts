@@ -106,6 +106,59 @@ PaymentRouter.get("/daily-revenue", PaymentController.getDailyRevenue);
  */
 PaymentRouter.get("/monthly-revenue", PaymentController.getMonthlyRevenue);
 
+// GET: api/v1/payments/total-revenue
+/**
+ * @openapi
+ * /api/v1/payments/total-revenue:
+ *   get:
+ *     summary: Get total revenue for all payments
+ *     tags: [Payments]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalProductRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all products
+ *                   example: 100000.0
+ *                 totalPodRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all PODs
+ *                   example: 200000.0
+ *                 totalStoreRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of the store
+ *                   example: 300000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PaymentRouter.get("/total-revenue", PaymentController.getTotalRevenue);
+
 // GET: api/v1/payments
 /**
  * @openapi
