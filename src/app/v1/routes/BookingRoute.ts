@@ -455,6 +455,10 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  *                                  type: integer
  *                                  description: id of selected product
  *                                  example: 1
+ *                              slot_id:
+ *                                  type: integer
+ *                                  description: id of selected slot
+ *                                  example: 1
  *                              unit_price:
  *                                  type: integer
  *                                  format: double
@@ -550,6 +554,10 @@ BookingRouter.post(
  *                                      type: boolean
  *                                      description: available status of slot
  *                                      example: false
+ *                                  is_checked_in:
+ *                                      type: boolean
+ *                                      description: available checkin status of slot
+ *                                      example: false
  *                                  price:
  *                                      type: integer
  *                                      description: price of slot
@@ -569,10 +577,74 @@ BookingRouter.post(
  */
 BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
 
-// PUT: api/v1/bookings/:booking_id/slots/:id
+// GET: api/v1/bookings/:booking_id/slots/:slot_id/products
 /**
  * @openapi
- * /api/v1/bookings/{booking_id}/slots/{id}:
+ * /api/v1/bookings/{booking_id}/slots/{slot_id}/products:
+ *  get:
+ *    summary: Get list of booking products by booking id and slot id
+ *    tags: [Bookings]
+ *    parameters:
+ *          - in: path
+ *            name: booking_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Booking id
+ *          - in: path
+ *            name: slot_id
+ *            schema:
+ *              type: number
+ *            required: true
+ *            description: The Slot id
+ *    responses:
+ *          200:
+ *              description: success
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: arrays
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  product_id:
+ *                                      type: integer
+ *                                      description: id of product
+ *                                      example: 3
+ *                                  product_name:
+ *                                      type: string
+ *                                      description: name of product
+ *                                      example: Expresso
+ *                                  price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: price price of product
+ *                                      example: 30000
+ *                                  unit_price:
+ *                                      type: integer
+ *                                      format: double
+ *                                      description: unit price of product
+ *                                      example: 30000
+ *                                  quantity:
+ *                                      type: integer
+ *                                      description: quantity of product
+ *                                      example: 2
+ *                                  stock:
+ *                                      type: integer
+ *                                      description: remaining amount of product
+ *                                      example: 100
+ *          404:
+ *              description: No booking products found
+ */
+BookingRouter.get(
+    "/:booking_id/slots/:slot_id/products",
+    BookingProductController.findByBookingIdAndSlotId
+);
+
+// PUT: api/v1/bookings/:booking_id/slots/:slot_id
+/**
+ * @openapi
+ * /api/v1/bookings/{booking_id}/slots/{slot_id}:
  *  put:
  *      summary: Update slot checkin status
  *      tags: [Bookings]
@@ -584,11 +656,11 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  *            required: true
  *            description: The booking id
  *          - in: path
- *            name: id
+ *            name: slot_id
  *            schema:
  *              type: number
  *            required: true
- *            description: The id of booking slot
+ *            description: The id of slot
  *      requestBody:
  *          required: true
  *          content:
@@ -627,7 +699,7 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  *                                  example: Not found any slot!
  */
 BookingRouter.put(
-    "/:booking_id/slots/:id",
+    "/:booking_id/slots/:slot_id",
     BookingSlotController.updateCheckin
 );
 

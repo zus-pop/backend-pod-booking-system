@@ -34,14 +34,28 @@ const findAllSlotByBookingId = async (
     if (!bookingSlots || !bookingSlots.length) {
         return [];
     }
-    const slots = await SlotRepository.findByMultipleId(
-        bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
-        connection
+    return await Promise.all(
+        bookingSlots.map(async (bookingSlot) => {
+            const slot = await SlotRepository.findById(
+                bookingSlot.slot_id!,
+                connection
+            );
+            return {
+                ...slot,
+                price: bookingSlot.unit_price,
+                is_checked_in: bookingSlot.is_checked_in,
+            };
+        })
     );
-    return slots.map((slot, index) => ({
-        ...slot,
-        price: bookingSlots[index].unit_price,
-    }));
+    // const slots = await SlotRepository.findByMultipleId(
+    //     bookingSlots.map((bookingSlot) => bookingSlot.slot_id!),
+    //     connection
+    // );
+    // return slots.map((slot, index) => ({
+    //     ...slot,
+    //     price: bookingSlots[index].unit_price,
+    //     is_checked_in: bookingSlots[index].is_checked_in
+    // }));
 };
 
 const createMany = async (
@@ -63,7 +77,7 @@ const createMany = async (
 };
 
 const updateCheckin = async (
-    id: number,
+    slot_id: number,
     booking_id: number,
     is_checked_in: boolean,
     connection: PoolConnection
@@ -72,8 +86,8 @@ const updateCheckin = async (
     const values = [
         "Booking_Slot",
         { is_checked_in },
-        "id",
-        id,
+        "slot_id",
+        slot_id,
         "booking_id",
         booking_id,
     ];
