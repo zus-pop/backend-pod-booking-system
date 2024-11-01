@@ -181,6 +181,19 @@ const getTotalProductRevenueSaled = async (req: Request, res: Response) => {
   }
 };
 
+const getTotalQuantitySold = async (req: Request, res: Response) => {
+  try {
+    const totalQuantity = await ProductService.getTotalQuantitySold();
+    if (!totalQuantity) {
+      return res.status(404).json({ message: "No quantity data found" });
+    }
+    return res.status(200).json(totalQuantity);
+  } catch (error) {
+    console.error("Error fetching total quantity sold:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   find,
   findById,
@@ -192,4 +205,5 @@ export default {
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
   getTotalProductRevenueSaled,
+  getTotalQuantitySold,
 };

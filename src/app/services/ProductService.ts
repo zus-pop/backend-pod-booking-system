@@ -158,6 +158,21 @@ const getTotalProductRevenueSaled = async () => {
   }
 };
 
+const getTotalQuantitySold = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const totalQuantity = await ProductRepository.getTotalQuantitySold(
+      connection
+    );
+    return totalQuantity;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
 export default {
   find,
   findProductById,
@@ -169,4 +184,5 @@ export default {
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
   getTotalProductRevenueSaled,
+  getTotalQuantitySold,
 };
