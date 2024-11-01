@@ -93,7 +93,7 @@ ProductRouter.get("/", ProductController.find);
 // GET: api/v1/products/total-revenue
 /**
  * @openapi
- * /api/v1/products/total-revenue:
+ * /api/v1/products/total-revenue-each-product:
  *   get:
  *     summary: Get total revenue for each product
  *     tags: [Products]
@@ -141,7 +141,10 @@ ProductRouter.get("/", ProductController.find);
  *                   type: string
  *                   example: "Internal server error"
  */
-ProductRouter.get("/total-revenue", ProductController.getTotalRevenueByProduct);
+ProductRouter.get(
+  "/total-revenue-each-product",
+  ProductController.getTotalRevenueByProduct
+);
 
 // GET: api/v1/products/daily-revenue
 /**
@@ -304,6 +307,52 @@ ProductRouter.get(
 ProductRouter.get(
   "/daily-total-revenue",
   ProductController.getDailyTotalRevenue
+);
+
+// GET: api/v1/products/total-revenue
+/**
+ * @openapi
+ * /api/v1/products/total-revenue:
+ *   get:
+ *     summary: Get total revenue all products saled
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalAllProductSaled:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all products
+ *                   example: 100000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get(
+  "/total-revenue",
+  ProductController.getTotalProductRevenueSaled
 );
 
 //GET: api/v1/products/{id}

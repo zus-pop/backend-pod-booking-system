@@ -112,6 +112,124 @@ const getTotalRevenueByStore = async (
   }));
 };
 
+const getDailyRevenueByStore = async (
+  storeId: number,
+  connection: PoolConnection
+): Promise<{ date: string; daily_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE(p.payment_date) AS date,
+        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        s.store_id = ?
+    GROUP BY 
+        DATE(p.payment_date)
+    ORDER BY 
+        DATE(p.payment_date);
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql, [storeId]);
+  return rows.map((row) => ({
+    date: row.date,
+    daily_revenue: row.daily_revenue,
+  }));
+};
+
+const getMonthlyRevenueByStore = async (
+  storeId: number,
+  connection: PoolConnection
+): Promise<{ month: string; monthly_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
+        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        s.store_id = ?
+    GROUP BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m')
+    ORDER BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m');
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql, [storeId]);
+  return rows.map((row) => ({
+    month: row.month,
+    monthly_revenue: row.monthly_revenue,
+  }));
+};
+
+const getDailyRevenueForAllStores = async (
+  connection: PoolConnection
+): Promise<{ date: string; daily_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        IFNULL(DATE(p.payment_date), '') AS date,
+        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        p.payment_date IS NOT NULL
+    GROUP BY 
+        DATE(p.payment_date)
+    ORDER BY 
+        DATE(p.payment_date);
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows.map((row) => ({
+    date: row.date,
+    daily_revenue: row.daily_revenue,
+  }));
+};
+
+const getMonthlyRevenueForAllStores = async (
+  connection: PoolConnection
+): Promise<{ month: string; monthly_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
+        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        p.payment_date IS NOT NULL
+    GROUP BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m')
+    ORDER BY 
+        DATE_FORMAT(p.payment_date, '%Y-%m');
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows.map((row) => ({
+    month: row.month,
+    monthly_revenue: row.monthly_revenue,
+  }));
+};
+
 export default {
   find,
   findById,
@@ -119,4 +237,8 @@ export default {
   updateStore,
   deleteById,
   getTotalRevenueByStore,
+  getDailyRevenueByStore,
+  getMonthlyRevenueByStore,
+  getDailyRevenueForAllStores,
+  getMonthlyRevenueForAllStores,
 };

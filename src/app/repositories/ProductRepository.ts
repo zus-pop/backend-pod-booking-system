@@ -288,6 +288,19 @@ const getMonthlyRevenueByProduct = async (
   return rows as { month: string; monthly_revenue: number }[];
 };
 
+const getTotalProductRevenueSaled = async (
+  connection: PoolConnection
+): Promise<{ totalAllProductSaled: number }> => {
+  const sql = `
+    SELECT 
+        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS totalAllProductSaled
+    FROM 
+        Booking_Product bp;
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql);
+  return rows[0] as { totalAllProductSaled: number };
+};
+
 export default {
   find,
   findById,
@@ -299,4 +312,5 @@ export default {
   getDailyRevenueByProduct,
   getDailyTotalRevenue,
   getMonthlyRevenueByProduct,
+  getTotalProductRevenueSaled,
 };
