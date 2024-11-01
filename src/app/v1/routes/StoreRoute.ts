@@ -132,6 +132,63 @@ StoreRouter.get("/", StoreController.find);
  */
 StoreRouter.get("/total-revenue", StoreController.getTotalRevenueByStore);
 
+// GET: api/v1/stores/:id/daily-revenue
+/**
+ * @openapi
+ * /api/v1/stores/{id}/daily-revenue:
+ *   get:
+ *     summary: Get daily revenue for a store
+ *     tags: [Stores]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The Store id
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the revenue
+ *                     example: "2023-10-01"
+ *                   daily_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The daily revenue of the store
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+StoreRouter.get("/:id/daily-revenue", StoreController.getDailyRevenueByStore);
+
 // GET: api/v1/stores/:id
 /**
  * @openapi

@@ -112,6 +112,36 @@ const getTotalRevenueByStore = async (
   }));
 };
 
+const getDailyRevenueByStore = async (
+  storeId: number,
+  connection: PoolConnection
+): Promise<{ date: string; daily_revenue: number }[]> => {
+  const sql = `
+    SELECT 
+        DATE(p.payment_date) AS date,
+        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+    FROM 
+        Store s
+    LEFT JOIN 
+        POD pod ON s.store_id = pod.store_id
+    LEFT JOIN 
+        Booking b ON pod.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        s.store_id = ?
+    GROUP BY 
+        DATE(p.payment_date)
+    ORDER BY 
+        DATE(p.payment_date);
+  `;
+  const [rows] = await connection.query<RowDataPacket[]>(sql, [storeId]);
+  return rows.map((row) => ({
+    date: row.date,
+    daily_revenue: row.daily_revenue,
+  }));
+};
+
 export default {
   find,
   findById,
@@ -119,4 +149,5 @@ export default {
   updateStore,
   deleteById,
   getTotalRevenueByStore,
+  getDailyRevenueByStore,
 };
