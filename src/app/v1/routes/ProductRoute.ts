@@ -355,6 +355,49 @@ ProductRouter.get(
   ProductController.getTotalProductRevenueSaled
 );
 
+// GET: api/v1/products/total-quantity
+/**
+ * @openapi
+ * /api/v1/products/total-quantity:
+ *   get:
+ *     summary: Get total quantity sold for all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total quantity sold
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalQuantitySold:
+ *                   type: number
+ *                   format: integer
+ *                   description: The total quantity sold of all products
+ *                   example: 1000
+ *       404:
+ *         description: No quantity data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No quantity data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ProductRouter.get("/total-quantity", ProductController.getTotalQuantitySold);
+
 //GET: api/v1/products/{id}
 /**
  * @openapi
