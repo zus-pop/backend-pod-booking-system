@@ -228,6 +228,10 @@ PaymentRouter.get("/total-revenue", PaymentController.getTotalRevenue);
  *                          description: status of payment
  *                          enum: [Processing, Unpaid, Paid, Failed]
  *                          example: Unpaid
+ *                      payment_for:
+ *                          type: string
+ *                          description: target of payment
+ *                          example: Slot
  *       404:
  *         description: No Payments found
  *

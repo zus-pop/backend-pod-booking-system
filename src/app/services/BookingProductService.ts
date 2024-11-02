@@ -1,6 +1,5 @@
 import { pool } from "../config/pool.ts";
 import BookingProductRepository from "../repositories/BookingProductRepository.ts";
-import ProductRepository from "../repositories/ProductRepository.ts";
 import { BookingProduct } from "../types/type.ts";
 import { createOnlinePaymentRequest } from "../utils/zalo.ts";
 
@@ -43,6 +42,27 @@ const findByBookingIdAndSlotId = async (
       await BookingProductRepository.findByBookingIdAndSlotId(
         booking_id,
         slot_id,
+        connection
+      );
+    return bookingProducts;
+  } catch (err) {
+    console.error(err);
+    return null;
+  } finally {
+    connection.release();
+  }
+};
+
+const findAllSlotByBookingIdAndPaymentId = async (
+  booking_id: number,
+  payment_id: number
+) => {
+  const connection = await pool.getConnection();
+  try {
+    const bookingProducts =
+      await BookingProductRepository.findAllSlotByBookingIdAndPaymentId(
+        booking_id,
+        payment_id,
         connection
       );
     return bookingProducts;
@@ -101,6 +121,7 @@ export default {
   findAllBookingProducts,
   findByBookingId,
   findByBookingIdAndSlotId,
+  findAllSlotByBookingIdAndPaymentId,
   addProductForBooking,
   createProductPayment,
 };

@@ -33,6 +33,22 @@ const findByBookingIdAndSlotId = async (req: Request, res: Response) => {
     return res.status(200).json(bookingProducts);
 };
 
+const findAllSlotByBookingIdAndPaymentId = async (
+    req: Request,
+    res: Response
+) => {
+    const { booking_id, payment_id } = req.params;
+    const bookingProducts =
+        await BookingProductService.findAllSlotByBookingIdAndPaymentId(
+            +booking_id,
+            +payment_id
+        );
+    if (!bookingProducts || !bookingProducts.length) {
+        return res.status(404).json({ message: "No booking products found" });
+    }
+    return res.status(200).json(bookingProducts);
+};
+
 const createProductPayment = async (req: Request, res: Response) => {
     const { payload } = req;
     const bookingProduct = req.body as BookingProduct[];
@@ -47,5 +63,6 @@ export default {
     findAll,
     findByBookingId,
     findByBookingIdAndSlotId,
+    findAllSlotByBookingIdAndPaymentId,
     createProductPayment,
 };

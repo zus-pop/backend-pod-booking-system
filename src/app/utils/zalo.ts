@@ -2,18 +2,16 @@ import crypto from "crypto";
 import moment from "moment";
 import qs from "qs";
 import { pool } from "../config/pool.ts";
+import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 import BookingRepo from "../repositories/BookingRepository.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
+import ProductRepository from "../repositories/ProductRepository.ts";
+import NotificationService from "../services/NotificationService.ts";
 import {
     BookingProduct,
     BookingSlot,
     OnlinePaymentResponse,
 } from "../types/type.ts";
-import BookingProductService from "../services/BookingProductService.ts";
-import PaymentService from "../services/PaymentService.ts";
-import NotificationService from "../services/NotificationService.ts";
-import ProductRepository from "../repositories/ProductRepository.ts";
-import BookingProductRepository from "../repositories/BookingProductRepository.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
@@ -154,12 +152,30 @@ export const callbackPaymentProduct = async (dataStr: any, reqMac: any) => {
             const bookingProducts = JSON.parse(
                 dataJson.item
             ) as BookingProduct[];
-            await connection.beginTransaction();
 
-            const productResult = await BookingProductRepository.create(
-                bookingProducts,
+            await connection.beginTransaction();
+            const paymentResult = await PaymentRepo.create(
+                {
+                    transaction_id: dataJson["app_trans_id"],
+                    booking_id: bookingProducts[0].booking_id,
+                    total_cost: dataJson.amount,
+                    payment_date: moment()
+                        .utcOffset(+7)
+                        .format("YYYY-MM-DD HH:mm:ss"),
+                    payment_status: "Paid",
+                    payment_for: "Product",
+                },
                 connection
             );
+
+            const productResult = await BookingProductRepository.create(
+                bookingProducts.map((bookingProduct) => ({
+                    ...bookingProduct,
+                    payment_id: paymentResult.insertId,
+                })),
+                connection
+            );
+
             if (productResult.affectedRows) {
                 for (const bookingProduct of bookingProducts) {
                     const product = await ProductRepository.findById(
@@ -175,18 +191,6 @@ export const callbackPaymentProduct = async (dataStr: any, reqMac: any) => {
                         connection
                     );
                 }
-                PaymentRepo.create(
-                    {
-                        transaction_id: dataJson["app_trans_id"],
-                        booking_id: bookingProducts[0].booking_id,
-                        total_cost: dataJson.amount,
-                        payment_date: moment()
-                            .utcOffset(+7)
-                            .format("YYYY-MM-DD HH:mm:ss"),
-                        payment_status: "Paid",
-                    },
-                    connection
-                );
             }
 
             const notiResult = await NotificationService.createNewMessage({
