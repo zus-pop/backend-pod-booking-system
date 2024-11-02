@@ -18,6 +18,21 @@ const findAllSlotByBookingId = async (req: Request, res: Response) => {
     return res.status(200).json(slots);
 };
 
+const findAllSlotByBookingIdAndPaymentId = async (
+    req: Request,
+    res: Response
+) => {
+    const { booking_id, payment_id } = req.params;
+    const slots = await BookingSlotService.findAllSlotByBookingIdAndPaymentId(
+        +booking_id,
+        +payment_id
+    );
+    if (!slots || !slots.length) {
+        return res.status(404).json({ message: "Not found any slot!" });
+    }
+    return res.status(200).json(slots);
+};
+
 const updateCheckin = async (req: Request, res: Response) => {
     const { slot_id, booking_id } = req.params;
     const { is_checked_in } = req.body;
@@ -35,5 +50,6 @@ const updateCheckin = async (req: Request, res: Response) => {
 export default {
     findAllSlot,
     findAllSlotByBookingId,
+    findAllSlotByBookingIdAndPaymentId,
     updateCheckin,
 };

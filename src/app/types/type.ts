@@ -48,6 +48,7 @@ export interface Product {
 
 export interface BookingProduct {
     booking_id?: number;
+    payment_id?: number;
     product_id?: number;
     slot_id?: number;
     unit_price?: number;
@@ -58,6 +59,7 @@ export interface BookingProduct {
 export interface BookingSlot {
     id?: number;
     booking_id?: number;
+    payment_id?: number;
     slot_id?: number;
     unit_price?: number;
     is_checked_in?: boolean;
@@ -82,6 +84,7 @@ export interface Payment {
     payment_url?: string;
     payment_date?: Date | string;
     payment_status?: keyof typeof PaymentStatus;
+    payment_for?: "Slot" | "Product";
 }
 
 export interface OnlinePaymentResponse {
