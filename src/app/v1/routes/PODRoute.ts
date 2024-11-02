@@ -57,10 +57,10 @@ export const PODRouter = Router();
  */
 PODRouter.get("/average-usage-time", PODController.getAveragePodUsageTime);
 
-// GET: api/v1/pods/total-revenue
+// GET: api/v1/pods/total-revenue-each-pod
 /**
  * @openapi
- * /api/v1/pods/total-revenue:
+ * /api/v1/pods/total-revenue-each-pod:
  *   get:
  *     summary: Get total revenue for each POD
  *     tags: [PODs]
@@ -108,7 +108,7 @@ PODRouter.get("/average-usage-time", PODController.getAveragePodUsageTime);
  *                   type: string
  *                   example: "Internal server error"
  */
-PODRouter.get("/total-revenue", PODController.getTotalRevenueByPod);
+PODRouter.get("/total-revenue-each-pod", PODController.getTotalRevenueByPod);
 
 // GET: api/v1/pods/daily-revenue
 /**
@@ -208,6 +208,49 @@ PODRouter.get("/daily-revenue", PODController.getDailyRevenueByPOD);
  *                   example: "Internal server error"
  */
 PODRouter.get("/monthly-revenue", PODController.getMonthlyRevenueByPOD);
+
+// GET: api/v1/pods/total-pod-revenue
+/**
+ * @openapi
+ * /api/v1/pods/total-pod-revenue:
+ *   get:
+ *     summary: Get total pod revenue
+ *     tags: [PODs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total pod revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalPodRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all PODs
+ *                   example: 4660200.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+PODRouter.get("/total-pod-revenue", PODController.getTotalPodRevenue);
 
 // GET: api/v1/pods/sorted-by-rating
 /**
