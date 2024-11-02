@@ -260,16 +260,24 @@ const getDailyTotalRevenue = async (
     connection: PoolConnection
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
-      SELECT 
-          DATE(bp.bought_date) AS date,
-          COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS daily_revenue
-      FROM 
-          Booking_Product bp
-      GROUP BY 
-          DATE(bp.bought_date)
-      ORDER BY 
-          DATE(bp.bought_date);
-    `;
+    SELECT 
+        DATE(bp.bought_date) AS date,
+        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS daily_revenue
+    FROM 
+        Booking_Product bp
+    LEFT JOIN 
+        Booking b ON bp.booking_id = b.booking_id
+    LEFT JOIN 
+        Payment pay ON b.booking_id = pay.booking_id
+    WHERE 
+        b.booking_status IN ('Complete', 'Confirmed')
+        AND pay.payment_status = 'Paid'
+        AND pay.payment_for = 'Product'
+    GROUP BY 
+        DATE(bp.bought_date)
+    ORDER BY 
+        DATE(bp.bought_date);
+  `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as { date: string; daily_revenue: number }[];
 };
@@ -283,6 +291,14 @@ const getMonthlyRevenueByProduct = async (
         COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS monthly_revenue
     FROM 
         Booking_Product bp
+    LEFT JOIN 
+        Booking b ON bp.booking_id = b.booking_id
+    LEFT JOIN 
+        Payment pay ON b.booking_id = pay.booking_id
+    WHERE 
+        b.booking_status IN ('Complete', 'Confirmed')
+        AND pay.payment_status = 'Paid'
+        AND pay.payment_for = 'Product'
     GROUP BY 
         DATE_FORMAT(bp.bought_date, '%Y-%m')
     ORDER BY 

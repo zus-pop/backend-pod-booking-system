@@ -350,6 +350,9 @@ const getDailyRevenueByPOD = async (
         Booking b
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        p.payment_status IN ('Paid')
+        AND b.booking_status IN ('Complete', 'Ongoing')
     GROUP BY 
         DATE(b.booking_date)
     ORDER BY 
@@ -370,6 +373,9 @@ const getMonthlyRevenueByPOD = async (
         Booking b
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
+    WHERE 
+        p.payment_status IN ('Paid')
+        AND b.booking_status IN ('Complete', 'Ongoing')
     GROUP BY 
         DATE_FORMAT(b.booking_date, '%Y-%m')
     ORDER BY 
