@@ -79,10 +79,10 @@ export const StoreRouter = Router();
  */
 StoreRouter.get("/", StoreController.find);
 
-// GET: api/v1/stores/total-revenue
+// GET: api/v1/stores/total-revenue-each-store
 /**
  * @openapi
- * /api/v1/stores/total-revenue:
+ * /api/v1/stores/total-revenue-each-store:
  *   get:
  *     summary: Get total revenue for each store
  *     tags: [Stores]
@@ -130,7 +130,10 @@ StoreRouter.get("/", StoreController.find);
  *                   type: string
  *                   example: "Internal server error"
  */
-StoreRouter.get("/total-revenue", StoreController.getTotalRevenueByStore);
+StoreRouter.get(
+    "/total-revenue-each-store",
+    StoreController.getTotalRevenueByStore
+);
 
 // GET: api/v1/stores/:id/daily-revenue
 /**
@@ -244,8 +247,8 @@ StoreRouter.get("/:id/daily-revenue", StoreController.getDailyRevenueByStore);
  *                   example: "Internal server error"
  */
 StoreRouter.get(
-  "/:id/monthly-revenue",
-  StoreController.getMonthlyRevenueByStore
+    "/:id/monthly-revenue",
+    StoreController.getMonthlyRevenueByStore
 );
 
 // GET: api/v1/stores/daily-revenue
@@ -346,9 +349,52 @@ StoreRouter.get("/daily-revenue", StoreController.getDailyRevenueForAllStores);
  *                   example: "Internal server error"
  */
 StoreRouter.get(
-  "/monthly-revenue",
-  StoreController.getMonthlyRevenueForAllStores
+    "/monthly-revenue",
+    StoreController.getMonthlyRevenueForAllStores
 );
+
+// GET: api/v1/stores/total-revenue
+/**
+ * @openapi
+ * /api/v1/stores/total-revenue:
+ *   get:
+ *     summary: Get total revenue for all stores
+ *     tags: [Stores]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all stores
+ *                   example: 1000000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+StoreRouter.get("/total-revenue", StoreController.getTotalRevenueForAllStores);
 
 // GET: api/v1/stores/:id
 /**
@@ -549,8 +595,8 @@ StoreRouter.get("/:id/pods", PODController.findByStoreId);
  *                                  example: No store prices found!
  */
 StoreRouter.get(
-  "/:store_id/pod-type/:type_id/prices",
-  StorePriceController.findByStoreIdAndTypeId
+    "/:store_id/pod-type/:type_id/prices",
+    StorePriceController.findByStoreIdAndTypeId
 );
 
 // POST: api/v1/stores

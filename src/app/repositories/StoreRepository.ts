@@ -179,7 +179,7 @@ const getDailyRevenueByStore = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        s.store_id = ?
+        s.store_id = ? AND p.payment_status = 'Paid'
     GROUP BY 
         DATE(p.payment_date)
     ORDER BY 
@@ -209,7 +209,7 @@ const getMonthlyRevenueByStore = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        s.store_id = ?
+        s.store_id = ? AND p.payment_status = 'Paid'
     GROUP BY 
         DATE_FORMAT(p.payment_date, '%Y-%m')
     ORDER BY 
@@ -227,7 +227,7 @@ const getDailyRevenueForAllStores = async (
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
     SELECT 
-        IFNULL(DATE(p.payment_date), '') AS date,
+        DATE(p.payment_date) AS date,
         COALESCE(SUM(p.total_cost), 0) AS daily_revenue
     FROM 
         Store s
@@ -238,7 +238,7 @@ const getDailyRevenueForAllStores = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        p.payment_date IS NOT NULL
+        p.payment_status = 'Paid'
     GROUP BY 
         DATE(p.payment_date)
     ORDER BY 
@@ -267,7 +267,7 @@ const getMonthlyRevenueForAllStores = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        p.payment_date IS NOT NULL
+        p.payment_status = 'Paid'
     GROUP BY 
         DATE_FORMAT(p.payment_date, '%Y-%m')
     ORDER BY 
@@ -278,6 +278,27 @@ const getMonthlyRevenueForAllStores = async (
         month: row.month,
         monthly_revenue: row.monthly_revenue,
     }));
+};
+
+const getTotalRevenueForAllStores = async (
+    connection: PoolConnection
+): Promise<{ totalRevenue: number }> => {
+    const sql = `
+      SELECT 
+          COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+      FROM 
+          Store s
+      LEFT JOIN 
+          POD pod ON s.store_id = pod.store_id
+      LEFT JOIN 
+          Booking b ON pod.pod_id = b.pod_id
+      LEFT JOIN 
+          Payment p ON b.booking_id = p.booking_id
+      WHERE 
+          p.payment_status = 'Paid';
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows[0] as { totalRevenue: number };
 };
 
 export default {
@@ -291,4 +312,5 @@ export default {
     getMonthlyRevenueByStore,
     getDailyRevenueForAllStores,
     getMonthlyRevenueForAllStores,
+    getTotalRevenueForAllStores,
 };

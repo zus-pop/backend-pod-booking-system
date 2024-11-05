@@ -178,8 +178,7 @@ const getDailyRevenueBySlot = async (
       LEFT JOIN 
           Payment pay ON b.booking_id = pay.booking_id
       WHERE 
-          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
-          AND pay.payment_status = 'Paid'
+          pay.payment_status = 'Paid'
           AND pay.payment_for = 'Slot'
       GROUP BY 
           DATE(pay.payment_date)
@@ -204,8 +203,7 @@ const getMonthlyRevenueBySlot = async (
       LEFT JOIN 
           Payment pay ON b.booking_id = pay.booking_id
       WHERE 
-          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
-          AND pay.payment_status = 'Paid'
+          pay.payment_status = 'Paid'
           AND pay.payment_for = 'Slot'
       GROUP BY 
           DATE_FORMAT(pay.payment_date, '%Y-%m')
@@ -229,8 +227,7 @@ const getTotalSlotRevenue = async (
       LEFT JOIN 
           Payment pay ON b.booking_id = pay.booking_id
       WHERE 
-          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
-          AND pay.payment_status = 'Paid'
+          pay.payment_status = 'Paid'
           AND pay.payment_for = 'Slot';
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);

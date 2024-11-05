@@ -277,8 +277,7 @@ const getDailyTotalRevenue = async (
       LEFT JOIN 
           Payment pay ON b.booking_id = pay.booking_id
       WHERE 
-          b.booking_status IN ('Complete', 'Confirmed')
-          AND pay.payment_status = 'Paid'
+          pay.payment_status = 'Paid'
           AND pay.payment_for = 'Product'
       GROUP BY 
           DATE(pay.payment_date)
@@ -303,8 +302,7 @@ const getMonthlyRevenueByProduct = async (
       LEFT JOIN 
           Payment pay ON b.booking_id = pay.booking_id
       WHERE 
-          b.booking_status IN ('Complete', 'Confirmed')
-          AND pay.payment_status = 'Paid'
+          pay.payment_status = 'Paid'
           AND pay.payment_for = 'Product'
       GROUP BY 
           DATE_FORMAT(pay.payment_date, '%Y-%m')
@@ -328,8 +326,7 @@ const getTotalProductRevenueSaled = async (
     LEFT JOIN 
         Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-        b.booking_status IN ('Complete', 'Confirmed')
-        AND pay.payment_status = 'Paid'
+        pay.payment_status = 'Paid'
         AND pay.payment_for = 'Product';
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
