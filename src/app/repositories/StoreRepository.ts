@@ -8,8 +8,17 @@ const find = async (
 ) => {
     const conditions: string[] = [];
     const queryParams: any[] = [];
-    let sql = "SELECT ?? FROM ??";
-    let countSql = "SELECT COUNT(*) AS total FROM Store";
+    let sql = `
+        SELECT s.*, COALESCE(AVG(Rating.rating), 0)  AS rating 
+        FROM 
+        (
+        	SELECT u.user_name, p.pod_name, p.store_id, b.rating FROM PODDY.Booking b 
+            JOIN PODDY.POD p ON b.pod_id = p.pod_id
+            JOIN PODDY.User u ON u.user_id = b.user_id
+        ) AS Rating
+        RIGHT OUTER JOIN PODDY.Store s ON s.store_id = Rating.store_id
+        `;
+    let countSql = "SELECT COUNT(DISTINCT s.store_id) AS total FROM Store s";
 
     Object.keys(filters).forEach((filter) => {
         const key = filter;
@@ -17,11 +26,11 @@ const find = async (
         if (value !== null && value !== undefined) {
             switch (key) {
                 case "store_name":
-                    conditions.push(`${key} LIKE ?`);
+                    conditions.push(`s.${key} LIKE ?`);
                     queryParams.push(`%${value}%`);
                     break;
                 case "address":
-                    conditions.push(`${key} LIKE ?`);
+                    conditions.push(`s.${key} LIKE ?`);
                     queryParams.push(`%${value}%`);
                     break;
                 default:
@@ -41,6 +50,9 @@ const find = async (
         queryParams
     );
 
+    sql += " GROUP BY s.store_id";
+    sql += " ORDER BY rating DESC";
+
     if (pagination) {
         const { page, limit } = pagination;
         const offset = (page! - 1) * limit!;
@@ -48,8 +60,7 @@ const find = async (
         queryParams.push(limit, offset);
     }
 
-    const columns = ["store_id", "store_name", "address", "hotline", "image"];
-    const values = [columns, "Store", ...queryParams];
+    const values = [...queryParams];
     const [stores] = await connection.query<RowDataPacket[]>(sql, values);
     return {
         stores: stores as Store[],
@@ -58,11 +69,42 @@ const find = async (
 };
 
 const findById = async (id: number, connection: PoolConnection) => {
-    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["store_id", "store_name", "address", "hotline", "image"];
-    const values = [columns, "Store", "store_id", id];
+    const sql = `
+        SELECT s.*, COALESCE(AVG(Rating.rating), 0)  AS rating 
+        FROM 
+        (
+        	SELECT u.user_name, p.pod_name, p.store_id, b.rating FROM PODDY.Booking b 
+            JOIN PODDY.POD p ON b.pod_id = p.pod_id
+            JOIN PODDY.User u ON u.user_id = b.user_id
+        ) AS Rating RIGHT OUTER JOIN PODDY.Store s ON s.store_id = Rating.store_id
+        WHERE ?? = ?
+        GROUP BY s.store_id
+        `;
+    const feedbackSql = `
+        SELECT u.user_name, p.pod_name, p.store_id, b.rating, b.comment FROM PODDY.Booking b 
+        JOIN PODDY.POD p ON b.pod_id = p.pod_id
+        JOIN PODDY.User u ON u.user_id = b.user_id
+        WHERE ?? = ? AND (b.rating IS NOT NULL OR b.comment IS NOT NULL)
+        ORDER BY ??
+        LIMIT ? OFFSET ?;
+    `;
+    const feedbackValues = ["p.store_id", id, "b.rating", 4, 0];
+    const [feedbacks] = await connection.query<RowDataPacket[]>(
+        feedbackSql,
+        feedbackValues
+    );
+    const values = ["s.store_id", id];
     const [stores] = await connection.query<RowDataPacket[]>(sql, values);
-    return stores[0] as Store;
+    return {
+        ...(stores[0] as Store),
+        feedbacks: feedbacks as {
+            user_name: string;
+            pod_name: string;
+            store_id: number;
+            rating: number | null;
+            comment: string | null;
+        }[],
+    };
 };
 
 const createNewStore = async (store: Store, connection: PoolConnection) => {

@@ -928,7 +928,7 @@ BookingRouter.post(
  * @openapi
  * /api/v1/bookings/{id}:
  *  put:
- *      summary: Update Booking status
+ *      summary: Update Booking
  *      tags: [Bookings]
  *      parameters:
  *          - in: path
@@ -946,8 +946,13 @@ BookingRouter.post(
  *                      properties:
  *                          booking_status:
  *                              type: string
- *                              required: true
- *                              enum: [Pending, Confirmed, Canceled, Complete, Ongoing]
+ *                              enum: [Pending, Confirmed, Canceled, Complete, Ongoing, Paused]
+ *                          rating:
+ *                              type: integer
+ *                              example: 4.8
+ *                          comment:
+ *                              type: string
+ *                              example: đỉnh nóc kịch trần
  *      responses:
  *          200:
  *              description: Update successfully

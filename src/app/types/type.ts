@@ -53,7 +53,6 @@ export interface BookingProduct {
     slot_id?: number;
     unit_price?: number;
     quantity?: number;
-    bought_date?: string;
 }
 
 export interface BookingSlot {
