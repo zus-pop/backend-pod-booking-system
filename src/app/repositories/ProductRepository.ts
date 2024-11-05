@@ -236,16 +236,23 @@ const getDailyRevenueByProduct = async (
       SELECT 
           p.product_id,
           p.product_name,
-          DATE(bp.bought_date) AS date,
+          DATE(pay.payment_date) AS date,
           COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS daily_revenue
       FROM 
           Product p
       LEFT JOIN 
           Booking_Product bp ON p.product_id = bp.product_id
+      LEFT JOIN 
+          Booking b ON bp.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Product'
       GROUP BY 
-          p.product_id, DATE(bp.bought_date)
+          p.product_id, DATE(pay.payment_date)
       ORDER BY 
-          DATE(bp.bought_date);
+          DATE(pay.payment_date);
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as {
@@ -260,24 +267,24 @@ const getDailyTotalRevenue = async (
     connection: PoolConnection
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
-    SELECT 
-        DATE(bp.bought_date) AS date,
-        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS daily_revenue
-    FROM 
-        Booking_Product bp
-    LEFT JOIN 
-        Booking b ON bp.booking_id = b.booking_id
-    LEFT JOIN 
-        Payment pay ON b.booking_id = pay.booking_id
-    WHERE 
-        b.booking_status IN ('Complete', 'Confirmed')
-        AND pay.payment_status = 'Paid'
-        AND pay.payment_for = 'Product'
-    GROUP BY 
-        DATE(bp.bought_date)
-    ORDER BY 
-        DATE(bp.bought_date);
-  `;
+      SELECT 
+          DATE(pay.payment_date) AS date,
+          COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS daily_revenue
+      FROM 
+          Booking_Product bp
+      LEFT JOIN 
+          Booking b ON bp.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          b.booking_status IN ('Complete', 'Confirmed')
+          AND pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Product'
+      GROUP BY 
+          DATE(pay.payment_date)
+      ORDER BY 
+          DATE(pay.payment_date);
+    `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as { date: string; daily_revenue: number }[];
 };
@@ -286,24 +293,24 @@ const getMonthlyRevenueByProduct = async (
     connection: PoolConnection
 ): Promise<{ month: string; monthly_revenue: number }[]> => {
     const sql = `
-    SELECT 
-        DATE_FORMAT(bp.bought_date, '%Y-%m') AS month,
-        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS monthly_revenue
-    FROM 
-        Booking_Product bp
-    LEFT JOIN 
-        Booking b ON bp.booking_id = b.booking_id
-    LEFT JOIN 
-        Payment pay ON b.booking_id = pay.booking_id
-    WHERE 
-        b.booking_status IN ('Complete', 'Confirmed')
-        AND pay.payment_status = 'Paid'
-        AND pay.payment_for = 'Product'
-    GROUP BY 
-        DATE_FORMAT(bp.bought_date, '%Y-%m')
-    ORDER BY 
-        DATE_FORMAT(bp.bought_date, '%Y-%m');
-  `;
+      SELECT 
+          DATE_FORMAT(pay.payment_date, '%Y-%m') AS month,
+          COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS monthly_revenue
+      FROM 
+          Booking_Product bp
+      LEFT JOIN 
+          Booking b ON bp.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          b.booking_status IN ('Complete', 'Confirmed')
+          AND pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Product'
+      GROUP BY 
+          DATE_FORMAT(pay.payment_date, '%Y-%m')
+      ORDER BY 
+          DATE_FORMAT(pay.payment_date, '%Y-%m');
+    `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as { month: string; monthly_revenue: number }[];
 };
@@ -313,7 +320,7 @@ const getTotalProductRevenueSaled = async (
 ): Promise<{ totalAllProductSaled: number }> => {
     const sql = `
     SELECT 
-        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS totalAllProductSaled
+        COALESCE(SUM(bp.unit_price * bp.quantity), 0) AS totalProductRevenue
     FROM 
         Booking_Product bp
     LEFT JOIN 

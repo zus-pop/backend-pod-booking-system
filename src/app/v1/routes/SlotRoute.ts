@@ -77,6 +77,149 @@ export const SlotRouter = Router();
  */
 SlotRouter.get("/", SlotController.find);
 
+// GET: api/v1/slots/daily-revenue
+/**
+ * @openapi
+ * /api/v1/slots/daily-revenue:
+ *   get:
+ *     summary: Get daily revenue for all slots
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the revenue
+ *                     example: "2023-10-01"
+ *                   daily_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The daily revenue
+ *                     example: 1000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/daily-revenue", SlotController.getDailyRevenueBySlot);
+
+// GET: api/v1/slots/monthly-revenue
+/**
+ * @openapi
+ * /api/v1/slots/monthly-revenue:
+ *   get:
+ *     summary: Get monthly revenue for all slots
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved monthly revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: string
+ *                     format: date
+ *                     description: The month of the revenue
+ *                     example: "2023-10"
+ *                   monthly_revenue:
+ *                     type: number
+ *                     format: float
+ *                     description: The monthly revenue
+ *                     example: 10000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/monthly-revenue", SlotController.getMonthlyRevenueBySlot);
+
+// GET: api/v1/slots/total-revenue
+/**
+ * @openapi
+ * /api/v1/slots/total-revenue:
+ *   get:
+ *     summary: Get total slot revenue
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total slot revenue
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalSlotRevenue:
+ *                   type: number
+ *                   format: float
+ *                   description: The total revenue of all slots
+ *                   example: 1000000.0
+ *       404:
+ *         description: No revenue data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No revenue data found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/total-revenue", SlotController.getTotalSlotRevenue);
+
 // GET: api/v1/slots/:id
 /**
  * @openapi

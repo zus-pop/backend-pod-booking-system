@@ -164,6 +164,79 @@ const checkOverlappingSlots = async (
     return overlappingSlots as Slot[];
 };
 
+const getDailyRevenueBySlot = async (
+    connection: PoolConnection
+): Promise<{ date: string; daily_revenue: number }[]> => {
+    const sql = `
+      SELECT 
+          DATE(pay.payment_date) AS date,
+          COALESCE(SUM(bs.unit_price), 0) AS daily_revenue
+      FROM 
+          Booking_Slot bs
+      LEFT JOIN 
+          Booking b ON bs.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
+          AND pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Slot'
+      GROUP BY 
+          DATE(pay.payment_date)
+      ORDER BY 
+          DATE(pay.payment_date);
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows as { date: string; daily_revenue: number }[];
+};
+
+const getMonthlyRevenueBySlot = async (
+    connection: PoolConnection
+): Promise<{ month: string; monthly_revenue: number }[]> => {
+    const sql = `
+      SELECT 
+          DATE_FORMAT(pay.payment_date, '%Y-%m') AS month,
+          COALESCE(SUM(bs.unit_price), 0) AS monthly_revenue
+      FROM 
+          Booking_Slot bs
+      LEFT JOIN 
+          Booking b ON bs.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
+          AND pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Slot'
+      GROUP BY 
+          DATE_FORMAT(pay.payment_date, '%Y-%m')
+      ORDER BY 
+          DATE_FORMAT(pay.payment_date, '%Y-%m');
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows as { month: string; monthly_revenue: number }[];
+};
+
+const getTotalSlotRevenue = async (
+    connection: PoolConnection
+): Promise<{ totalSlotRevenue: number }> => {
+    const sql = `
+      SELECT 
+          COALESCE(SUM(bs.unit_price), 0) AS totalSlotRevenue
+      FROM 
+          Booking_Slot bs
+      LEFT JOIN 
+          Booking b ON bs.booking_id = b.booking_id
+      LEFT JOIN 
+          Payment pay ON b.booking_id = pay.booking_id
+      WHERE 
+          b.booking_status IN ('Complete', 'Confirmed', 'Ongoing')
+          AND pay.payment_status = 'Paid'
+          AND pay.payment_for = 'Slot';
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows[0] as { totalSlotRevenue: number };
+};
+
 export default {
     find,
     findById,
@@ -174,4 +247,7 @@ export default {
     updateStatusMultipleSlot,
     updateExpiredSlot,
     remove,
+    getDailyRevenueBySlot,
+    getMonthlyRevenueBySlot,
+    getTotalSlotRevenue,
 };
