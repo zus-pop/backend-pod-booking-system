@@ -1,7 +1,6 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { BookingProduct } from "../types/type.ts";
 import ProductRepository from "./ProductRepository.ts";
-import moment from "moment";
 
 const findAll = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
@@ -162,9 +161,7 @@ const create = async (
         "slot_id",
         "unit_price",
         "quantity",
-        "bought_date",
     ];
-    const bought_date = moment().utcOffset(+7).format("YYYY-MM-DD HH:mm:ss");
     const values = [
         "Booking_Product",
         columns,
@@ -175,7 +172,6 @@ const create = async (
             item.slot_id,
             item.unit_price,
             item.quantity,
-            bought_date,
         ]),
     ];
     console.log(connection.format(sql, values));
