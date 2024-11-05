@@ -254,6 +254,47 @@ const remove = async (id: number) => {
     }
 };
 
+const getDailyRevenueBySlot = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const dailyRevenue = await SlotRepo.getDailyRevenueBySlot(connection);
+        return dailyRevenue;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const getMonthlyRevenueBySlot = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const monthlyRevenue = await SlotRepo.getMonthlyRevenueBySlot(
+            connection
+        );
+        return monthlyRevenue;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const getTotalSlotRevenue = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const totalSlotRevenue = await SlotRepo.getTotalSlotRevenue(connection);
+        return totalSlotRevenue;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 export default {
     find,
     findSlotById,
@@ -264,4 +305,7 @@ export default {
     updateMultipleSlot,
     updateExpiredSlot,
     remove,
+    getDailyRevenueBySlot,
+    getMonthlyRevenueBySlot,
+    getTotalSlotRevenue,
 };

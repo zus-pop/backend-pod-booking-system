@@ -321,7 +321,7 @@ const getTotalRevenueByPod = async (
     LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
     WHERE 
     pay.payment_status = 'Paid'
-    AND b.booking_status IN ('Complete', 'Ongoing')
+    AND b.booking_status IN ('Complete', 'Confirmed' ,'Ongoing')
     GROUP BY p.pod_id;
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
@@ -352,7 +352,7 @@ const getDailyRevenueByPOD = async (
         Payment p ON b.booking_id = p.booking_id
     WHERE 
         p.payment_status IN ('Paid')
-        AND b.booking_status IN ('Complete', 'Ongoing')
+        AND b.booking_status IN ('Complete', 'Confirmed' ,'Ongoing')
     GROUP BY 
         DATE(b.booking_date)
     ORDER BY 
@@ -375,7 +375,7 @@ const getMonthlyRevenueByPOD = async (
         Payment p ON b.booking_id = p.booking_id
     WHERE 
         p.payment_status IN ('Paid')
-        AND b.booking_status IN ('Complete', 'Ongoing')
+        AND b.booking_status IN ('Complete', 'Confirmed' ,'Ongoing')
     GROUP BY 
         DATE_FORMAT(b.booking_date, '%Y-%m')
     ORDER BY 
@@ -399,7 +399,7 @@ const getTotalPodRevenue = async (
         Payment pay ON b.booking_id = pay.booking_id
     WHERE 
         pay.payment_status IN ('Paid')
-        AND b.booking_status IN ('Complete', 'Ongoing');
+        AND b.booking_status IN ('Complete', 'Confirmed' ,'Ongoing');
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows[0] as { totalPodRevenue: number };

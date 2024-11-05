@@ -76,10 +76,52 @@ const removeSlot = async (req: Request, res: Response) => {
     return res.status(201).json({ message: "Delete successfully" });
 };
 
+const getDailyRevenueBySlot = async (req: Request, res: Response) => {
+    try {
+        const dailyRevenue = await SlotService.getDailyRevenueBySlot();
+        if (!dailyRevenue || !dailyRevenue.length) {
+            return res.status(404).json({ message: "No revenue data found" });
+        }
+        return res.status(200).json(dailyRevenue);
+    } catch (error) {
+        console.error("Error fetching daily revenue by slot:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const getMonthlyRevenueBySlot = async (req: Request, res: Response) => {
+    try {
+        const monthlyRevenue = await SlotService.getMonthlyRevenueBySlot();
+        if (!monthlyRevenue || !monthlyRevenue.length) {
+            return res.status(404).json({ message: "No revenue data found" });
+        }
+        return res.status(200).json(monthlyRevenue);
+    } catch (error) {
+        console.error("Error fetching monthly revenue by slot:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const getTotalSlotRevenue = async (req: Request, res: Response) => {
+    try {
+        const totalSlotRevenue = await SlotService.getTotalSlotRevenue();
+        if (!totalSlotRevenue) {
+            return res.status(404).json({ message: "No revenue data found" });
+        }
+        return res.status(200).json(totalSlotRevenue);
+    } catch (error) {
+        console.error("Error fetching total slot revenue:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export default {
     find,
     findById,
     generateSlots,
     updateSlot,
     removeSlot,
+    getDailyRevenueBySlot,
+    getMonthlyRevenueBySlot,
+    getTotalSlotRevenue,
 };
