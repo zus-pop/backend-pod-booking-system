@@ -79,11 +79,13 @@ export interface Payment {
     payment_id?: number;
     booking_id?: number;
     transaction_id?: string;
+    zp_trans_id?: string;
     total_cost?: number;
     payment_url?: string;
-    payment_date?: Date | string;
+    payment_date?: string;
     payment_status?: keyof typeof PaymentStatus;
     payment_for?: "Slot" | "Product";
+    refunded_date?: string;
 }
 
 export interface OnlinePaymentResponse {
@@ -221,6 +223,7 @@ export enum PaymentStatus {
     Unpaid = "Unpaid",
     Paid = "Paid",
     Failed = "Failed",
+    Refunded = "Refunded",
 }
 
 export enum Roles {

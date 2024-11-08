@@ -11,14 +11,17 @@ import {
     BookingProduct,
     BookingSlot,
     OnlinePaymentResponse,
+    Payment,
 } from "../types/type.ts";
 
 const config = {
     APP_ID: process.env.APP_ID as string,
     KEY1: process.env.KEY1 as string,
     KEY2: process.env.KEY2 as string,
-    CREATE_PAYMENT: process.env.CREATE_PAYMENT as string,
-    QUERY_STATUS: process.env.QUERY_STATUS as string,
+    CREATE_PAYMENT: `${process.env.ZALO_BASE_URL}/create` as string,
+    QUERY_STATUS: `${process.env.ZALO_BASE_URL}/query` as string,
+    REFUND_URL: `${process.env.ZALO_BASE_URL}/refund` as string,
+    QUERY_REFUND_URL: `${process.env.ZALO_BASE_URL}/query_refund` as string,
 };
 
 interface PaymentOptions {
@@ -98,6 +101,7 @@ export const callbackPaymentSlot = async (dataStr: any, reqMac: any) => {
                 {
                     transaction_id: dataJson["app_trans_id"],
                     payment_status: "Paid",
+                    zp_trans_id: dataJson["zp_trans_id"],
                 },
                 connection
             );
@@ -164,6 +168,7 @@ export const callbackPaymentProduct = async (dataStr: any, reqMac: any) => {
                         .format("YYYY-MM-DD HH:mm:ss"),
                     payment_status: "Paid",
                     payment_for: "Product",
+                    zp_trans_id: dataJson["zp_trans_id"],
                 },
                 connection
             );
@@ -247,4 +252,86 @@ export const getPaymentStatus = async (app_trans_id: string) => {
         discount_amount: number;
         zp_trans_id: number;
     };
+};
+
+export const refundBooking = async (
+    payment: Payment,
+    refund_amount?: number
+) => {
+    const timestamp = Date.now();
+    const uid = `${timestamp}${Math.floor(111 + Math.random() * 999)}`; // unique id
+
+    let params: Record<string, any> = {
+        app_id: config.APP_ID,
+        m_refund_id: `${moment().format("YYMMDD")}_${config.APP_ID}_${uid}`,
+        timestamp, // miliseconds
+        zp_trans_id: payment.zp_trans_id,
+        amount: refund_amount || payment.total_cost,
+        description: "Poddy Refund Demo",
+    };
+    // app_id|zp_trans_id|amount|description|timestamp
+    let data = `${params.app_id}|${params.zp_trans_id}|${params.amount}|${params.description}|${params.timestamp}`;
+    params.mac = crypto
+        .createHmac("sha256", config.KEY1)
+        .update(data)
+        .digest("hex");
+
+    try {
+        const response = await fetch(config.REFUND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(params).toString(),
+        });
+        const result = await response.json();
+        return {
+            ...result,
+            m_refund_id: params.m_refund_id,
+        } as {
+            return_code: 1 | 2 | 3;
+            return_message: string;
+            sub_return_code: number;
+            sub_return_message: string;
+            refund_id: string;
+            m_refund_id: string;
+        };
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
+
+export const refundStatus = async (m_refund_id: string) => {
+    const timestamp = Date.now();
+    let params: Record<string, any> = {
+        app_id: config.APP_ID,
+        timestamp,
+        m_refund_id,
+    };
+    let data = `${params.app_id}|${params.m_refund_id}|${params.timestamp}`;
+    params.mac = crypto
+        .createHmac("sha256", config.KEY1)
+        .update(data)
+        .digest("hex");
+
+    try {
+        const response = await fetch(config.QUERY_REFUND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(params).toString(),
+        });
+        const data = await response.json();
+        return data as {
+            return_code: 1 | 2 | 3 | -3 | -10 | -13 | -24 | -25 | -26;
+            return_message: string;
+            sub_return_code: number;
+            sub_return_message: string;
+        };
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 };

@@ -31,16 +31,34 @@ const findAllSlotByBookingId = async (booking_id: number) => {
     }
 };
 
+const findAllSlotByPaymentId = async (payment_id: number) => {
+    const connection = await pool.getConnection();
+    try {
+        const bookingSlots = await BookingSlotRepo.findAllSlotByPaymentId(
+            payment_id,
+            connection
+        );
+        return bookingSlots;
+    } catch (err) {
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 const findAllSlotByBookingIdAndPaymentId = async (
     booking_id: number,
     payment_id: number
 ) => {
     const connection = await pool.getConnection();
     try {
-        const bookingSlots = await BookingSlotRepo.findAllSlotByBookingId(
-            booking_id,
-            connection
-        );
+        const bookingSlots =
+            await BookingSlotRepo.findAllSlotByBookingIdAndPaymentId(
+                booking_id,
+                payment_id,
+                connection
+            );
         return bookingSlots;
     } catch (err) {
         console.log(err);
@@ -78,6 +96,7 @@ const updateCheckin = async (
 export default {
     findAllSlot,
     findAllSlotByBookingId,
+    findAllSlotByPaymentId,
     findAllSlotByBookingIdAndPaymentId,
     updateCheckin,
 };

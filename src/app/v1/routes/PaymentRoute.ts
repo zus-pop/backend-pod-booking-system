@@ -1,5 +1,6 @@
 import PaymentController from "../../controllers/PaymentController.ts";
 import { Router } from "express";
+import { authenticateToken } from "../../middlewares/authenticateToken.ts";
 
 export const PaymentRouter = Router();
 
@@ -297,3 +298,53 @@ PaymentRouter.post("/callback-slot", PaymentController.callbackSlot);
 
 // POST: api/c1/payments/callback-product
 PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
+
+// POST: api/v1/payments/:id/refund
+/**
+ * @openapi
+ * /api/v1/payments/{id}/refund:
+ *   post:
+ *     summary: Refund a payment by its id
+ *     tags: [Payments]
+ *     security:
+ *      - Authorization: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The Payment id
+ *     requestBody:
+ *          content:
+ *              application/json:
+ *              schema:
+ *                  type: object
+ *                  properties:
+ *                      refund_amount:
+ *                          type: number
+ *                          description: The amount to refund
+ *                          example: 80000
+ *     responses:
+ *       200:
+ *         description: Successfully refunded the payment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Payment refunded successfully"
+ *       404:
+ *         description: Payment not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Payment not found"
+ */
+PaymentRouter.post("/:id/refund", authenticateToken, PaymentController.refund);

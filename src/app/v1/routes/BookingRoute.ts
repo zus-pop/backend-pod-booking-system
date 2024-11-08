@@ -953,7 +953,7 @@ BookingRouter.put(
  *                                          type: integer
  *                                          description: id of POD's selected slot
  *                                          example: 1
- *                                      price:
+ *                                      unit_price:
  *                                          type: integer
  *                                          format: double
  *                                          description: the price for the selected slot
