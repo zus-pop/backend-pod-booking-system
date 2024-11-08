@@ -61,7 +61,7 @@ export interface BookingSlot {
     payment_id?: number;
     slot_id?: number;
     unit_price?: number;
-    is_checked_in?: boolean;
+    status?: "Not Yet" | "Checked In" | "Checked Out" | "Absent";
 }
 
 export interface Category {

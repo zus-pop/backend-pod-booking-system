@@ -554,10 +554,10 @@ BookingRouter.post(
  *                                      type: boolean
  *                                      description: available status of slot
  *                                      example: false
- *                                  is_checked_in:
- *                                      type: boolean
+ *                                  status:
+ *                                      type: string
  *                                      description: available checkin status of slot
- *                                      example: false
+ *                                      example: Not Yet
  *                                  price:
  *                                      type: integer
  *                                      description: price of slot
@@ -634,10 +634,10 @@ BookingRouter.get("/:id/slots", BookingSlotController.findAllSlotByBookingId);
  *                                      type: boolean
  *                                      description: available status of slot
  *                                      example: false
- *                                  is_checked_in:
- *                                      type: boolean
+ *                                  status:
+ *                                      type: string
  *                                      description: available checkin status of slot
- *                                      example: false
+ *                                      example: Not Yet
  *                                  price:
  *                                      type: integer
  *                                      description: price of slot
@@ -815,8 +815,9 @@ BookingRouter.get(
  *                  schema:
  *                      type: object
  *                      properties:
- *                          is_checked_in:
- *                              type: boolean
+ *                          status:
+ *                              type: string
+ *                              enum: [Not Yet, Checked In, Checked Out, Absent] 
  *                              required: true
  *      responses:
  *          200:
@@ -847,6 +848,7 @@ BookingRouter.get(
  */
 BookingRouter.put(
     "/:booking_id/slots/:slot_id",
+    validateEmptyObject,
     BookingSlotController.updateCheckin
 );
 

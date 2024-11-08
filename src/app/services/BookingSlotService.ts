@@ -1,5 +1,6 @@
 import { pool } from "../config/pool.ts";
 import BookingSlotRepo from "../repositories/BookingSlotRepository.ts";
+import { BookingSlot } from "../types/type.ts";
 
 const findAllSlot = async () => {
     const connection = await pool.getConnection();
@@ -52,7 +53,7 @@ const findAllSlotByBookingIdAndPaymentId = async (
 const updateCheckin = async (
     slot_id: number,
     booking_id: number,
-    is_checked_in: boolean
+    status: BookingSlot["status"]
 ) => {
     const connection = await pool.getConnection();
     try {
@@ -60,7 +61,7 @@ const updateCheckin = async (
         const result = await BookingSlotRepo.updateCheckin(
             slot_id,
             booking_id,
-            is_checked_in,
+            status,
             connection
         );
         await connection.commit();
