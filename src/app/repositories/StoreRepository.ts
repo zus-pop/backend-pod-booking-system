@@ -51,7 +51,7 @@ const find = async (
     );
 
     sql += " GROUP BY s.store_id";
-    sql += " ORDER BY rating DESC";
+    sql += " ORDER BY rating DESC, s.store_id ASC";
 
     if (pagination) {
         const { page, limit } = pagination;
