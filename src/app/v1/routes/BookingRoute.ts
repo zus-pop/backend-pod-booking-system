@@ -469,7 +469,7 @@ BookingRouter.get("/:id/products", BookingProductController.findByBookingId);
  *                                  description: quanity of selected product
  *                                  example: 2
  *      responses:
- *           200:
+ *           201:
  *              description: Added products
  *              content:
  *                  application/json:
@@ -501,6 +501,75 @@ BookingRouter.post(
     authenticateToken,
     validateEmptyObject,
     BookingProductController.createProductPayment
+);
+
+/**
+ * @openapi
+ * /api/v1/bookings/{id}/cash-products:
+ *  post:
+ *      summary: Add product for booking
+ *      tags: [Bookings]
+ *      security:
+ *          - Authorization: []
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              booking_id:
+ *                                  type: integer
+ *                                  description: id of selected booking
+ *                                  example: 1
+ *                              product_id:
+ *                                  type: integer
+ *                                  description: id of selected product
+ *                                  example: 1
+ *                              slot_id:
+ *                                  type: integer
+ *                                  description: id of selected slot
+ *                                  example: 1
+ *                              unit_price:
+ *                                  type: integer
+ *                                  format: double
+ *                                  description: unit price of selected product
+ *                                  example: 50000
+ *                              quantity:
+ *                                  type: integer
+ *                                  description: quanity of selected product
+ *                                  example: 2
+ *      responses:
+ *           201:
+ *              description: Added products
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              message:
+ *                                  type: string
+ *                                  description: message about the response status
+ *                                  example: Booking product added successfully
+ *           400:
+ *               description: Add products failed
+ *               content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                               message:
+ *                                   type: string
+ *                                   description: message about the response status failed
+ *                                   example: Add product failed
+ */
+BookingRouter.post(
+    "/:id/cash-products",
+    authenticateToken,
+    validateEmptyObject,
+    BookingProductController.cashProduct
 );
 
 // GET: api/v1/bookings/:id/slots

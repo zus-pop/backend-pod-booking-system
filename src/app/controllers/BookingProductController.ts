@@ -59,10 +59,22 @@ const createProductPayment = async (req: Request, res: Response) => {
     return res.status(201).json(result);
 };
 
+const cashProduct = async (req: Request, res: Response) => {
+    const bookingProduct = req.body as BookingProduct[];
+    const result = await BookingProductService.addProductForBooking(
+        bookingProduct
+    );
+    if (!result) {
+        return res.status(400).json({ message: "Failed to cash product" });
+    }
+    return res.status(201).json(result);
+};
+
 export default {
     findAll,
     findByBookingId,
     findByBookingIdAndSlotId,
     findAllSlotByBookingIdAndPaymentId,
     createProductPayment,
+    cashProduct,
 };

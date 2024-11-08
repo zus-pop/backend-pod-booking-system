@@ -103,6 +103,7 @@ const findByEmail = async (email: string, connection: PoolConnection) => {
     const columns = ["user_id", "email", "password", "user_name", "role_id"];
     const values = [columns, "User", "email", email];
     const [user] = await connection.query<RowDataPacket[]>(sql, values);
+    console.log
     return user[0] as User;
 };
 
