@@ -35,11 +35,11 @@ const findAllSlotByBookingIdAndPaymentId = async (
 
 const updateCheckin = async (req: Request, res: Response) => {
     const { slot_id, booking_id } = req.params;
-    const { is_checked_in } = req.body;
+    const { status } = req.body;
     const result = await BookingSlotService.updateCheckin(
         +slot_id,
         +booking_id,
-        is_checked_in
+        status
     );
     if (!result?.affectedRows) {
         return res.status(404).json({ message: "Not found any slot!" });

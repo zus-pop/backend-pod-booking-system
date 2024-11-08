@@ -9,7 +9,7 @@ const findAllSlot = async (connection: PoolConnection) => {
         "booking_id",
         "slot_id",
         "unit_price",
-        "is_checked_in",
+        "status",
     ];
     const values = [columns, "Booking_Slot"];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
@@ -27,7 +27,7 @@ const findAllSlotByBookingId = async (
         "payment_id",
         "slot_id",
         "unit_price",
-        "is_checked_in",
+        "status",
     ];
     const values = [columns, "Booking_Slot", "booking_id", booking_id];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
@@ -44,7 +44,7 @@ const findAllSlotByBookingId = async (
             return {
                 ...slot,
                 price: bookingSlot.unit_price,
-                is_checked_in: bookingSlot.is_checked_in,
+                status: bookingSlot.status,
             };
         })
     );
@@ -55,7 +55,7 @@ const findAllSlotByBookingId = async (
     // return slots.map((slot, index) => ({
     //     ...slot,
     //     price: bookingSlots[index].unit_price,
-    //     is_checked_in: bookingSlots[index].is_checked_in
+    //     status: bookingSlots[index].status
     // }));
 };
 
@@ -71,7 +71,7 @@ const findAllSlotByBookingIdAndPaymentId = async (
         "payment_id",
         "slot_id",
         "unit_price",
-        "is_checked_in",
+        "status",
     ];
     const values = [
         columns,
@@ -95,7 +95,7 @@ const findAllSlotByBookingIdAndPaymentId = async (
             return {
                 ...slot,
                 price: bookingSlot.unit_price,
-                is_checked_in: bookingSlot.is_checked_in,
+                status: bookingSlot.status,
             };
         })
     );
@@ -123,13 +123,13 @@ const createMany = async (
 const updateCheckin = async (
     slot_id: number,
     booking_id: number,
-    is_checked_in: boolean,
+    status: BookingSlot["status"],
     connection: PoolConnection
 ) => {
     const sql = "UPDATE ?? SET ? WHERE ?? = ? AND ?? = ?";
     const values = [
         "Booking_Slot",
-        { is_checked_in },
+        { status },
         "slot_id",
         slot_id,
         "booking_id",
