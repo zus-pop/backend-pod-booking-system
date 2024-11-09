@@ -275,7 +275,7 @@ export const refundBooking = async (
         .createHmac("sha256", config.KEY1)
         .update(data)
         .digest("hex");
-
+    console.log(params);
     try {
         const response = await fetch(config.REFUND_URL, {
             method: "POST",
