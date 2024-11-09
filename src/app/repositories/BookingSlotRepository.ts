@@ -4,7 +4,14 @@ import SlotRepository from "./SlotRepository.ts";
 
 const findAllSlot = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const columns = ["id", "booking_id", "slot_id", "unit_price", "status"];
+    const columns = [
+        "id",
+        "booking_id",
+        "payment_id",
+        "slot_id",
+        "unit_price",
+        "status",
+    ];
     const values = [columns, "Booking_Slot"];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     return rows as BookingSlot[];
@@ -39,6 +46,7 @@ const findAllSlotByBookingId = async (
                 ...slot,
                 price: bookingSlot.unit_price,
                 status: bookingSlot.status,
+                payment_id: bookingSlot.payment_id,
             };
         })
     );
@@ -82,6 +90,7 @@ const findAllSlotByPaymentId = async (
                 ...slot,
                 price: bookingSlot.unit_price,
                 status: bookingSlot.status,
+                payment_id: bookingSlot.payment_id,
             };
         })
     );
@@ -124,6 +133,7 @@ const findAllSlotByBookingIdAndPaymentId = async (
                 ...slot,
                 price: bookingSlot.unit_price,
                 status: bookingSlot.status,
+                payment_id: bookingSlot.payment_id,
             };
         })
     );

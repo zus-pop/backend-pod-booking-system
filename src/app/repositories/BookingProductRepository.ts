@@ -26,6 +26,7 @@ const findByBookingId = async (
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
     const columns = [
         "booking_id",
+        "payment_id",
         "product_id",
         "slot_id",
         "unit_price",
@@ -48,6 +49,7 @@ const findByBookingId = async (
                 ...product,
                 quantity: bookingProduct.quantity,
                 unit_price: bookingProduct.unit_price,
+                payment_id: bookingProduct.payment_id,
             };
         })
     );
@@ -101,6 +103,7 @@ const findByBookingIdAndSlotId = async (
                 ...product,
                 quantity: bookingProduct.quantity,
                 unit_price: bookingProduct.unit_price,
+                payment_id: bookingProduct.payment_id,
             };
         })
     );
@@ -144,6 +147,7 @@ const findAllSlotByBookingIdAndPaymentId = async (
                 ...product,
                 quantity: bookingProduct.quantity,
                 unit_price: bookingProduct.unit_price,
+                payment_id: bookingProduct.payment_id,
             };
         })
     );
