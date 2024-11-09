@@ -220,6 +220,48 @@ SlotRouter.get("/monthly-revenue", SlotController.getMonthlyRevenueBySlot);
  */
 SlotRouter.get("/total-revenue", SlotController.getTotalSlotRevenue);
 
+// GET: api/v1/slots/total-slot-refunded
+/**
+ * @openapi
+ * /api/v1/slots/total-slot-refunded:
+ *   get:
+ *     summary: Get total number of refunded slots
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total number of refunded slots
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalSlotsRefunded:
+ *                   type: number
+ *                   description: The total number of refunded slots
+ *                   example: 5
+ *       404:
+ *         description: No refunded slots found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No refunded slots found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/total-slot-refunded", SlotController.getTotalSlotsRefunded);
+
 // GET: api/v1/slots/:id
 /**
  * @openapi
