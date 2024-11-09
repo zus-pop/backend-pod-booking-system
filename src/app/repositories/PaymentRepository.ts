@@ -56,6 +56,7 @@ const find = async (
         "payment_status",
         "payment_for",
         "refunded_date",
+        "refunded_amount",
     ];
     const values = [columns, "Payment", ...queryParams];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);
@@ -78,6 +79,7 @@ const findById = async (id: number, connection: PoolConnection) => {
         "payment_status",
         "payment_for",
         "refunded_date",
+        "refunded_amount",
     ];
     const values = [columns, "Payment", "payment_id", id];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);
@@ -100,6 +102,7 @@ const findByBookingId = async (
         "payment_status",
         "payment_for",
         "refunded_date",
+        "refunded_amount"
     ];
     const values = [columns, "Payment", "booking_id", booking_id];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);
@@ -122,6 +125,7 @@ const findByTransactionId = async (
         "payment_status",
         "payment_for",
         "refunded_date",
+        "refunded_amount",
     ];
     const values = [columns, "Payment", "transaction_id", transaction_id];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);

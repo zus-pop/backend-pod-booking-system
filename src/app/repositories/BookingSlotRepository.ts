@@ -4,13 +4,7 @@ import SlotRepository from "./SlotRepository.ts";
 
 const findAllSlot = async (connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ??";
-    const columns = [
-        "id",
-        "booking_id",
-        "slot_id",
-        "unit_price",
-        "status",
-    ];
+    const columns = ["id", "booking_id", "slot_id", "unit_price", "status"];
     const values = [columns, "Booking_Slot"];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     return rows as BookingSlot[];
@@ -169,6 +163,7 @@ const updateCheckin = async (
         "booking_id",
         booking_id,
     ];
+    console.log(connection.format(sql, values));
     const [rows] = await connection.query<ResultSetHeader>(sql, values);
     return rows;
 };

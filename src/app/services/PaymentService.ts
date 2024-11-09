@@ -1,11 +1,12 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
-import { Pagination, Payment, PaymentQueries } from "../types/type.ts";
+import { Pagination, Payment, PaymentQueries, Slot } from "../types/type.ts";
 import { refundBooking, refundStatus } from "../utils/zalo.ts";
 import NotificationService from "./NotificationService.ts";
 import { ResultSetHeader } from "mysql2";
 import { trackRefund } from "../utils/cron-job.ts";
+import BookingRepository from "../repositories/BookingRepository.ts";
 
 const find = async (filters: PaymentQueries, pagination: Pagination) => {
     const connection = await pool.getConnection();
@@ -121,8 +122,8 @@ const getTotalRevenue = async () => {
 
 const refund = async (
     payment_id: number,
-    user_id: number,
-    refund_amount?: number
+    refund_amount: number,
+    slots: Slot[]
 ) => {
     const connection = await pool.getConnection();
     try {
@@ -130,46 +131,28 @@ const refund = async (
         if (!payment) {
             return null;
         }
-        if (payment.payment_status !== "Paid") {
+        const booking = await BookingRepository.findById(
+            payment.booking_id!,
+            connection,
+            { user: true }
+        );
+        if (
+            payment.payment_status !== "Refunded" &&
+            payment.payment_status !== "Paid"
+        ) {
             return null;
         }
 
         const refundRes = await refundBooking(payment, refund_amount);
-        trackRefund(payment_id, refundRes?.m_refund_id!, user_id, connection);
-        // const refundStat = await refundStatus(refundRes?.m_refund_id!);
-        // let message: string;
-        // if (refundStat?.return_code === 1) {
-        //     await PaymentRepo.updateById(
-        //         {
-        //             payment_id,
-        //             payment_status: "Refunded",
-        //             refunded_date: moment()
-        //                 .utcOffset(+7)
-        //                 .format("YYYY-MM-DD HH:mm:ss"),
-        //         },
-        //         connection
-        //     );
-        //     message = `Your payment with ID: ${payment_id} has been refunded successfully!`;
-        //     NotificationService.createNewMessage({
-        //         user_id: user_id,
-        //         message,
-        //         created_at: moment()
-        //             .utcOffset(+7)
-        //             .format("YYYY-MM-DD HH:mm:ss"),
-        //     });
-        // } else if (refundStat?.return_code === 2) {
-        //     message = `Your payment with ID: ${payment_id} has been failed to refund!`;
-        //     NotificationService.createNewMessage({
-        //         user_id: user_id,
-        //         message,
-        //         created_at: moment()
-        //             .utcOffset(+7)
-        //             .format("YYYY-MM-DD HH:mm:ss"),
-        //     });
-        // } else {
-        //   message = `Your payment with ID: ${payment_id} has is pending to refund!`;
-        // }
-        // return { message };
+        trackRefund(
+            payment,
+            refundRes?.m_refund_id!,
+            booking.user?.user_id!,
+            refund_amount,
+            slots,
+            connection
+        );
+
         return refundRes;
     } catch (err) {
         console.error(err);

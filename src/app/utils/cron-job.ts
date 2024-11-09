@@ -7,7 +7,7 @@ import NotificationService from "../services/NotificationService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import SlotService from "../services/SlotService.ts";
 import { getPaymentStatus, refundStatus } from "./zalo.ts";
-import { Payment } from "../types/type.ts";
+import { BookingSlot, Payment, Slot } from "../types/type.ts";
 import { PoolConnection } from "mysql2/promise";
 import PaymentRepository from "../repositories/PaymentRepository.ts";
 
@@ -33,7 +33,7 @@ export const trackBooking = (
     let isExtend = false;
     const job = cron.schedule("*/30 * * * * *", async () => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
-        const baseTime = 5;
+        const baseTime = 10;
         const bufferTime = 0.5;
         const threshHold = isExtend ? baseTime + bufferTime : baseTime;
         const current = moment().format(FORMAT_TYPE);
@@ -189,35 +189,46 @@ export const trackPayment = (user_id: number, payment_id: number) => {
 };
 
 export const trackRefund = async (
-    payment_id: number,
+    payment: Payment,
     m_refund_id: string,
     user_id: number,
+    refund_amount: number,
+    slots: Slot[],
     connection: PoolConnection
 ) => {
     const job = cron.schedule(`*/3 * * * * *`, async () => {
+        console.log(refund_amount);
         const refundStat = await refundStatus(m_refund_id!);
         let message: string;
         if (refundStat?.return_code === 1) {
             console.log(
-                `The payment with ID: ${payment_id} is refunded -> stop the job`
+                `The payment with ID: ${payment.payment_id} is refunded -> stop the job`
             );
-            const bookingSlots =
-                await BookingSlotService.findAllSlotByPaymentId(payment_id);
+            // const bookingSlots =
+            //     await BookingSlotService.findAllSlotByPaymentId(payment.payment_id!);
             await SlotService.updateMultipleSlot(
                 true,
-                bookingSlots!.map((bookingSlot) => bookingSlot.slot_id!)
+                slots!.map((slot) => slot.slot_id!)
             );
+            slots.forEach(async (slot) => {
+                await BookingSlotService.updateCheckin(
+                    slot.slot_id!,
+                    payment.booking_id!,
+                    "Refunded"
+                );
+            });
             await PaymentRepository.updateById(
                 {
-                    payment_id,
+                    payment_id: payment.payment_id,
                     payment_status: "Refunded",
                     refunded_date: moment()
                         .utcOffset(+7)
                         .format("YYYY-MM-DD HH:mm:ss"),
+                    refunded_amount: payment.refunded_amount! + refund_amount!,
                 },
                 connection
             );
-            message = `Your payment with ID: ${payment_id} has been refunded successfully!`;
+            message = `Your payment with ID: ${payment.payment_id} has been refunded successfully!`;
             NotificationService.createNewMessage({
                 user_id: user_id,
                 message,
@@ -230,9 +241,9 @@ export const trackRefund = async (
             }, 0);
         } else if (refundStat?.return_code === 2) {
             console.log(
-                `The payment with ID: ${payment_id} is failed to refund -> stop the job`
+                `The payment with ID: ${payment.payment_id} is failed to refund -> stop the job`
             );
-            message = `Your payment with ID: ${payment_id} has been failed to refund!`;
+            message = `Your payment with ID: ${payment.payment_id} has been failed to refund!`;
             NotificationService.createNewMessage({
                 user_id,
                 message,
@@ -244,7 +255,9 @@ export const trackRefund = async (
                 job.stop();
             }, 0);
         } else {
-            console.log(`The payment with ID: ${payment_id} is pending`);
+            console.log(
+                `The payment with ID: ${payment.payment_id} is pending`
+            );
         }
     });
 };

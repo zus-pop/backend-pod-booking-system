@@ -61,7 +61,7 @@ export interface BookingSlot {
     payment_id?: number;
     slot_id?: number;
     unit_price?: number;
-    status?: "Not Yet" | "Checked In" | "Checked Out" | "Absent";
+    status?: "Not Yet" | "Checked In" | "Checked Out" | "Absent" | "Refunded";
 }
 
 export interface Category {
@@ -86,6 +86,7 @@ export interface Payment {
     payment_status?: keyof typeof PaymentStatus;
     payment_for?: "Slot" | "Product";
     refunded_date?: string;
+    refunded_amount?: number;
 }
 
 export interface OnlinePaymentResponse {

@@ -316,15 +316,25 @@ PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
  *         required: true
  *         description: The Payment id
  *     requestBody:
- *          content:
+ *         required: true
+ *         content:
  *              application/json:
- *              schema:
- *                  type: object
- *                  properties:
- *                      refund_amount:
- *                          type: number
- *                          description: The amount to refund
- *                          example: 80000
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          refund_amount:
+ *                              type: integer
+ *                              description: The amount to refund
+ *                              example: 80000
+ *                          slots:
+ *                              type: array
+ *                              items:
+ *                                 type: object
+ *                                 properties:
+ *                                   slot_id:
+ *                                     type: integer
+ *                                     description: id of slot
+ *                                     example: 1
  *     responses:
  *       200:
  *         description: Successfully refunded the payment
