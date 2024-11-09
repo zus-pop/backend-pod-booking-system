@@ -31,7 +31,22 @@ export interface MappingResponse {
     rating?: number;
     comment?: string;
     pod?: POD;
-    slots?: Slot[];
+    slots?: {
+        price: number | undefined;
+        status:
+            | "Not Yet"
+            | "Checked In"
+            | "Checked Out"
+            | "Absent"
+            | "Refunded"
+            | undefined;
+        payment_id: number | undefined;
+        slot_id?: number;
+        pod_id?: number;
+        start_time?: string;
+        end_time?: string;
+        is_available?: boolean;
+    }[];
     products?: Product[];
     user?: {
         user_id: number;

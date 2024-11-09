@@ -113,11 +113,9 @@ export const syncCalendar = async (req: Request, res: Response) => {
     );
     await deleteBeforeSyncAgain(userCalendarId as string);
 
-    const confirmedBookings = await BookingService.findByUserId(
+    const bookings = await BookingService.findByUserId(
         payload.user_id,
-        {
-            booking_status: "Confirmed",
-        },
+        {},
         undefined,
         {
             pod: true,
@@ -125,19 +123,25 @@ export const syncCalendar = async (req: Request, res: Response) => {
         }
     );
 
-    if (
-        !confirmedBookings ||
-        !confirmedBookings.bookings ||
-        !confirmedBookings.bookings.length
-    ) {
+    const syncedBookings = bookings?.bookings?.filter(
+        (booking) =>
+            booking.booking_status === "Confirmed" ||
+            booking.booking_status === "Ongoing" ||
+            booking.booking_status === "Paused"
+    );
+
+    if (!syncedBookings || !syncedBookings.length) {
         return res.status(404).send("No bookings found");
     }
 
-    for (const booking of confirmedBookings.bookings) {
+    for (const booking of syncedBookings) {
         if (!booking.slots || !booking.slots.length) {
             continue;
         }
         for (const slot of booking.slots) {
+            if (slot.status === "Absent" || slot.status === "Refunded") {
+                continue;
+            }
             const event: calendar_v3.Schema$Event = {
                 summary: `Event for - ${booking.pod?.pod_name}`,
                 description: `Event from booking of ${booking.pod?.pod_name}`,

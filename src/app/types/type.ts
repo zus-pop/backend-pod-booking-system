@@ -218,6 +218,7 @@ export enum BookingStatus {
     Canceled = "Canceled",
     Complete = "Complete",
     Ongoing = "Ongoing",
+    Paused = "Paused",
 }
 
 export enum PaymentStatus {
