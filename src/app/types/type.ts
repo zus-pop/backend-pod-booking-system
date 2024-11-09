@@ -61,7 +61,7 @@ export interface BookingSlot {
     payment_id?: number;
     slot_id?: number;
     unit_price?: number;
-    status?: "Not Yet" | "Checked In" | "Checked Out" | "Absent";
+    status?: "Not Yet" | "Checked In" | "Checked Out" | "Absent" | "Refunded";
 }
 
 export interface Category {
@@ -79,11 +79,14 @@ export interface Payment {
     payment_id?: number;
     booking_id?: number;
     transaction_id?: string;
+    zp_trans_id?: string;
     total_cost?: number;
     payment_url?: string;
-    payment_date?: Date | string;
+    payment_date?: string;
     payment_status?: keyof typeof PaymentStatus;
     payment_for?: "Slot" | "Product";
+    refunded_date?: string;
+    refunded_amount?: number;
 }
 
 export interface OnlinePaymentResponse {
@@ -221,6 +224,7 @@ export enum PaymentStatus {
     Unpaid = "Unpaid",
     Paid = "Paid",
     Failed = "Failed",
+    Refunded = "Refunded",
 }
 
 export enum Roles {

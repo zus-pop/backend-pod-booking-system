@@ -107,7 +107,7 @@ const createABooking = async (
                 amount: total_cost,
                 callback_url: "callback-slot",
                 redirect_url: `${process.env.CUSTOMER_FRONTEND_SERVER}/booking-history/${bookingResult.insertId}`,
-                expire_duration_seconds: 300,
+                expire_duration_seconds: 600,
             });
         if (return_code === 1) {
             const paymentResult = await PaymentRepo.create(

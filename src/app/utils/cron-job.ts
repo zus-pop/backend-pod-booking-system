@@ -1,12 +1,15 @@
 import "dotenv/config";
 import moment from "moment";
+import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
+import PaymentRepository from "../repositories/PaymentRepository.ts";
 import BookingService from "../services/BookingService.ts";
 import BookingSlotService from "../services/BookingSlotService.ts";
 import NotificationService from "../services/NotificationService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import SlotService from "../services/SlotService.ts";
-import { getPaymentStatus } from "./zalo.ts";
+import { Payment, Slot } from "../types/type.ts";
+import { getPaymentStatus, refundStatus } from "./zalo.ts";
 
 if (process.env.NODE_ENV !== "test") {
     cron.schedule("*/10 * * * *", async () => {
@@ -30,10 +33,10 @@ export const trackBooking = (
     let isExtend = false;
     const job = cron.schedule("*/30 * * * * *", async () => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
-        const baseTime = 5;
+        const baseTime = 10;
         const bufferTime = 0.5;
         const threshHold = isExtend ? baseTime + bufferTime : baseTime;
-        const current = moment().format(FORMAT_TYPE);
+        const current = moment().utcOffset(+7).format(FORMAT_TYPE);
         const booking = await BookingService.findBookingById(booking_id);
         const bookingSlots = await BookingSlotService.findAllSlotByBookingId(
             booking?.booking_id!
@@ -130,7 +133,7 @@ export const trackPayment = (user_id: number, payment_id: number) => {
         const FORMAT_TYPE = "YYYY-MM-DD HH:mm:ss";
         const payment = await PaymentService.findPaymentById(payment_id);
         if (payment) {
-            const { return_code } = await getPaymentStatus(
+            const { return_code, zp_trans_id } = await getPaymentStatus(
                 payment.transaction_id!
             );
             if (return_code === 1) {
@@ -141,6 +144,7 @@ export const trackPayment = (user_id: number, payment_id: number) => {
                 await PaymentService.updatePayment({
                     transaction_id: payment.transaction_id,
                     payment_status: "Paid",
+                    zp_trans_id: zp_trans_id.toString(),
                 });
                 await BookingService.updateABooking({
                     booking_id: payment.booking_id,
@@ -182,4 +186,76 @@ export const trackPayment = (user_id: number, payment_id: number) => {
         }
     });
     return job;
+};
+
+export const trackRefund = async (
+    payment: Payment,
+    m_refund_id: string,
+    user_id: number,
+    refund_amount: number,
+    slots: Slot[],
+    connection: PoolConnection
+) => {
+    const job = cron.schedule(`*/3 * * * * *`, async () => {
+        console.log(refund_amount);
+        const refundStat = await refundStatus(m_refund_id!);
+        let message: string;
+        if (refundStat?.return_code === 1) {
+            console.log(
+                `The payment with ID: ${payment.payment_id} is refunded -> stop the job`
+            );
+            await SlotService.updateMultipleSlot(
+                true,
+                slots!.map((slot) => slot.slot_id!)
+            );
+            slots.forEach(async (slot) => {
+                await BookingSlotService.updateCheckin(
+                    slot.slot_id!,
+                    payment.booking_id!,
+                    "Refunded"
+                );
+            });
+            await PaymentRepository.updateById(
+                {
+                    payment_id: payment.payment_id,
+                    payment_status: "Refunded",
+                    refunded_date: moment()
+                        .utcOffset(+7)
+                        .format("YYYY-MM-DD HH:mm:ss"),
+                    refunded_amount: payment.refunded_amount! + refund_amount!,
+                },
+                connection
+            );
+            message = `Your payment with ID: ${payment.payment_id} has been refunded successfully!`;
+            NotificationService.createNewMessage({
+                user_id: user_id,
+                message,
+                created_at: moment()
+                    .utcOffset(+7)
+                    .format("YYYY-MM-DD HH:mm:ss"),
+            });
+            setTimeout(() => {
+                job.stop();
+            }, 0);
+        } else if (refundStat?.return_code === 2) {
+            console.log(
+                `The payment with ID: ${payment.payment_id} is failed to refund -> stop the job`
+            );
+            message = `Your payment with ID: ${payment.payment_id} has been failed to refund!`;
+            NotificationService.createNewMessage({
+                user_id,
+                message,
+                created_at: moment()
+                    .utcOffset(+7)
+                    .format("YYYY-MM-DD HH:mm:ss"),
+            });
+            setTimeout(() => {
+                job.stop();
+            }, 0);
+        } else {
+            console.log(
+                `The payment with ID: ${payment.payment_id} is pending`
+            );
+        }
+    });
 };
