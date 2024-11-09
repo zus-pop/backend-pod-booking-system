@@ -315,12 +315,12 @@ const getTotalRevenueByPod = async (
 ): Promise<{ pod: POD; revenue: number }[]> => {
     const sql = `
     SELECT p.*, 
-           COALESCE(SUM(pay.total_cost), 0) AS revenue
+           SUM(pay.total_cost - pay.refunded_amount) AS revenue
     FROM POD p
     LEFT JOIN Booking b ON p.pod_id = b.pod_id
     LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-    pay.payment_status = 'Paid'
+    pay.payment_status IN ('Paid', 'Refunded')
     GROUP BY p.pod_id;
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
