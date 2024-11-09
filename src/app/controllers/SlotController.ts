@@ -143,6 +143,22 @@ const getTotalRefundedAmount = async (req: Request, res: Response) => {
     }
 };
 
+const getDailyRefundedAmountBySlot = async (req: Request, res: Response) => {
+    try {
+        const dailyRefundedAmount =
+            await SlotService.getDailyRefundedAmountBySlot();
+        if (!dailyRefundedAmount) {
+            return res
+                .status(404)
+                .json({ message: "No refunded amount found" });
+        }
+        return res.status(200).json(dailyRefundedAmount);
+    } catch (error) {
+        console.error("Error fetching daily refunded amount:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export default {
     find,
     findById,
@@ -154,4 +170,5 @@ export default {
     getTotalSlotRevenue,
     getTotalSlotsRefunded,
     getTotalRefundedAmount,
+    getDailyRefundedAmountBySlot,
 };

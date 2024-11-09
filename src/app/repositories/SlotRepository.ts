@@ -252,6 +252,30 @@ const getTotalRefundedAmount = async (
     return rows[0] as { totalRefunded: number };
 };
 
+const getDailyRefundedAmountBySlot = async (
+    connection: PoolConnection
+): Promise<{ date: string; total_refunded: number }[]> => {
+    const sql = `
+      SELECT 
+          DATE(pay.refunded_date) AS date,
+          SUM(pay.refunded_amount) AS total_refunded
+      FROM 
+          Payment pay
+      WHERE 
+          pay.payment_status IN ('Refunded')
+          AND pay.payment_for = 'Slot'
+      GROUP BY 
+          DATE(pay.refunded_date)
+      ORDER BY 
+          DATE(pay.refunded_date);
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows.map((row) => ({
+        date: row.date,
+        total_refunded: row.total_refunded,
+    }));
+};
+
 export default {
     find,
     findById,
@@ -267,4 +291,5 @@ export default {
     getTotalSlotRevenue,
     getTotalSlotsRefunded,
     getTotalRefundedAmount,
+    getDailyRefundedAmountBySlot,
 };
