@@ -1,15 +1,15 @@
 import "dotenv/config";
 import moment from "moment";
+import { PoolConnection } from "mysql2/promise";
 import cron from "node-cron";
+import PaymentRepository from "../repositories/PaymentRepository.ts";
 import BookingService from "../services/BookingService.ts";
 import BookingSlotService from "../services/BookingSlotService.ts";
 import NotificationService from "../services/NotificationService.ts";
 import PaymentService from "../services/PaymentService.ts";
 import SlotService from "../services/SlotService.ts";
+import { Payment, Slot } from "../types/type.ts";
 import { getPaymentStatus, refundStatus } from "./zalo.ts";
-import { BookingSlot, Payment, Slot } from "../types/type.ts";
-import { PoolConnection } from "mysql2/promise";
-import PaymentRepository from "../repositories/PaymentRepository.ts";
 
 if (process.env.NODE_ENV !== "test") {
     cron.schedule("*/10 * * * *", async () => {
@@ -36,7 +36,7 @@ export const trackBooking = (
         const baseTime = 10;
         const bufferTime = 0.5;
         const threshHold = isExtend ? baseTime + bufferTime : baseTime;
-        const current = moment().format(FORMAT_TYPE);
+        const current = moment().utcOffset(+7).format(FORMAT_TYPE);
         const booking = await BookingService.findBookingById(booking_id);
         const bookingSlots = await BookingSlotService.findAllSlotByBookingId(
             booking?.booking_id!
