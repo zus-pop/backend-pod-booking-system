@@ -315,12 +315,12 @@ const getTotalRevenueByPod = async (
 ): Promise<{ pod: POD; revenue: number }[]> => {
     const sql = `
     SELECT p.*, 
-           COALESCE(SUM(pay.total_cost), 0) AS revenue
+           SUM(pay.total_cost - pay.refunded_amount) AS revenue
     FROM POD p
     LEFT JOIN Booking b ON p.pod_id = b.pod_id
     LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-    pay.payment_status = 'Paid'
+    pay.payment_status IN ('Paid', 'Refunded')
     GROUP BY p.pod_id;
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
@@ -343,18 +343,20 @@ const getDailyRevenueByPOD = async (
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
     SELECT 
-        DATE(b.booking_date) AS date,
-        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+        DATE(pay.payment_date) AS date,
+        SUM(pay.total_cost - pay.refunded_amount) AS daily_revenue
     FROM 
-        Booking b
+        POD p
     LEFT JOIN 
-        Payment p ON b.booking_id = p.booking_id
+        Booking b ON p.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-        p.payment_status IN ('Paid')
+        pay.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
-        DATE(b.booking_date)
+        DATE(pay.payment_date)
     ORDER BY 
-        DATE(b.booking_date);
+        DATE(pay.payment_date);
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as { date: string; daily_revenue: number }[];
@@ -365,18 +367,20 @@ const getMonthlyRevenueByPOD = async (
 ): Promise<{ month: string; monthly_revenue: number }[]> => {
     const sql = `
     SELECT 
-        DATE_FORMAT(b.booking_date, '%Y-%m') AS month,
-        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+        DATE_FORMAT(pay.payment_date, '%Y-%m') AS month,
+        SUM(pay.total_cost - pay.refunded_amount) AS monthly_revenue
     FROM 
-        Booking b
+        POD p
     LEFT JOIN 
-        Payment p ON b.booking_id = p.booking_id
+        Booking b ON p.pod_id = b.pod_id
+    LEFT JOIN 
+        Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-        p.payment_status IN ('Paid')
+        pay.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
-        DATE_FORMAT(b.booking_date, '%Y-%m')
+        DATE_FORMAT(pay.payment_date, '%Y-%m')
     ORDER BY 
-        DATE_FORMAT(b.booking_date, '%Y-%m');
+        DATE_FORMAT(pay.payment_date, '%Y-%m');
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows as { month: string; monthly_revenue: number }[];
@@ -387,7 +391,7 @@ const getTotalPodRevenue = async (
 ): Promise<{ totalPodRevenue: number }> => {
     const sql = `
     SELECT 
-        COALESCE(SUM(pay.total_cost), 0) AS totalPodRevenue
+        SUM(pay.total_cost - pay.refunded_amount) AS totalPodRevenue
     FROM 
         POD p
     LEFT JOIN 
@@ -395,7 +399,7 @@ const getTotalPodRevenue = async (
     LEFT JOIN 
         Payment pay ON b.booking_id = pay.booking_id
     WHERE 
-        pay.payment_status IN ('Paid');
+        pay.payment_status IN ('Paid', 'Refunded');
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows[0] as { totalPodRevenue: number };

@@ -295,6 +295,49 @@ const getTotalSlotRevenue = async () => {
     }
 };
 
+const getTotalSlotsRefunded = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const totalSlotsRefunded = await SlotRepo.getTotalSlotsRefunded(
+            connection
+        );
+        return totalSlotsRefunded;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const getTotalRefundedAmount = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const totalRefunded = await SlotRepo.getTotalRefundedAmount(connection);
+        return totalRefunded;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
+const getDailyRefundedAmountBySlot = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const dailyRefundedAmount = await SlotRepo.getDailyRefundedAmountBySlot(
+            connection
+        );
+        return dailyRefundedAmount;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 export default {
     find,
     findSlotById,
@@ -308,4 +351,7 @@ export default {
     getDailyRevenueBySlot,
     getMonthlyRevenueBySlot,
     getTotalSlotRevenue,
+    getTotalSlotsRefunded,
+    getTotalRefundedAmount,
+    getDailyRefundedAmountBySlot,
 };

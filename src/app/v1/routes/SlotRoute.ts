@@ -220,6 +220,142 @@ SlotRouter.get("/monthly-revenue", SlotController.getMonthlyRevenueBySlot);
  */
 SlotRouter.get("/total-revenue", SlotController.getTotalSlotRevenue);
 
+// GET: api/v1/slots/total-slot-refunded
+/**
+ * @openapi
+ * /api/v1/slots/total-slot-refunded:
+ *   get:
+ *     summary: Get total number of refunded slots
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total number of refunded slots
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalSlotsRefunded:
+ *                   type: number
+ *                   description: The total number of refunded slots
+ *                   example: 5
+ *       404:
+ *         description: No refunded slots found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No refunded slots found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/total-slot-refunded", SlotController.getTotalSlotsRefunded);
+
+// GET: api/v1/slots/total-refunded-amount
+/**
+ * @openapi
+ * /api/v1/slots/total-refunded-amount:
+ *   get:
+ *     summary: Get total refunded amount
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total refunded amount
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRefunded:
+ *                   type: number
+ *                   description: The total refunded amount
+ *                   example: 5000
+ *       404:
+ *         description: No refunded amount found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No refunded amount found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/total-refunded-amount", SlotController.getTotalRefundedAmount);
+
+// GET: api/v1/slots/daily-refunded-amount
+/**
+ * @openapi
+ * /api/v1/slots/daily-refunded-amount:
+ *   get:
+ *     summary: Get daily refunded amount for slots
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved daily refunded amount
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     description: The date of the refund
+ *                     example: "2023-10-01"
+ *                   total_refunded:
+ *                     type: number
+ *                     description: The total refunded amount for the day
+ *                     example: 5000
+ *       404:
+ *         description: No refunded amount found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No refunded amount found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get(
+    "/daily-refunded-amount",
+    SlotController.getDailyRefundedAmountBySlot
+);
+
 // GET: api/v1/slots/:id
 /**
  * @openapi

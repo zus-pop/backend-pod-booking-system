@@ -102,7 +102,7 @@ const findByBookingId = async (
         "payment_status",
         "payment_for",
         "refunded_date",
-        "refunded_amount"
+        "refunded_amount",
     ];
     const values = [columns, "Payment", "booking_id", booking_id];
     const [payments] = await connection.query<RowDataPacket[]>(sql, values);
@@ -165,9 +165,9 @@ const getDailyRevenue = async (
     connection: PoolConnection
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
-        SELECT DATE(payment_date) AS date, SUM(total_cost) AS daily_revenue
+        SELECT DATE(payment_date) AS date, SUM(total_cost - refunded_amount) AS daily_revenue
         FROM Payment
-        WHERE payment_status = 'Paid'
+        WHERE payment_status IN ('Paid', 'Refunded')
         GROUP BY DATE(payment_date);
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
@@ -178,9 +178,9 @@ const getMonthlyRevenue = async (
     connection: PoolConnection
 ): Promise<{ year: number; month: number; monthly_revenue: number }[]> => {
     const sql = `
-      SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, SUM(total_cost) AS monthly_revenue
+      SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, SUM(total_cost - refunded_amount) AS monthly_revenue
       FROM Payment
-      WHERE payment_status = 'Paid'
+      WHERE payment_status IN ('Paid', 'Refunded')
       GROUP BY YEAR(payment_date), MONTH(payment_date);
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
@@ -192,11 +192,11 @@ const getTotalRevenue = async (
 ): Promise<{ totalRevenue: number }> => {
     const sql = `
     SELECT 
-        COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+        SUM(pay.total_cost - pay.refunded_amount) AS totalRevenue
     FROM 
-        Payment p
+        Payment pay
     WHERE 
-        p.payment_status = 'Paid';
+        pay.payment_status IN ('Paid', 'Refunded');
   `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows[0] as { totalRevenue: number };

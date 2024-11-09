@@ -170,15 +170,11 @@ const getDailyRevenueBySlot = async (
     const sql = `
       SELECT 
           DATE(pay.payment_date) AS date,
-          COALESCE(SUM(bs.unit_price), 0) AS daily_revenue
+          SUM(pay.total_cost - pay.refunded_amount) AS daily_revenue
       FROM 
-          Booking_Slot bs
-      LEFT JOIN 
-          Booking b ON bs.booking_id = b.booking_id
-      LEFT JOIN 
-          Payment pay ON b.booking_id = pay.booking_id
+		Payment pay
       WHERE 
-          pay.payment_status = 'Paid'
+          pay.payment_status IN ('Paid', 'Refunded')
           AND pay.payment_for = 'Slot'
       GROUP BY 
           DATE(pay.payment_date)
@@ -195,15 +191,11 @@ const getMonthlyRevenueBySlot = async (
     const sql = `
       SELECT 
           DATE_FORMAT(pay.payment_date, '%Y-%m') AS month,
-          COALESCE(SUM(bs.unit_price), 0) AS monthly_revenue
+          SUM(pay.total_cost - pay.refunded_amount) AS monthly_revenue
       FROM 
-          Booking_Slot bs
-      LEFT JOIN 
-          Booking b ON bs.booking_id = b.booking_id
-      LEFT JOIN 
-          Payment pay ON b.booking_id = pay.booking_id
+          Payment pay
       WHERE 
-          pay.payment_status = 'Paid'
+          pay.payment_status IN ('Paid', 'Refunded')
           AND pay.payment_for = 'Slot'
       GROUP BY 
           DATE_FORMAT(pay.payment_date, '%Y-%m')
@@ -218,20 +210,70 @@ const getTotalSlotRevenue = async (
     connection: PoolConnection
 ): Promise<{ totalSlotRevenue: number }> => {
     const sql = `
-      SELECT 
-          COALESCE(SUM(bs.unit_price), 0) AS totalSlotRevenue
-      FROM 
-          Booking_Slot bs
-      LEFT JOIN 
-          Booking b ON bs.booking_id = b.booking_id
-      LEFT JOIN 
-          Payment pay ON b.booking_id = pay.booking_id
-      WHERE 
-          pay.payment_status = 'Paid'
-          AND pay.payment_for = 'Slot';
+    SELECT 
+        SUM(p.total_cost - p.refunded_amount) as totalRevenueSlot2 
+    FROM 
+        Payment p 
+    WHERE 
+        p.payment_for = 'Slot' 
+        AND p.payment_status IN ('Paid', 'Refunded');
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows[0] as { totalSlotRevenue: number };
+};
+
+const getTotalSlotsRefunded = async (
+    connection: PoolConnection
+): Promise<{ totalSlotsRefunded: number }> => {
+    const sql = `
+    SELECT 
+        COUNT(id) as totalSlotsRefunded 
+    FROM 
+        Booking_Slot
+    WHERE 
+        status = 'Refunded';
+  `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows[0] as { totalSlotsRefunded: number };
+};
+
+const getTotalRefundedAmount = async (
+    connection: PoolConnection
+): Promise<{ totalRefunded: number }> => {
+    const sql = `
+    SELECT 
+        SUM(pay.refunded_amount) AS totalRefunded
+    FROM 
+        Payment pay
+    WHERE 
+        pay.payment_status IN ('Refunded');
+  `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows[0] as { totalRefunded: number };
+};
+
+const getDailyRefundedAmountBySlot = async (
+    connection: PoolConnection
+): Promise<{ date: string; total_refunded: number }[]> => {
+    const sql = `
+      SELECT 
+          DATE(pay.refunded_date) AS date,
+          SUM(pay.refunded_amount) AS total_refunded
+      FROM 
+          Payment pay
+      WHERE 
+          pay.payment_status IN ('Refunded')
+          AND pay.payment_for = 'Slot'
+      GROUP BY 
+          DATE(pay.refunded_date)
+      ORDER BY 
+          DATE(pay.refunded_date);
+    `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows.map((row) => ({
+        date: row.date,
+        total_refunded: row.total_refunded,
+    }));
 };
 
 export default {
@@ -247,4 +289,7 @@ export default {
     getDailyRevenueBySlot,
     getMonthlyRevenueBySlot,
     getTotalSlotRevenue,
+    getTotalSlotsRefunded,
+    getTotalRefundedAmount,
+    getDailyRefundedAmountBySlot,
 };

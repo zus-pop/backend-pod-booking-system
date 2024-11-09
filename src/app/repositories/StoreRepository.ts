@@ -138,7 +138,7 @@ const getTotalRevenueByStore = async (
     SELECT 
         s.store_id,
         s.store_name,
-        COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+        SUM(p.total_cost - p.refunded_amount) AS totalRevenue
     FROM 
         Store s
     LEFT JOIN 
@@ -148,7 +148,7 @@ const getTotalRevenueByStore = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        p.payment_status = 'Paid'
+        p.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
         s.store_id, s.store_name
     ORDER BY 
@@ -169,7 +169,7 @@ const getDailyRevenueByStore = async (
     const sql = `
     SELECT 
         DATE(p.payment_date) AS date,
-        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+        SUM(p.total_cost - p.refunded_amount) AS daily_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -179,7 +179,7 @@ const getDailyRevenueByStore = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        s.store_id = ? AND p.payment_status = 'Paid'
+        s.store_id = ? AND p.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
         DATE(p.payment_date)
     ORDER BY 
@@ -199,7 +199,7 @@ const getMonthlyRevenueByStore = async (
     const sql = `
     SELECT 
         DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
-        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+        SUM(p.total_cost - p.refunded_amount) AS monthly_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -209,7 +209,7 @@ const getMonthlyRevenueByStore = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        s.store_id = ? AND p.payment_status = 'Paid'
+        s.store_id = ? AND p.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
         DATE_FORMAT(p.payment_date, '%Y-%m')
     ORDER BY 
@@ -228,7 +228,7 @@ const getDailyRevenueForAllStores = async (
     const sql = `
     SELECT 
         DATE(p.payment_date) AS date,
-        COALESCE(SUM(p.total_cost), 0) AS daily_revenue
+        SUM(p.total_cost - p.refunded_amount) AS daily_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -238,7 +238,7 @@ const getDailyRevenueForAllStores = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        p.payment_status = 'Paid'
+        p.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
         DATE(p.payment_date)
     ORDER BY 
@@ -257,7 +257,7 @@ const getMonthlyRevenueForAllStores = async (
     const sql = `
     SELECT 
         DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
-        COALESCE(SUM(p.total_cost), 0) AS monthly_revenue
+        SUM(p.total_cost - p.refunded_amount) AS monthly_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -267,7 +267,7 @@ const getMonthlyRevenueForAllStores = async (
     LEFT JOIN 
         Payment p ON b.booking_id = p.booking_id
     WHERE 
-        p.payment_status = 'Paid'
+        p.payment_status IN ('Paid', 'Refunded')
     GROUP BY 
         DATE_FORMAT(p.payment_date, '%Y-%m')
     ORDER BY 
@@ -285,7 +285,7 @@ const getTotalRevenueForAllStores = async (
 ): Promise<{ totalRevenue: number }> => {
     const sql = `
       SELECT 
-          COALESCE(SUM(p.total_cost), 0) AS totalRevenue
+          SUM(p.total_cost - p.refunded_amount) AS totalRevenue
       FROM 
           Store s
       LEFT JOIN 
@@ -295,7 +295,7 @@ const getTotalRevenueForAllStores = async (
       LEFT JOIN 
           Payment p ON b.booking_id = p.booking_id
       WHERE 
-          p.payment_status = 'Paid';
+          p.payment_status IN ('Paid', 'Refunded');
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
     return rows[0] as { totalRevenue: number };
