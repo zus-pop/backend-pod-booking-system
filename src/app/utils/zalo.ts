@@ -41,7 +41,7 @@ export const createOnlinePaymentRequest = async (options: PaymentOptions) => {
     const transID = Math.floor(Math.random() * 1000000);
     const order: Record<string, any> = {
         app_id: config.APP_ID,
-        app_trans_id: `${moment().format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
+        app_trans_id: `${moment().utcOffset(+7).format("YYMMDD")}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
         app_user: `user_id: ${options.user_id}`,
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
@@ -263,7 +263,7 @@ export const refundBooking = async (
 
     let params: Record<string, any> = {
         app_id: config.APP_ID,
-        m_refund_id: `${moment().format("YYMMDD")}_${config.APP_ID}_${uid}`,
+        m_refund_id: `${moment().utcOffset(+7).format("YYMMDD")}_${config.APP_ID}_${uid}`,
         timestamp, // miliseconds
         zp_trans_id: payment.zp_trans_id,
         amount: refund_amount || payment.total_cost,
@@ -276,6 +276,7 @@ export const refundBooking = async (
         .update(data)
         .digest("hex");
     console.log(params);
+    console.log(new URLSearchParams(params).toString());
     try {
         const response = await fetch(config.REFUND_URL, {
             method: "POST",
