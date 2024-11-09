@@ -204,8 +204,6 @@ export const trackRefund = async (
             console.log(
                 `The payment with ID: ${payment.payment_id} is refunded -> stop the job`
             );
-            // const bookingSlots =
-            //     await BookingSlotService.findAllSlotByPaymentId(payment.payment_id!);
             await SlotService.updateMultipleSlot(
                 true,
                 slots!.map((slot) => slot.slot_id!)

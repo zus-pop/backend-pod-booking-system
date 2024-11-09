@@ -322,11 +322,7 @@ PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
  *                  schema:
  *                      type: object
  *                      properties:
- *                          refund_amount:
- *                              type: integer
- *                              description: The amount to refund
- *                              example: 80000
- *                          slots:
+ *                          bookingSlots:
  *                              type: array
  *                              items:
  *                                 type: object
@@ -335,6 +331,10 @@ PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
  *                                     type: integer
  *                                     description: id of slot
  *                                     example: 1
+ *                                   unit_price:
+ *                                     type: integer
+ *                                     description: price of slot
+ *                                     example: 80000
  *     responses:
  *       200:
  *         description: Successfully refunded the payment

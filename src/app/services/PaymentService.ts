@@ -1,7 +1,13 @@
 import moment from "moment";
 import { pool } from "../config/pool.ts";
 import PaymentRepo from "../repositories/PaymentRepository.ts";
-import { Pagination, Payment, PaymentQueries, Slot } from "../types/type.ts";
+import {
+    BookingSlot,
+    Pagination,
+    Payment,
+    PaymentQueries,
+    Slot,
+} from "../types/type.ts";
 import { refundBooking, refundStatus } from "../utils/zalo.ts";
 import NotificationService from "./NotificationService.ts";
 import { ResultSetHeader } from "mysql2";
@@ -120,11 +126,7 @@ const getTotalRevenue = async () => {
     }
 };
 
-const refund = async (
-    payment_id: number,
-    refund_amount: number,
-    slots: Slot[]
-) => {
+const refund = async (payment_id: number, bookingSlots: BookingSlot[]) => {
     const connection = await pool.getConnection();
     try {
         const payment = await PaymentRepo.findById(payment_id, connection);
@@ -142,14 +144,17 @@ const refund = async (
         ) {
             return null;
         }
-
+        const refund_amount = bookingSlots.reduce(
+            (acc, slot) => acc + slot.unit_price!,
+            0
+        );
         const refundRes = await refundBooking(payment, refund_amount);
         trackRefund(
             payment,
             refundRes?.m_refund_id!,
             booking.user?.user_id!,
             refund_amount,
-            slots,
+            bookingSlots.map((slot) => ({ slot_id: slot.slot_id! } as Slot)),
             connection
         );
 
