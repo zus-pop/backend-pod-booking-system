@@ -204,10 +204,10 @@ export const trackRefund = async (
             console.log(
                 `The payment with ID: ${payment.payment_id} is refunded -> stop the job`
             );
-            await SlotService.updateMultipleSlot(
-                true,
-                slots!.map((slot) => slot.slot_id!)
-            );
+            // await SlotService.updateMultipleSlot(
+            //     true,
+            //     slots!.map((slot) => slot.slot_id!)
+            // );
             slots.forEach(async (slot) => {
                 await BookingSlotService.updateCheckin(
                     slot.slot_id!,
