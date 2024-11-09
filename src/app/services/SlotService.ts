@@ -310,6 +310,19 @@ const getTotalSlotsRefunded = async () => {
     }
 };
 
+const getTotalRefundedAmount = async () => {
+    const connection = await pool.getConnection();
+    try {
+        const totalRefunded = await SlotRepo.getTotalRefundedAmount(connection);
+        return totalRefunded;
+    } catch (err) {
+        console.error(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 export default {
     find,
     findSlotById,
@@ -324,4 +337,5 @@ export default {
     getMonthlyRevenueBySlot,
     getTotalSlotRevenue,
     getTotalSlotsRefunded,
+    getTotalRefundedAmount,
 };

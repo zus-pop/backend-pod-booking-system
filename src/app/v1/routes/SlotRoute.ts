@@ -262,6 +262,48 @@ SlotRouter.get("/total-revenue", SlotController.getTotalSlotRevenue);
  */
 SlotRouter.get("/total-slot-refunded", SlotController.getTotalSlotsRefunded);
 
+// GET: api/v1/slots/total-refunded-amount
+/**
+ * @openapi
+ * /api/v1/slots/total-refunded-amount:
+ *   get:
+ *     summary: Get total refunded amount
+ *     tags: [Slots]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved total refunded amount
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalRefunded:
+ *                   type: number
+ *                   description: The total refunded amount
+ *                   example: 5000
+ *       404:
+ *         description: No refunded amount found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No refunded amount found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+SlotRouter.get("/total-refunded-amount", SlotController.getTotalRefundedAmount);
+
 // GET: api/v1/slots/:id
 /**
  * @openapi

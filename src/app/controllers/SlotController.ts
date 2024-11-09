@@ -128,6 +128,21 @@ const getTotalSlotsRefunded = async (req: Request, res: Response) => {
     }
 };
 
+const getTotalRefundedAmount = async (req: Request, res: Response) => {
+    try {
+        const totalRefunded = await SlotService.getTotalRefundedAmount();
+        if (!totalRefunded) {
+            return res
+                .status(404)
+                .json({ message: "No refunded amount found" });
+        }
+        return res.status(200).json(totalRefunded);
+    } catch (error) {
+        console.error("Error fetching total refunded amount:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export default {
     find,
     findById,
@@ -138,4 +153,5 @@ export default {
     getMonthlyRevenueBySlot,
     getTotalSlotRevenue,
     getTotalSlotsRefunded,
+    getTotalRefundedAmount,
 };

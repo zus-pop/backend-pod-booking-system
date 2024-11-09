@@ -237,6 +237,21 @@ const getTotalSlotsRefunded = async (
     return rows[0] as { totalSlotsRefunded: number };
 };
 
+const getTotalRefundedAmount = async (
+    connection: PoolConnection
+): Promise<{ totalRefunded: number }> => {
+    const sql = `
+    SELECT 
+        SUM(pay.refunded_amount) AS totalRefunded
+    FROM 
+        Payment pay
+    WHERE 
+        pay.payment_status IN ('Refunded');
+  `;
+    const [rows] = await connection.query<RowDataPacket[]>(sql);
+    return rows[0] as { totalRefunded: number };
+};
+
 export default {
     find,
     findById,
@@ -251,4 +266,5 @@ export default {
     getMonthlyRevenueBySlot,
     getTotalSlotRevenue,
     getTotalSlotsRefunded,
+    getTotalRefundedAmount,
 };
