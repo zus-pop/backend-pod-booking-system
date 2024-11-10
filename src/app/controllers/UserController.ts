@@ -49,18 +49,19 @@ const register = async (req: Request, res: Response) => {
     if (userByEmail) {
         return res.status(400).json({ message: "Email already exists!" });
     }
-    if (phone_number) {
-        const userByPhone = await UserService.findByPhone(phone_number);
-        if (userByPhone) {
-            return res.status(400).json({ message: "Phone number already exists!" });
-        }
-    }
+    // if (phone_number) {
+    //     const userByPhone = await UserService.findByPhone(phone_number);
+    //     if (userByPhone) {
+    //         return res.status(400).json({ message: "Phone number already exists!" });
+    //     }
+    // }
     const hashedPassword = await UserService.hashPassword(password);
     const newUser = {
         email,
         password: hashedPassword,
         user_name,
         role_id: role_id ? role_id : Roles.Customer,
+        phone_number,
     };
     const result = await UserService.persist(newUser);
     if (!result) {

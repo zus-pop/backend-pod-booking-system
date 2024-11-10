@@ -18,10 +18,23 @@ describe("UserService", () => {
         });
 
         it("should return null for non-existing email", async () => {
-            const user = await UserService.findByEmail(
-                "nonexistent@example.com"
-            );
+            const { email } = getTestData.users.invalidUser;
+            const user = await UserService.findByEmail(email);
             expect(user).toBeUndefined();
         });
     });
+
+    // describe("findByPhone", () => {
+    //     it("should find existing user by phone", async () => {
+    //         const { phone_number } = getTestData.users.validUser;
+    //         const user = await UserService.findByPhone(phone_number);
+    //         expect(user).not.toBeNull();
+    //     });
+
+    //     it("should return null for non-existing phone", async () => {
+    //         const { phone_number } = getTestData.users.invalidUser;
+    //         const user = await UserService.findByPhone(phone_number);
+    //         expect(user).toBeUndefined();
+    //     });
+    // });
 });
