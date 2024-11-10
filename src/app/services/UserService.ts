@@ -76,8 +76,12 @@ const persist = async (user: {
 }) => {
     const connection = await pool.getConnection();
     try {
-        return UserRepo.persist(user, connection);
+        await connection.beginTransaction();
+        const userResult = await UserRepo.persist(user, connection);
+        await connection.commit();
+        return userResult;
     } catch (err) {
+        await connection.rollback();
         console.error(err);
         return null;
     } finally {
