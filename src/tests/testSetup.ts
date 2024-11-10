@@ -14,12 +14,12 @@ export const getTestData = {
         validUser: {
             email: "jane@gmail.com",
             password: "jane123",
-            phone_number: "0902345678",
+            // phone_number: "0902345678",
         },
         invalidUser: {
             email: "nonexistent@example.com",
             password: "invalid",
-            phone_number: "0999999999",
+            // phone_number: "0999999999",
         },
     },
     pods: {

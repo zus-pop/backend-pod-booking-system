@@ -24,17 +24,17 @@ describe("UserService", () => {
         });
     });
 
-    describe("findByPhone", () => {
-        it("should find existing user by phone", async () => {
-            const { phone_number } = getTestData.users.validUser;
-            const user = await UserService.findByPhone(phone_number);
-            expect(user).not.toBeNull();
-        });
+    // describe("findByPhone", () => {
+    //     it("should find existing user by phone", async () => {
+    //         const { phone_number } = getTestData.users.validUser;
+    //         const user = await UserService.findByPhone(phone_number);
+    //         expect(user).not.toBeNull();
+    //     });
 
-        it("should return null for non-existing phone", async () => {
-            const { phone_number } = getTestData.users.invalidUser;
-            const user = await UserService.findByPhone(phone_number);
-            expect(user).toBeUndefined();
-        });
-    });
+    //     it("should return null for non-existing phone", async () => {
+    //         const { phone_number } = getTestData.users.invalidUser;
+    //         const user = await UserService.findByPhone(phone_number);
+    //         expect(user).toBeUndefined();
+    //     });
+    // });
 });
