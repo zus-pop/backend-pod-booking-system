@@ -107,6 +107,15 @@ const findByEmail = async (email: string, connection: PoolConnection) => {
     return user[0] as User;
 };
 
+const findByPhone = async (phone_number: string, connection: PoolConnection) => {
+    const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
+    const columns = ["user_id", "phone_number", "password", "user_name", "role_id"];
+    const values = [columns, "User", "phone_number", phone_number];
+    const [user] = await connection.query<RowDataPacket[]>(sql, values);
+    console.log
+    return user[0] as User;
+};
+
 const persist = async (
     user: {
         email: string;
@@ -135,6 +144,7 @@ export default {
     find,
     findById,
     findByEmail,
+    findByPhone,
     persist,
     update,
 };

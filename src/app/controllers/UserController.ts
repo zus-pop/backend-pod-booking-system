@@ -44,10 +44,16 @@ const login = async (req: Request, res: Response) => {
 };
 
 const register = async (req: Request, res: Response) => {
-    const { user_name, email, password, role_id } = req.body;
-    const user = await UserService.findByEmail(email);
-    if (user) {
+    const { user_name, email, phone_number, password, role_id } = req.body;
+    const userByEmail = await UserService.findByEmail(email);
+    if (userByEmail) {
         return res.status(400).json({ message: "Email already exists!" });
+    }
+    if (phone_number) {
+        const userByPhone = await UserService.findByPhone(phone_number);
+        if (userByPhone) {
+            return res.status(400).json({ message: "Phone number already exists!" });
+        }
     }
     const hashedPassword = await UserService.hashPassword(password);
     const newUser = {

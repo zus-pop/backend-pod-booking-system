@@ -54,6 +54,19 @@ const findByEmail = async (email: string) => {
     }
 };
 
+const findByPhone = async (phone_number: string) => {
+    const connection = await pool.getConnection();
+    try {
+        const user = await UserRepo.findByPhone(phone_number, connection);
+        return user;
+    } catch (err) {
+        console.log(err);
+        return null;
+    } finally {
+        connection.release();
+    }
+};
+
 const persist = async (user: {
     email: string;
     password: string;
@@ -118,6 +131,7 @@ export default {
     find,
     findById,
     findByEmail,
+    findByPhone,
     persist,
     hashPassword,
     comparePassword,
