@@ -165,7 +165,7 @@ const getDailyRevenue = async (
     connection: PoolConnection
 ): Promise<{ date: string; daily_revenue: number }[]> => {
     const sql = `
-        SELECT DATE(payment_date) AS date, SUM(total_cost - refunded_amount) AS daily_revenue
+        SELECT DATE(payment_date) AS date, COALESCE(SUM(total_cost - refunded_amount), 0) AS daily_revenue
         FROM Payment
         WHERE payment_status IN ('Paid', 'Refunded')
         GROUP BY DATE(payment_date);
@@ -178,7 +178,7 @@ const getMonthlyRevenue = async (
     connection: PoolConnection
 ): Promise<{ year: number; month: number; monthly_revenue: number }[]> => {
     const sql = `
-      SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, SUM(total_cost - refunded_amount) AS monthly_revenue
+      SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, COALESCE(SUM(total_cost - refunded_amount), 0) AS monthly_revenue
       FROM Payment
       WHERE payment_status IN ('Paid', 'Refunded')
       GROUP BY YEAR(payment_date), MONTH(payment_date);
@@ -192,7 +192,7 @@ const getTotalRevenue = async (
 ): Promise<{ totalRevenue: number }> => {
     const sql = `
     SELECT 
-        SUM(pay.total_cost - pay.refunded_amount) AS totalRevenue
+        COALESCE(SUM(pay.total_cost - pay.refunded_amount), 0) AS totalRevenue
     FROM 
         Payment pay
     WHERE 

@@ -242,7 +242,7 @@ const getTotalRefundedAmount = async (
 ): Promise<{ totalRefunded: number }> => {
     const sql = `
     SELECT 
-        SUM(pay.refunded_amount) AS totalRefunded
+        COALESCE(SUM(pay.refunded_amount), 0) AS totalRefunded
     FROM 
         Payment pay
     WHERE 
@@ -258,7 +258,7 @@ const getDailyRefundedAmountBySlot = async (
     const sql = `
       SELECT 
           DATE(pay.refunded_date) AS date,
-          SUM(pay.refunded_amount) AS total_refunded
+          COALESCE(SUM(pay.refunded_amount), 0) AS total_refunded
       FROM 
           Payment pay
       WHERE 
@@ -270,6 +270,13 @@ const getDailyRefundedAmountBySlot = async (
           DATE(pay.refunded_date);
     `;
     const [rows] = await connection.query<RowDataPacket[]>(sql);
+
+    if (rows.length === 0) {
+        return [
+            { date: new Date().toISOString().split("T")[0], total_refunded: 0 },
+        ];
+    }
+
     return rows.map((row) => ({
         date: row.date,
         total_refunded: row.total_refunded,
