@@ -315,7 +315,7 @@ const getTotalRevenueByPod = async (
 ): Promise<{ pod: POD; revenue: number }[]> => {
     const sql = `
     SELECT p.*, 
-           SUM(pay.total_cost - pay.refunded_amount) AS revenue
+           COALESCE(SUM(pay.total_cost - pay.refunded_amount), 0) AS revenue
     FROM POD p
     LEFT JOIN Booking b ON p.pod_id = b.pod_id
     LEFT JOIN Payment pay ON b.booking_id = pay.booking_id
@@ -344,7 +344,7 @@ const getDailyRevenueByPOD = async (
     const sql = `
     SELECT 
         DATE(pay.payment_date) AS date,
-        SUM(pay.total_cost - pay.refunded_amount) AS daily_revenue
+        COALESCE(SUM(pay.total_cost - pay.refunded_amount), 0) AS daily_revenue
     FROM 
         POD p
     LEFT JOIN 
@@ -368,7 +368,7 @@ const getMonthlyRevenueByPOD = async (
     const sql = `
     SELECT 
         DATE_FORMAT(pay.payment_date, '%Y-%m') AS month,
-        SUM(pay.total_cost - pay.refunded_amount) AS monthly_revenue
+        COALESCE(SUM(pay.total_cost - pay.refunded_amount), 0) AS monthly_revenue
     FROM 
         POD p
     LEFT JOIN 
@@ -391,7 +391,7 @@ const getTotalPodRevenue = async (
 ): Promise<{ totalPodRevenue: number }> => {
     const sql = `
     SELECT 
-        SUM(pay.total_cost - pay.refunded_amount) AS totalPodRevenue
+        COALESCE(SUM(pay.total_cost - pay.refunded_amount), 0) AS totalPodRevenue
     FROM 
         POD p
     LEFT JOIN 

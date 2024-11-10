@@ -138,7 +138,7 @@ const getTotalRevenueByStore = async (
     SELECT 
         s.store_id,
         s.store_name,
-        SUM(p.total_cost - p.refunded_amount) AS totalRevenue
+        COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS totalRevenue
     FROM 
         Store s
     LEFT JOIN 
@@ -169,7 +169,7 @@ const getDailyRevenueByStore = async (
     const sql = `
     SELECT 
         DATE(p.payment_date) AS date,
-        SUM(p.total_cost - p.refunded_amount) AS daily_revenue
+        COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS daily_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -199,7 +199,7 @@ const getMonthlyRevenueByStore = async (
     const sql = `
     SELECT 
         DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
-        SUM(p.total_cost - p.refunded_amount) AS monthly_revenue
+        COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS monthly_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -228,7 +228,7 @@ const getDailyRevenueForAllStores = async (
     const sql = `
     SELECT 
         DATE(p.payment_date) AS date,
-        SUM(p.total_cost - p.refunded_amount) AS daily_revenue
+        COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS daily_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -257,7 +257,7 @@ const getMonthlyRevenueForAllStores = async (
     const sql = `
     SELECT 
         DATE_FORMAT(p.payment_date, '%Y-%m') AS month,
-        SUM(p.total_cost - p.refunded_amount) AS monthly_revenue
+        COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS monthly_revenue
     FROM 
         Store s
     LEFT JOIN 
@@ -285,7 +285,7 @@ const getTotalRevenueForAllStores = async (
 ): Promise<{ totalRevenue: number }> => {
     const sql = `
       SELECT 
-          SUM(p.total_cost - p.refunded_amount) AS totalRevenue
+          COALESCE(SUM(p.total_cost - p.refunded_amount), 0) AS totalRevenue
       FROM 
           Store s
       LEFT JOIN 
