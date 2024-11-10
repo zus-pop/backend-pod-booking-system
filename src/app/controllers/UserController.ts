@@ -61,6 +61,7 @@ const register = async (req: Request, res: Response) => {
         password: hashedPassword,
         user_name,
         role_id: role_id ? role_id : Roles.Customer,
+        phone_number,
     };
     const result = await UserService.persist(newUser);
     if (!result) {

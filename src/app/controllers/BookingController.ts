@@ -67,6 +67,9 @@ const create = async (req: Request, res: Response) => {
         bookingSlots,
     }: { booking: Booking; bookingSlots: BookingSlot[] } = req.body;
     const { payload } = req;
+    if (!booking || !bookingSlots || !bookingSlots.length) {
+        return res.status(400).json({ message: "Invalid booking data" });
+    }
     const result = await BookingService.createABooking(
         booking,
         bookingSlots,
