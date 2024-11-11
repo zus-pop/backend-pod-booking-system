@@ -53,6 +53,7 @@ export interface MappingResponse {
         user_name: string;
         email: string;
         role?: Role;
+        phone_number?: string;
     };
     payment?: Payment[];
 }
@@ -113,6 +114,7 @@ const bookingMapper = async (
                 user_name: user.user_name!,
                 email: user.email!,
                 role: user.role,
+                phone_number: user.phone_number,
             };
         }
 

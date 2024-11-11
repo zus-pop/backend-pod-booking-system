@@ -100,6 +100,10 @@ UserRouter.post("/login", UserController.login);
  *                              format: password
  *                              description: password of user
  *                              example: jane123
+ *                          phone_number:
+ *                              type: string
+ *                              description: phone number of user
+ *                              example: 0123456789
  *      responses:
  *          201:
  *              description: Register successfully
@@ -176,6 +180,10 @@ UserRouter.post("/register", UserController.register);
  *                                              type: integer
  *                                              description: id of user
  *                                              example: 1
+ *                                          phone_number:
+ *                                              type: string
+ *                                              description: phone number of user
+ *                                              example: 1
  *                                          email:
  *                                              type: string
  *                                              format: email
@@ -232,6 +240,10 @@ UserRouter.get("/users", UserController.find);
  *                              user_id:
  *                                  type: integer
  *                                  description: id of user
+ *                                  example: 1
+ *                              phone_number:
+ *                                  type: string
+ *                                  description: phone number of user
  *                                  example: 1
  *                              email:
  *                                  type: string
@@ -580,6 +592,10 @@ UserRouter.put(
  *                              type: string
  *                              description: name of user
  *                              example: Marry Jane
+ *                          phone_number:
+ *                              type: string
+ *                              description: phone number of user
+ *                              example: 0123456789
  *                          role_id:
  *                              type: integer
  *                              description: role id of user
