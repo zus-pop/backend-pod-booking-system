@@ -126,7 +126,11 @@ const getTotalRevenue = async () => {
     }
 };
 
-const refund = async (payment_id: number, bookingSlots: BookingSlot[]) => {
+const refund = async (
+    payment_id: number,
+    bookingSlots: BookingSlot[],
+    description?: string
+) => {
     const connection = await pool.getConnection();
     try {
         const payment = await PaymentRepo.findById(payment_id, connection);
@@ -148,7 +152,11 @@ const refund = async (payment_id: number, bookingSlots: BookingSlot[]) => {
             (acc, slot) => acc + slot.unit_price!,
             0
         );
-        const refundRes = await refundBooking(payment, refund_amount);
+        const refundRes = await refundBooking(
+            payment,
+            refund_amount,
+            description
+        );
         trackRefund(
             payment,
             refundRes?.m_refund_id!,
