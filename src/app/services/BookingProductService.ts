@@ -152,7 +152,7 @@ const addProductForBooking = async (bookingProducts: BookingProduct[]) => {
         }
 
         await connection.commit();
-        return {message: "Booking Product Added Successfully"};
+        return { message: "Booking Product Added Successfully" };
     } catch (err) {
         console.log(err);
         await connection.rollback();

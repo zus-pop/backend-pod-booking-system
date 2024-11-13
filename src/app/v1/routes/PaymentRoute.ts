@@ -335,6 +335,10 @@ PaymentRouter.post("/callback-product", PaymentController.callbackProduct);
  *                                     type: integer
  *                                     description: price of slot
  *                                     example: 80000
+ *                          description:
+ *                              type: string
+ *                              description: description of refund
+ *                              example: "Refund for slot"
  *     responses:
  *       200:
  *         description: Successfully refunded the payment

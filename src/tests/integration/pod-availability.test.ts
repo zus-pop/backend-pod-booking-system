@@ -12,7 +12,7 @@ describe("Pod Availability Integration", () => {
     });
 
     describe("Pod Search and Availability", () => {
-        it("should find available pods with their slots", async () => {
+        it("should find unavailable slots with their pod", async () => {
             // 1. Find pods
             const pods = await PODService.find(
                 { pod_name: "Pod" },

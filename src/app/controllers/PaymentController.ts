@@ -83,8 +83,8 @@ const getTotalRevenue = async (req: Request, res: Response) => {
 
 const refund = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { bookingSlots } = req.body;
-    const result = await PaymentService.refund(+id, bookingSlots);
+    const { bookingSlots, description } = req.body;
+    const result = await PaymentService.refund(+id, bookingSlots, description);
     if (!result) {
         return res.status(404).json({ message: "Payment not found" });
     }

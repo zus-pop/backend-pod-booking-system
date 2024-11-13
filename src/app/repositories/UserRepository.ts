@@ -11,6 +11,7 @@ export interface MappingResponse {
     email?: string;
     user_name?: string;
     role?: Role;
+    phone_number?: string;
 }
 
 const userMapper = async (
@@ -22,6 +23,7 @@ const userMapper = async (
         user_id: user.user_id,
         email: user.email,
         user_name: user.user_name,
+        phone_number: user.phone_number,
     };
 
     if (options) {
@@ -74,7 +76,14 @@ const find = async (
         queryParams.push(limit, offset);
     }
 
-    const columns = ["user_id", "email", "password", "user_name", "role_id"];
+    const columns = [
+        "user_id",
+        "phone_number",
+        "email",
+        "password",
+        "user_name",
+        "role_id",
+    ];
     const values = [columns, "User", ...queryParams];
     const [rows] = await connection.query<RowDataPacket[]>(sql, values);
     const users = rows as User[];
@@ -92,7 +101,14 @@ const findById = async (
     options?: MappingOptions
 ) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["user_id", "email", "password", "user_name", "role_id"];
+    const columns = [
+        "user_id",
+        "phone_number",
+        "email",
+        "password",
+        "user_name",
+        "role_id",
+    ];
     const values = [columns, "User", "user_id", id];
     const [user] = await connection.query<RowDataPacket[]>(sql, values);
     return await userMapper(user[0] as User, connection, options);
@@ -100,19 +116,35 @@ const findById = async (
 
 const findByEmail = async (email: string, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["user_id", "email", "password", "user_name", "role_id"];
+    const columns = [
+        "user_id",
+        "phone_number",
+        "email",
+        "password",
+        "user_name",
+        "role_id",
+    ];
     const values = [columns, "User", "email", email];
     const [user] = await connection.query<RowDataPacket[]>(sql, values);
-    console.log
+    console.log;
     return user[0] as User;
 };
 
-const findByPhone = async (phone_number: string, connection: PoolConnection) => {
+const findByPhone = async (
+    phone_number: string,
+    connection: PoolConnection
+) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const columns = ["user_id", "phone_number", "password", "user_name", "role_id"];
+    const columns = [
+        "user_id",
+        "phone_number",
+        "password",
+        "user_name",
+        "role_id",
+    ];
     const values = [columns, "User", "phone_number", phone_number];
     const [user] = await connection.query<RowDataPacket[]>(sql, values);
-    console.log
+    console.log;
     return user[0] as User;
 };
 

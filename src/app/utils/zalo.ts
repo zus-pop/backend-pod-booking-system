@@ -256,18 +256,22 @@ export const getPaymentStatus = async (app_trans_id: string) => {
 
 export const refundBooking = async (
     payment: Payment,
-    refund_amount?: number
+    refund_amount?: number,
+    description?: string
 ) => {
     const timestamp = Date.now();
     const uid = `${timestamp}${Math.floor(111 + Math.random() * 999)}`; // unique id
 
     let params: Record<string, any> = {
         app_id: config.APP_ID,
-        m_refund_id: `${moment().utcOffset(+7).format("YYMMDD")}_${config.APP_ID}_${uid}`,
+        m_refund_id: `${moment().utcOffset(+7).format("YYMMDD")}_${
+            config.APP_ID
+        }_${uid}`,
         timestamp, // miliseconds
         zp_trans_id: payment.zp_trans_id,
         amount: refund_amount || payment.total_cost,
-        description: "Poddy Refund Demo",
+        description:
+            description || `Refund for the order with transaction id: ${payment.transaction_id}`,
     };
     // app_id|zp_trans_id|amount|description|timestamp
     let data = `${params.app_id}|${params.zp_trans_id}|${params.amount}|${params.description}|${params.timestamp}`;

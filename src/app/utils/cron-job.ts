@@ -226,7 +226,12 @@ export const trackRefund = async (
                 },
                 connection
             );
-            message = `Your payment with ID: ${payment.payment_id} has been refunded successfully!`;
+            message = slots
+                .map(
+                    (slot) =>
+                        `Your Slot #${slot.slot_id} from Payment with ID: ${payment.payment_id} has been refunded due to our store's issue. We apologize for any inconvenience caused.`
+                )
+                .join("\n");
             NotificationService.createNewMessage({
                 user_id: user_id,
                 message,
