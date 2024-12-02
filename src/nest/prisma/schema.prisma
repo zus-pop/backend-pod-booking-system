@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Booking {
+  booking_id       Int                     @id @default(autoincrement())
+  pod_id           Int
+  user_id          Int
+  rating           Decimal?                @db.Decimal(2, 1)
+  comment          String?                 @db.VarChar(255)
+  booking_date     DateTime                @db.DateTime(0)
+  booking_status   Booking_booking_status? @default(Pending)
+  user             User                    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "booking_ibfk_1")
+  pod              Pod                     @relation(fields: [pod_id], references: [pod_id], onDelete: Cascade, map: "booking_ibfk_2")
+  booking_products Booking_Product[]
+  booking_slots    Booking_Slot[]
+  payments         Payment[]
+
+  @@index([pod_id], map: "pod_id")
+  @@index([user_id], map: "user_id")
+}
+
+model Booking_Product {
+  id         Int      @id @default(autoincrement())
+  booking_id Int?
+  payment_id Int?
+  product_id Int?
+  slot_id    Int?
+  unit_price Decimal  @db.Decimal(10, 2)
+  quantity   Int
+  booking    Booking? @relation(fields: [booking_id], references: [booking_id], onDelete: Cascade, map: "booking_product_ibfk_1")
+  payment    Payment? @relation(fields: [payment_id], references: [payment_id], onDelete: Cascade, map: "booking_product_ibfk_2")
+  product    Product? @relation(fields: [product_id], references: [product_id], onDelete: Cascade, map: "booking_product_ibfk_3")
+  slot       Slot?    @relation(fields: [slot_id], references: [slot_id], onDelete: Cascade, map: "booking_product_ibfk_4")
+
+  @@index([booking_id], map: "booking_id")
+  @@index([payment_id], map: "payment_id")
+  @@index([product_id], map: "product_id")
+  @@index([slot_id], map: "slot_id")
+}
+
+model Booking_Slot {
+  id         Int                  @id @default(autoincrement())
+  booking_id Int
+  payment_id Int
+  slot_id    Int
+  unit_price Decimal              @db.Decimal(10, 2)
+  status     Booking_Slot_status? @default(Not_Yet)
+  booking    Booking              @relation(fields: [booking_id], references: [booking_id], onDelete: Cascade, map: "booking_slot_ibfk_1")
+  payment    Payment              @relation(fields: [payment_id], references: [payment_id], onDelete: Cascade, map: "booking_slot_ibfk_2")
+  slot       Slot                 @relation(fields: [slot_id], references: [slot_id], onDelete: Cascade, map: "booking_slot_ibfk_3")
+
+  @@index([booking_id], map: "booking_id")
+  @@index([payment_id], map: "payment_id")
+  @@index([slot_id], map: "slot_id")
+}
+
+model Category {
+  category_id   Int       @id @default(autoincrement())
+  category_name String    @db.VarChar(255)
+  products      Product[]
+}
+
+model Notification {
+  notification_id Int       @id @default(autoincrement())
+  user_id         Int?
+  message         String    @db.VarChar(255)
+  is_read         Boolean?  @default(false)
+  created_at      DateTime? @db.DateTime(0)
+  user            User?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "notification_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model Pod {
+  pod_id        Int           @id @default(autoincrement())
+  pod_name      String        @db.VarChar(255)
+  type_id       Int?
+  description   String?       @db.VarChar(255)
+  image         String?       @db.VarChar(255)
+  is_available  Boolean?      @default(true)
+  store_id      Int?
+  bookings      Booking[]
+  pod_type      Pod_Type?     @relation(fields: [type_id], references: [type_id], onDelete: Cascade, map: "pod_ibfk_1")
+  store         Store?        @relation(fields: [store_id], references: [store_id], onDelete: Cascade, map: "pod_ibfk_2")
+  pod_utilities Pod_Utility[]
+  slots         Slot[]
+
+  @@index([store_id], map: "store_id")
+  @@index([type_id], map: "type_id")
+  @@map("POD")
+}
+
+model Pod_Type {
+  type_id      Int           @id @default(autoincrement())
+  type_name    String        @unique(map: "type_name") @db.VarChar(255)
+  capacity     Int
+  pods         Pod[]
+  store_prices Store_Price[]
+
+  @@map("POD_Type")
+}
+
+model Pod_Utility {
+  id         Int      @id @default(autoincrement())
+  pod_id     Int?
+  utility_id Int?
+  utilities  Utility? @relation(fields: [utility_id], references: [utility_id], onDelete: Cascade, map: "pod_utility_ibfk_1")
+  pod        Pod?     @relation(fields: [pod_id], references: [pod_id], onDelete: Cascade, map: "pod_utility_ibfk_2")
+
+  @@index([pod_id], map: "pod_id")
+  @@index([utility_id], map: "utility_id")
+  @@map("POD_Utility")
+}
+
+model Payment {
+  payment_id       Int                     @id @default(autoincrement())
+  booking_id       Int?
+  transaction_id   String?                 @unique(map: "transaction_id") @db.VarChar(255)
+  zp_trans_id      String?                 @unique(map: "zp_trans_id") @db.VarChar(255)
+  total_cost       Decimal                 @db.Decimal(10, 2)
+  payment_url      String?                 @db.VarChar(2048)
+  payment_date     DateTime                @db.DateTime(0)
+  payment_status   Payment_payment_status? @default(Unpaid)
+  payment_for      Payment_payment_for?
+  refunded_date    DateTime?               @db.DateTime(0)
+  refunded_amount  Decimal?                @default(0.00) @db.Decimal(10, 2)
+  booking_products Booking_Product[]
+  booking_slots    Booking_Slot[]
+  booking          Booking?                @relation(fields: [booking_id], references: [booking_id], onDelete: Cascade, map: "payment_ibfk_1")
+
+  @@index([booking_id], map: "booking_id")
+}
+
+model Product {
+  product_id       Int               @id @default(autoincrement())
+  product_name     String            @db.VarChar(255)
+  category_id      Int?
+  image            String?           @db.VarChar(255)
+  description      String?           @db.VarChar(255)
+  price            Decimal           @db.Decimal(10, 2)
+  store_id         Int?
+  stock            Int?
+  booking_products Booking_Product[]
+  store            Store?            @relation(fields: [store_id], references: [store_id], onDelete: Cascade, map: "product_ibfk_1")
+  category         Category?         @relation(fields: [category_id], references: [category_id], map: "product_ibfk_2")
+
+  @@index([category_id], map: "category_id")
+  @@index([store_id], map: "store_id")
+}
+
+model Role {
+  role_id   Int    @id @default(autoincrement())
+  role_name String @unique(map: "role_name") @db.VarChar(30)
+  users     User[]
+}
+
+model Slot {
+  slot_id          Int               @id @default(autoincrement())
+  pod_id           Int?
+  start_time       DateTime          @db.DateTime(0)
+  end_time         DateTime          @db.DateTime(0)
+  price            Decimal           @db.Decimal(10, 2)
+  is_available     Boolean?          @default(true)
+  booking_products Booking_Product[]
+  booking_slots    Booking_Slot[]
+  pod              Pod?              @relation(fields: [pod_id], references: [pod_id], onDelete: Cascade, map: "slot_ibfk_1")
+
+  @@index([pod_id], map: "pod_id")
+}
+
+model Store {
+  store_id     Int           @id @default(autoincrement())
+  store_name   String        @db.VarChar(255)
+  address      String        @db.VarChar(255)
+  hotline      String        @unique(map: "hotline") @db.Char(10)
+  image        String?       @db.VarChar(255)
+  pods         Pod[]
+  products     Product[]
+  store_prices Store_Price[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Store_Price {
+  id           Int       @id @default(autoincrement())
+  start_hour   Int
+  end_hour     Int
+  price        Decimal   @db.Decimal(10, 2)
+  store_id     Int?
+  type_id      Int?
+  days_of_week Int?      @db.SmallInt
+  priority     Int
+  store        Store?    @relation(fields: [store_id], references: [store_id], onDelete: Cascade, map: "store_price_ibfk_1")
+  pod_type     Pod_Type? @relation(fields: [type_id], references: [type_id], onDelete: Cascade, map: "store_price_ibfk_2")
+
+  @@index([store_id], map: "store_id")
+  @@index([type_id], map: "type_id")
+}
+
+model User {
+  user_id       Int            @id @default(autoincrement())
+  email         String         @unique(map: "email") @db.VarChar(255)
+  password      String         @db.VarChar(255)
+  user_name     String         @db.VarChar(255)
+  avatar        String?        @db.VarChar(255)
+  role_id       Int?
+  phone_number  String?        @db.Char(10)
+  created_at    DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at    DateTime?      @default(now()) @db.Timestamp(0)
+  bookings      Booking[]
+  notifications Notification[]
+  role          Role?          @relation(fields: [role_id], references: [role_id], map: "user_ibfk_1")
+
+  @@index([role_id], map: "role_id")
+}
+
+model Utility {
+  utility_id    Int           @id @default(autoincrement())
+  utility_name  String        @unique(map: "utility_name") @db.VarChar(255)
+  description   String        @db.VarChar(255)
+  pod_utilities Pod_Utility[]
+}
+
+enum Booking_Slot_status {
+  Not_Yet     @map("Not Yet")
+  Checked_In  @map("Checked In")
+  Checked_Out @map("Checked Out")
+  Absent
+  Refunded
+}
+
+enum Booking_booking_status {
+  Pending
+  Confirmed
+  Canceled
+  Complete
+  Ongoing
+  Paused
+}
+
+enum Payment_payment_status {
+  Unpaid
+  Paid
+  Failed
+  Refunded
+}
+
+enum Payment_payment_for {
+  Slot
+  Product
+}
