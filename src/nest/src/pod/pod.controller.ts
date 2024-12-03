@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,10 +21,18 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  PickType,
 } from '@nestjs/swagger';
 import { memoryStorage } from 'multer';
-import { CreatePodDto, UpdatePodDto } from './dto';
+import { PaginationDto } from '../shared/dto';
+import {
+  CreatePodRequestDto,
+  CreatePodResponseDto,
+  QueryPodRequestDto,
+  QueryPodResponseDto,
+  QueryUniquePodResponseDto,
+  UpdatePodRequestDto,
+  UpdatePodResponseDto,
+} from './dto';
 import { PodService } from './pod.service';
 
 @Controller('pods')
@@ -33,10 +42,13 @@ export class PodController {
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
-  @ApiCreatedResponse({ description: 'Pod created' })
+  @ApiCreatedResponse({
+    type: CreatePodResponseDto,
+    description: 'Pod created',
+  })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   create(
-    @Body() createPodDto: CreatePodDto,
+    @Body() createPodDto: CreatePodRequestDto,
     @UploadedFile() image: Express.Multer.File,
   ) {
     createPodDto.image = image;
@@ -45,25 +57,26 @@ export class PodController {
 
   @Get()
   @ApiOkResponse({
-    type: [
-      PickType(CreatePodDto, [
-        'pod_name',
-        'description',
-        'image',
-        'type_id',
-        'store_id',
-        'pod_utilities',
-      ]),
-    ],
+    type: [QueryPodResponseDto],
+    description: 'Pods found',
   })
   @ApiNotFoundResponse({ description: 'No pods found' })
-  async findAll() {
-    const pods = await this.podService.findAll();
-    return pods;
+  async findAll(
+    @Query() filters: QueryPodRequestDto,
+    @Query() pagination: PaginationDto,
+  ) {
+    const result = await this.podService.findAll({
+      filters,
+      pagination,
+    });
+    return result;
   }
 
   @Get(':id')
-  @ApiOkResponse({ description: 'Pod found' })
+  @ApiOkResponse({
+    type: QueryUniquePodResponseDto,
+    description: 'Pod found',
+  })
   @ApiNotFoundResponse({ description: 'Pod not found' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.podService.findOne(id);
@@ -71,7 +84,7 @@ export class PodController {
 
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
-  @ApiOkResponse({ description: 'Pod updated' })
+  @ApiOkResponse({ type: UpdatePodResponseDto, description: 'Pod updated' })
   @ApiNotFoundResponse({ description: 'Pod not found' })
   @UseInterceptors(
     FileInterceptor('image', {
@@ -81,7 +94,7 @@ export class PodController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() image: Express.Multer.File,
-    @Body() updatePodDto: UpdatePodDto,
+    @Body() updatePodDto: UpdatePodRequestDto,
   ) {
     updatePodDto.image = image;
     return this.podService.update(id, updatePodDto);

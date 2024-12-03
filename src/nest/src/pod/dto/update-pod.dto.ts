@@ -1,15 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Utility } from '@prisma/client';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Pod_Type, Store, Utility } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
 
-export class UpdatePodDto {
+export class UpdatePodRequestDto {
   @IsString()
   @IsOptional()
   pod_name?: string;
@@ -74,4 +75,97 @@ export class UpdatePodDto {
   @IsArray()
   @IsOptional()
   pod_utilities?: Pick<Utility, 'utility_id'>[];
+}
+
+export class UpdatePodResponseDto {
+  @IsNumber()
+  pod_id: number;
+
+  @IsString()
+  pod_name: string;
+
+  @IsString()
+  description: string;
+
+  @IsString()
+  image: string;
+
+  @IsNumber()
+  type_id: number;
+
+  @IsNumber()
+  store_id: number;
+
+  @IsArray()
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        utility_id: {
+          type: 'number',
+          minProperties: 1,
+          example: 1,
+        },
+        utility_name: {
+          type: 'string',
+          example: 'Electricity',
+        },
+        description: {
+          type: 'string',
+          example: 'Electricity utility',
+        },
+      },
+    },
+  })
+  pod_utilities: Utility[];
+
+  @IsObject()
+  @ApiPropertyOptional({
+    type: 'object',
+    properties: {
+      type_id: {
+        type: 'number',
+        example: 1,
+      },
+      type_name: {
+        type: 'string',
+        enum: ['Single', 'Double', 'Meeting'],
+        example: 'Double',
+      },
+      capacity: {
+        type: 'number',
+        example: 2,
+      },
+    },
+  })
+  type?: Pod_Type;
+
+  @IsObject()
+  @ApiPropertyOptional({
+    type: 'object',
+    properties: {
+      store_id: {
+        type: 'number',
+        example: 1,
+      },
+      store_name: {
+        type: 'string',
+        example: 'Store Name',
+      },
+      address: {
+        type: 'string',
+        example: 'Store Address',
+      },
+      hotline: {
+        type: 'string',
+        example: 'Store Hotline',
+      },
+      image: {
+        type: 'string',
+        example: 'Store Image URL',
+      },
+    },
+  })
+  store?: Store;
 }

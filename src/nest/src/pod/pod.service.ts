@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Pod } from '@prisma/client';
+import { Pod, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploaderService } from '../uploader/uploader.service';
-import { CreatePodDto } from './dto/create-pod.dto';
-import { UpdatePodDto } from './dto/update-pod.dto';
+import { CreatePodRequestDto } from './dto/create-pod.dto';
+import { UpdatePodRequestDto } from './dto/update-pod.dto';
+import { PaginationDto } from '../shared/dto';
+import { QueryPodRequestDto } from './dto';
 
 @Injectable()
 export class PodService {
@@ -13,7 +15,7 @@ export class PodService {
     private readonly uploaderService: UploaderService,
   ) {}
 
-  async create(createPodDto: CreatePodDto) {
+  async create(createPodDto: CreatePodRequestDto) {
     let image: string | null = null;
     if (createPodDto.image) {
       image = await this.uploaderService.letImageCookToCloud(
@@ -45,9 +47,52 @@ export class PodService {
     });
   }
 
-  async findAll(): Promise<Pod[]> {
-    const pods = await this.prisma.pod.findMany();
-    return pods;
+  async findAll(options: {
+    filters: QueryPodRequestDto;
+    pagination: PaginationDto;
+  }): Promise<{
+    data: Pod[];
+    total: number;
+  }> {
+    const {
+      filters: { pod_name, description, ...rest },
+      pagination: { limit, page },
+    } = options;
+
+    const where: Prisma.PodWhereInput = {
+      pod_name: {
+        contains: pod_name,
+      },
+      description: {
+        contains: description,
+      },
+      ...rest,
+    };
+
+    const total = await this.prisma.pod.count({ where });
+
+    const offset = (page - 1) * limit;
+
+    const pods = await this.prisma.pod.findMany({
+      where,
+      take: limit,
+      skip: offset,
+      include: {
+        pod_type: true,
+      },
+      orderBy: {
+        pod_id: 'desc',
+      },
+    });
+
+    if (pods.length === 0) {
+      throw new NotFoundException('No pods found');
+    }
+
+    return {
+      data: pods,
+      total,
+    };
   }
 
   async findOne(id: number) {
@@ -57,19 +102,24 @@ export class PodService {
       },
       include: {
         pod_utilities: {
-          include: {
+          select: {
             utilities: true,
           },
         },
+        pod_type: true,
+        store: true,
       },
     });
     if (!pod) {
       throw new NotFoundException(`Pod with ID ${id} not found`);
     }
-    return pod;
+    return {
+      ...pod,
+      pod_utilities: pod.pod_utilities.map((pu) => pu.utilities),
+    };
   }
 
-  async update(id: number, updatePodDto: UpdatePodDto) {
+  async update(id: number, updatePodDto: UpdatePodRequestDto) {
     const updatedPod = await this.prisma.$transaction(async (prisma) => {
       if (updatePodDto.pod_utilities) {
         await prisma.pod_Utility.deleteMany({
