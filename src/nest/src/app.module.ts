@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-import { PodModule } from './pod/pod.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { PodModule } from './modules/pod/pod.module';
+import { PrismaModule } from './shared/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
-import { LoggerPipe } from './pipes';
-import { UploaderModule } from './uploader/uploader.module';
+import { LoggerPipe } from './shared/pipes';
+import { UploaderModule } from './modules/uploader/uploader.module';
+import { RedisModule } from './shared/redis/redis.module';
+import { SlotModule } from './modules/slot/slot.module';
+import { LuxonModule } from './shared/luxon/luxon.module';
 
 @Module({
   imports: [
@@ -12,6 +15,9 @@ import { UploaderModule } from './uploader/uploader.module';
     PodModule,
     PrismaModule,
     UploaderModule,
+    RedisModule,
+    SlotModule,
+    LuxonModule,
   ],
   controllers: [],
   providers: [

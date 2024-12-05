@@ -1,21 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PodService } from './pod.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../shared/prisma/prisma.service';
 import { UploaderService } from '../uploader/uploader.service';
+import { PodController } from './pod.controller';
+import { PodService } from './pod.service';
 import { ConfigService } from '@nestjs/config';
 
-describe('PodService', () => {
-  let service: PodService;
+describe('PodController', () => {
+  let controller: PodController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [PodController],
       providers: [PodService, PrismaService, UploaderService, ConfigService],
     }).compile();
 
-    service = module.get<PodService>(PodService);
+    controller = module.get<PodController>(PodController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

@@ -23,7 +23,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { memoryStorage } from 'multer';
-import { PaginationDto } from '../shared/dto';
+import { PaginationDto } from '../../shared/dto';
 import {
   CreatePodRequestDto,
   CreatePodResponseDto,

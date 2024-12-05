@@ -43,7 +43,7 @@ const find = async (filters: SlotQueries, connection: PoolConnection) => {
         sql += where;
     }
 
-    const colums = [
+    const columns = [
         "slot_id",
         "pod_id",
         "start_time",
@@ -51,14 +51,14 @@ const find = async (filters: SlotQueries, connection: PoolConnection) => {
         "price",
         "is_available",
     ];
-    const values = [colums, "Slot", ...queryParams];
+    const values = [columns, "Slot", ...queryParams];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
     return slots as Slot[];
 };
 
 const findById = async (id: number, connection: PoolConnection) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? = ?";
-    const colums = [
+    const columns = [
         "slot_id",
         "pod_id",
         "start_time",
@@ -66,7 +66,7 @@ const findById = async (id: number, connection: PoolConnection) => {
         "price",
         "is_available",
     ];
-    const values = [colums, "Slot", "slot_id", id];
+    const values = [columns, "Slot", "slot_id", id];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
     return slots[0] as Slot;
 };
@@ -76,7 +76,7 @@ const findByMultipleId = async (
     connection: PoolConnection
 ) => {
     const sql = "SELECT ?? FROM ?? WHERE ?? IN ( ? )";
-    const colums = [
+    const columns = [
         "slot_id",
         "pod_id",
         "start_time",
@@ -84,7 +84,7 @@ const findByMultipleId = async (
         "price",
         "is_available",
     ];
-    const values = [colums, "Slot", "slot_id", slot_ids];
+    const values = [columns, "Slot", "slot_id", slot_ids];
     const [slots] = await connection.query<RowDataPacket[]>(sql, values);
     return slots as Slot[];
 };

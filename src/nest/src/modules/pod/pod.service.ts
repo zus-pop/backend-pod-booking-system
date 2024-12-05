@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Pod, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../shared/prisma/prisma.service';
 import { UploaderService } from '../uploader/uploader.service';
 import { CreatePodRequestDto } from './dto/create-pod.dto';
 import { UpdatePodRequestDto } from './dto/update-pod.dto';
-import { PaginationDto } from '../shared/dto';
+import { PaginationDto } from '../../shared/dto';
 import { QueryPodRequestDto } from './dto';
 
 @Injectable()
