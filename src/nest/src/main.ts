@@ -19,6 +19,7 @@ async function bootstrap() {
     .setTitle('Pod Booking API')
     .setDescription('The Pod Booking API description')
     .setVersion('2.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v2/docs', app, documentFactory);

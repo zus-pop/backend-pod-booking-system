@@ -1,24 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Pod, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PaginationDto } from '../../shared/dto';
 import { PrismaService } from '../../shared/prisma/prisma.service';
-import { UploaderService } from '../uploader/uploader.service';
+import { CloudStorage } from '../uploader/cloud.interface';
+import { QueryPodRequestDto } from './dto';
 import { CreatePodRequestDto } from './dto/create-pod.dto';
 import { UpdatePodRequestDto } from './dto/update-pod.dto';
-import { PaginationDto } from '../../shared/dto';
-import { QueryPodRequestDto } from './dto';
 
 @Injectable()
 export class PodService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly uploaderService: UploaderService,
+    private readonly uploader: CloudStorage,
   ) {}
 
   async create(createPodDto: CreatePodRequestDto) {
     let image: string | null = null;
     if (createPodDto.image) {
-      image = await this.uploaderService.letImageCookToCloud(
+      image = await this.uploader.letImageCookToCloud(
         createPodDto.image,
         'pods',
       );
@@ -132,7 +132,7 @@ export class PodService {
       try {
         let image: string | null = null;
         if (updatePodDto.image) {
-          image = await this.uploaderService.letImageCookToCloud(
+          image = await this.uploader.letImageCookToCloud(
             updatePodDto.image,
             'pods',
           );

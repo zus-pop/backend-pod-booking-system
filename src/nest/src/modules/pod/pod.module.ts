@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
-import { PodService } from './pod.service';
+import { CloudStorage } from '../uploader/cloud.interface';
+import { GoogleCloudService } from '../uploader/google-cloud-storage.service';
 import { PodController } from './pod.controller';
-import { UploaderModule } from '../uploader/uploader.module';
+import { PodService } from './pod.service';
 
 @Module({
-  imports: [UploaderModule],
   controllers: [PodController],
-  providers: [PodService],
+  providers: [
+    PodService,
+    {
+      provide: CloudStorage,
+      useClass: GoogleCloudService,
+    },
+  ],
 })
 export class PodModule {}

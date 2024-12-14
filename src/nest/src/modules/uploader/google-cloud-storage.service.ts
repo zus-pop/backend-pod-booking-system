@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { CloudStorage } from './cloud.interface';
 
 @Injectable()
-export class UploaderService
+export class GoogleCloudService
   extends Storage
   implements CloudStorage, OnModuleInit
 {

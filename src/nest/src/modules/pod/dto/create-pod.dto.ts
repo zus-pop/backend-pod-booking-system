@@ -136,7 +136,7 @@ export class CreatePodResponseDto {
       capacity: {
         type: 'number',
         example: 2,
-      }
+      },
     },
   })
   type?: Pod_Type;
@@ -164,7 +164,7 @@ export class CreatePodResponseDto {
       image: {
         type: 'string',
         example: 'Store Image URL',
-      }
+      },
     },
   })
   store?: Store;

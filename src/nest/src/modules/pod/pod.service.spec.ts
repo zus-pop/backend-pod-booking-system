@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PodService } from './pod.service';
 import { PrismaService } from '../../shared/prisma/prisma.service';
-import { UploaderService } from '../uploader/uploader.service';
+import { GoogleCloudService } from '../uploader/google-cloud-storage.service';
 import { ConfigService } from '@nestjs/config';
 
 describe('PodService', () => {
@@ -9,7 +9,7 @@ describe('PodService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PodService, PrismaService, UploaderService, ConfigService],
+      providers: [PodService, PrismaService, GoogleCloudService, ConfigService],
     }).compile();
 
     service = module.get<PodService>(PodService);
